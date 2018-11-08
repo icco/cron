@@ -17,7 +17,7 @@ func main() {
 
 	tags := []string{}
 	start := 0   // 0 means beginning
-	results := 1 // 0 means all
+	results := 0 // 0 means all
 
 	posts, _, err := pinClient.Posts.All(tags, start, results, nil, nil)
 	if err != nil {
@@ -43,7 +43,6 @@ func main() {
 	gqlClient.Log = func(s string) { log.Println(s) }
 
 	for _, p := range posts {
-		log.Printf("%+v", p.URL)
 		req := graphql.NewRequest(mut)
 		req.Var("title", p.Title)
 		req.Var("tags", p.Tags)
@@ -51,7 +50,6 @@ func main() {
 		req.Var("desc", p.Description)
 		req.Var("time", p.Time)
 		req.Header.Add("Authorization", os.Getenv("GQL_TOKEN"))
-		log.Printf("%+v", req)
 
 		var resp json.RawMessage
 		err := gqlClient.Run(context.Background(), req, &resp)
