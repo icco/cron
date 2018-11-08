@@ -1,0 +1,8 @@
+github.com/icco/pinboard v0.0.0-20160202054757-76a7f4084d2b h1:p2uljmxfMkWRUjpwot7L6tDmfLM1zk/nRuoexDoRjlk=
+github.com/icco/pinboard v0.0.0-20160202054757-76a7f4084d2b/go.mod h1:CjgUDNGluS4Z9yoQ5oqXvkv/Hnr0rytV+Xxz2w/my6k=
+github.com/machinebox/graphql v0.2.2 h1:dWKpJligYKhYKO5A2gvNhkJdQMNZeChZYyBbrZkBZfo=
+github.com/machinebox/graphql v0.2.2/go.mod h1:F+kbVMHuwrQ5tYgU9JXlnskM8nOaFxCAEolaQybkjWA=
+github.com/pkg/errors v0.8.0 h1:WdK/asTD0HN+q6hsWO3/vpuAkAr+tw6aNJNDFFf0+qw=
+github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
+github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53 h1:kJ8n80ivbXxyBCPudAKScsMYc3/ehvLtOwb2eiWQ7nc=
+github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53/go.mod h1:/319t+rUGC38PomjJnQRwR9L4C0NOAADDoFMHTN5dbs=
