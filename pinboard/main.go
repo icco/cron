@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("time parsing: %+v", err)
 	}
 	from := time.Now().Add(oneDay * 90)
-	var to time.Time
+	to := time.Now()
 
 	posts, _, err := pinClient.Posts.All(tags, start, results, &from, &to)
 	if err != nil {
@@ -66,4 +66,12 @@ func main() {
 			log.Panicf("error talking to graphql: %+v", err)
 		}
 	}
+
+	req := graphql.NewRequest(`query { counts { key, value } }`)
+	var resp json.RawMessage
+	err = gqlClient.Run(context.Background(), req, &resp)
+	if err != nil {
+		log.Panicf("error talking to graphql: %+v", err)
+	}
+	log.Printf("New Database Counts: %+v", string(resp))
 }
