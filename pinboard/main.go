@@ -60,8 +60,7 @@ func main() {
 		req.Var("time", p.Time)
 		req.Header.Add("Authorization", os.Getenv("GQL_TOKEN"))
 
-		var resp json.RawMessage
-		err := gqlClient.Run(context.Background(), req, &resp)
+		err := gqlClient.Run(context.Background(), req, nil)
 		if err != nil {
 			log.Panicf("error talking to graphql: %+v", err)
 		}
