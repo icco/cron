@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/machinebox/graphql"
 	"github.com/zachlatta/pin"
@@ -16,10 +17,18 @@ func main() {
 	pinClient := pin.NewClient(nil, &pin.AuthToken{Username: tokenParts[0], Token: tokenParts[1]})
 
 	tags := []string{}
-	start := 0   // 0 means beginning
+	start := 0   // 0 means most recent
 	results := 0 // 0 means all
 
-	posts, _, err := pinClient.Posts.All(tags, start, results, nil, nil)
+	// Only get pins from the last 90d
+	oneDay, err := time.ParseDuration("-24h")
+	if err != nil {
+		log.Fatalf("time parsing: %+v", err)
+	}
+	from := time.Now().Add(oneDay * 90)
+	var to time.Time
+
+	posts, _, err := pinClient.Posts.All(tags, start, results, &from, &to)
 	if err != nil {
 		log.Panicf("error talking to pinboard: %+v", err)
 	}
