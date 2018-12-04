@@ -7,7 +7,6 @@ import (
 	"cloud.google.com/go/pubsub"
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	"contrib.go.opencensus.io/exporter/stackdriver/monitoredresource"
-	"contrib.go.opencensus.io/exporter/stackdriver/propagation"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/trace"
 )
@@ -35,7 +34,6 @@ func main() {
 		}
 		defer sd.Flush()
 
-		view.RegisterExporter(sd)
 		trace.RegisterExporter(sd)
 		trace.ApplyConfig(trace.Config{
 			DefaultSampler: trace.AlwaysSample(),
@@ -43,18 +41,18 @@ func main() {
 	}
 
 	ctx := context.Background()
-	pubsubClient, err := pubsub.NewClient(ctx, "project-id")
+	pubsubClient, err := pubsub.NewClient(ctx, "icco-cloud")
 	if err != nil {
 		// TODO: Handle error.
 	}
 
 	sub, err := pubsubClient.CreateSubscription(ctx, "cron-client",
-		pubsub.SubscriptionConfig{Topic: topic})
+		pubsub.SubscriptionConfig{Topic: pubsubClient.Topic("cron")})
 	if err != nil {
 		// TODO: Handle error.
 	}
 
-	err = sub.Receive(context.Background(), func(ctx context.Context, m *Message) {
+	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
 		log.Printf("Got message: %s", m.Data)
 		m.Ack()
 	})
