@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"sync"
 
 	"cloud.google.com/go/pubsub"
 	"contrib.go.opencensus.io/exporter/stackdriver"
@@ -50,25 +51,12 @@ func main() {
 		})
 	}
 
-	ctx := context.Background()
-	pubsubClient, err := pubsub.NewClient(ctx, "icco-cloud")
-	if err != nil {
-		log.WithError(err).Fatal("Could not create client.")
-	}
-
-	sub, err := pubsubClient.CreateSubscription(ctx, "cron-client",
-		pubsub.SubscriptionConfig{Topic: pubsubClient.Topic("cron")})
-	if err != nil {
-		log.WithError(err).Fatal("Could not create subscription.")
-	}
-
-	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
-		log.Printf("Got message: %s", m.Data)
-		m.Ack()
-	})
-	if err != nil {
-		log.WithError(err).Fatal("Could not recieve message.")
-	}
+	go func() {
+		ctx := context.Background()
+		for {
+			recieveMessages(ctx, "cron-client")
+		}
+	}()
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -87,4 +75,35 @@ func main() {
 	}
 
 	log.Fatal(http.ListenAndServe(":"+port, h))
+}
+
+func recieveMessages(ctx context.Context, subName string) error {
+	pubsubClient, err := pubsub.NewClient(ctx, "icco-cloud")
+	if err != nil {
+		log.WithError(err).Fatal("Could not create client.")
+		return err
+	}
+
+	sub, err := pubsubClient.CreateSubscription(ctx, subName,
+		pubsub.SubscriptionConfig{Topic: pubsubClient.Topic("cron")})
+	if err != nil {
+		// This is fine, don't do anything.
+		log.WithError(err).Info("Could not create subscription.")
+		sub = pubsubClient.Subscription(subName)
+	}
+
+	var mu sync.Mutex
+	cctx, _ := context.WithCancel(ctx)
+	err = sub.Receive(cctx, func(ctx context.Context, msg *pubsub.Message) {
+		msg.Ack()
+		log.Printf("Got message: %q\n", string(msg.Data))
+		mu.Lock()
+		defer mu.Unlock()
+		// TODO: Add metrics for message recieve
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
