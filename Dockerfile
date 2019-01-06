@@ -5,6 +5,6 @@ EXPOSE 8080
 WORKDIR /go/src/github.com/icco/cron
 COPY . .
 
-RUN go build -o /go/bin/server .
+RUN go build -o /go/bin/server ./server
 
 CMD ["/go/bin/server"]
