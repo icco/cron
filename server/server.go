@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"os"
 
 	"cloud.google.com/go/pubsub"
 	"contrib.go.opencensus.io/exporter/stackdriver"
 	"contrib.go.opencensus.io/exporter/stackdriver/monitoredresource"
+	"contrib.go.opencensus.io/exporter/stackdriver/propagation"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/icco/cron"
@@ -48,18 +50,16 @@ func main() {
 		})
 	}
 
-	isDev := os.Getenv("NAT_ENV") != "production"
-
 	ctx := context.Background()
 	pubsubClient, err := pubsub.NewClient(ctx, "icco-cloud")
 	if err != nil {
-		log.WithErr(err).Fatal("Could not create client.")
+		log.WithError(err).Fatal("Could not create client.")
 	}
 
 	sub, err := pubsubClient.CreateSubscription(ctx, "cron-client",
 		pubsub.SubscriptionConfig{Topic: pubsubClient.Topic("cron")})
 	if err != nil {
-		log.WithErr(err).Fatal("Could not create subscription.")
+		log.WithError(err).Fatal("Could not create subscription.")
 	}
 
 	err = sub.Receive(context.Background(), func(ctx context.Context, m *pubsub.Message) {
@@ -67,7 +67,7 @@ func main() {
 		m.Ack()
 	})
 	if err != nil {
-		log.WithErr(err).Fatal("Could not recieve message.")
+		log.WithError(err).Fatal("Could not recieve message.")
 	}
 
 	r := chi.NewRouter()
@@ -76,7 +76,7 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(cron.LoggingMiddleware())
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.Write("ok.")
+		w.Write([]byte("ok."))
 	})
 	h := &ochttp.Handler{
 		Handler:     r,
