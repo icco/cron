@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"os"
-	"sync"
 
 	"cloud.google.com/go/pubsub"
 	"contrib.go.opencensus.io/exporter/stackdriver"
@@ -94,11 +93,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 		sub = pubsubClient.Subscription(subName)
 	}
 
-	var mu sync.Mutex
-	cctx, _ := context.WithCancel(ctx)
-	err = sub.Receive(cctx, func(ctx context.Context, msg *pubsub.Message) {
-		msg.Ack()
-
+	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		data := map[string]string{}
 		err := json.Unmarshal(msg.Data, &data)
 		logFields := logrus.Fields{"parsed": data, "unparsed": string(msg.Data)}
@@ -106,11 +101,12 @@ func recieveMessages(ctx context.Context, subName string) error {
 			log.WithError(err).WithFields(logFields).Warn("Couldn't decode json.")
 		} else {
 			log.WithFields(logFields).Debug("Got message")
-			mu.Lock()
-			defer mu.Unlock()
 			err = cron.Act(ctx, data["job"])
 			if err != nil {
 				log.WithError(err).Error("Problem running job.")
+				msg.Nack()
+			} else {
+				msg.Ack()
 			}
 
 			// TODO: Add metrics for message recieve
