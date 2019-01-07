@@ -1,19 +1,18 @@
-package main
+package pinboard
 
 import (
 	"context"
 	"encoding/json"
-	"log"
-	"os"
 	"strings"
 	"time"
 
 	"github.com/machinebox/graphql"
+	"github.com/sirupsen/logrus"
 	"github.com/zachlatta/pin"
 )
 
-func main() {
-	tokenParts := strings.Split(os.Getenv("PINBOARD_TOKEN"), ":")
+func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlToken string) error {
+	tokenParts := strings.Split(pinboardToken, ":")
 	pinClient := pin.NewClient(nil, &pin.AuthToken{Username: tokenParts[0], Token: tokenParts[1]})
 
 	tags := []string{}
@@ -23,14 +22,16 @@ func main() {
 	// Only get pins from the last 90d
 	oneDay, err := time.ParseDuration("-24h")
 	if err != nil {
-		log.Fatalf("time parsing: %+v", err)
+		log.WithError(err).Error("time parsing")
+		return err
 	}
 	from := time.Now().Add(oneDay * 90)
 	to := time.Now()
 
 	posts, _, err := pinClient.Posts.All(tags, start, results, &from, &to)
 	if err != nil {
-		log.Panicf("error talking to pinboard: %+v", err)
+		log.WithError(err).Error("failure talking to pinboard")
+		return err
 	}
 
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
@@ -49,7 +50,7 @@ func main() {
       }
     }
   `
-	gqlClient.Log = func(s string) { log.Println(s) }
+	gqlClient.Log = func(s string) { log.Debug(s) }
 
 	for _, p := range posts {
 		req := graphql.NewRequest(mut)
@@ -58,19 +59,24 @@ func main() {
 		req.Var("uri", p.URL)
 		req.Var("desc", p.Description)
 		req.Var("time", p.Time)
-		req.Header.Add("Authorization", os.Getenv("GQL_TOKEN"))
+		req.Header.Add("Authorization", graphqlToken)
 
-		err := gqlClient.Run(context.Background(), req, nil)
+		err := gqlClient.Run(ctx, req, nil)
 		if err != nil {
-			log.Panicf("error talking to graphql: %+v", err)
+			log.WithError(err).Error("error talking to graphql")
+			return err
 		}
 	}
 
 	req := graphql.NewRequest(`query { counts { key, value } }`)
 	var resp json.RawMessage
-	err = gqlClient.Run(context.Background(), req, &resp)
+	err = gqlClient.Run(ctx, req, &resp)
 	if err != nil {
-		log.Panicf("error talking to graphql: %+v", err)
+		log.WithError(err).Error("error talking to graphql")
+		return err
 	}
-	log.Printf("New Database Counts: %+v", string(resp))
+
+	log.WithField("link_count", string(resp)).Infof("New Database Counts: %+v", string(resp))
+
+	return nil
 }

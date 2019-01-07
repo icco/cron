@@ -101,14 +101,18 @@ func recieveMessages(ctx context.Context, subName string) error {
 
 		data := map[string]string{}
 		err := json.Unmarshal(msg.Data, &data)
+		logFields := logrus.Fields{"parsed": data, "unparsed": string(msg.Data)}
 		if err != nil {
-			log.WithError(err).Warn("Couldn't decode json.")
+			log.WithError(err).WithFields(logFields).Warn("Couldn't decode json.")
 		} else {
-
-			logFields := logrus.Fields{"data": data, "job": data["job"]}
 			log.WithFields(logFields).Debug("Got message")
 			mu.Lock()
 			defer mu.Unlock()
+			err = cron.Act(ctx, data["job"])
+			if err != nil {
+				log.WithError(err).Error("Problem running job.")
+			}
+
 			// TODO: Add metrics for message recieve
 		}
 	})
