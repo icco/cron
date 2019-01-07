@@ -12,7 +12,18 @@ import (
 )
 
 func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlToken string) error {
+	if pinboardToken == "" {
+		return fmt.Errorf("Pinboard Token is empty")
+	}
+
+	if graphqlToken == "" {
+		return fmt.Errorf("GraphQL Token is empty")
+	}
+
 	tokenParts := strings.Split(pinboardToken, ":")
+	if len(tokenParts) != 2 {
+		return fmt.Errorf("Pinboard Token is malformed")
+	}
 	pinClient := pin.NewClient(nil, &pin.AuthToken{Username: tokenParts[0], Token: tokenParts[1]})
 
 	tags := []string{}
