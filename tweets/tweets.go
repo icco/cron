@@ -103,7 +103,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
 	mut := `
   mutation ($t: NewTweet!) {
-      upsertLink(input: $t) {
+      upsertTweet(input: $t) {
         id
       }
     }
