@@ -1,26 +1,29 @@
 package tweets
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"net/http"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
-	"github.com/icco/cacophony/models"
+	gql "github.com/icco/graphql"
+	"github.com/machinebox/graphql"
+	"github.com/sirupsen/logrus"
 )
 
-func getUserTweets(ctx context.Context, consumerKey, consumerSecret, accessToken, accessSecret string) error {
+func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken, consumerKey, consumerSecret, accessToken, accessSecret string) error {
+	if graphqlToken == "" {
+		return fmt.Errorf("GraphQL Token is empty")
+	}
 
 	if consumerKey == "" || consumerSecret == "" || accessToken == "" || accessSecret == "" {
 		return fmt.Errorf("Consumer key/secret and Access token/secret required")
 	}
 
-	config := oauth1.NewConfig(*consumerKey, *consumerSecret)
-	token := oauth1.NewToken(*accessToken, *accessSecret)
+	config := oauth1.NewConfig(consumerKey, consumerSecret)
+	token := oauth1.NewToken(accessToken, accessSecret)
 	httpClient := config.Client(oauth1.NoContext, token)
 	client := twitter.NewClient(httpClient)
 
@@ -32,11 +35,9 @@ func getUserTweets(ctx context.Context, consumerKey, consumerSecret, accessToken
 	user, resp, err := client.Accounts.VerifyCredentials(verifyParams)
 	if err != nil {
 		log.WithError(err).Errorf("Error verifying creds: %+v", resp)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return err
 	}
 
-	// Home Timeline
 	userTimelineParams := &twitter.UserTimelineParams{
 		ScreenName: user.ScreenName,
 		Count:      200,
@@ -47,11 +48,10 @@ func getUserTweets(ctx context.Context, consumerKey, consumerSecret, accessToken
 		i, err := strconv.ParseInt(resp.Header.Get("X-Rate-Limit-Reset"), 10, 64)
 		if err != nil {
 			log.WithError(err).Error("Error converting int")
+			return err
 		}
 		tm := time.Unix(i, 0)
-		rtlimit := fmt.Errorf("Out of Rate Limit. Returns: %+v", tm)
-		http.Error(w, rtlimit.Error(), http.StatusInternalServerError)
-		return
+		return fmt.Errorf("Out of Rate Limit. Returns: %+v", tm)
 	}
 
 	if err != nil {
@@ -60,23 +60,64 @@ func getUserTweets(ctx context.Context, consumerKey, consumerSecret, accessToken
 	}
 
 	for _, t := range tweets {
-		for _, u := range t.Entities.Urls {
-			err = models.SaveURL(u.ExpandedURL, t.IDStr)
-			if err != nil {
-				log.WithError(err).Error("Error saving url")
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
+		err := UploadTweet(ctx, log, graphqlToken, t)
+		if err != nil {
+			return nil
 		}
 	}
 
-	_, err = models.AllSavedURLs()
-	if err != nil {
-		log.WithError(err).Error("Error getting urls")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	return nil
+}
+
+func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t twitter.Tweet) error {
+	tweet := gql.NewTweet{
+		ID:            t.IDStr,
+		Text:          t.FullText,
+		ScreenName:    t.User.ScreenName,
+		FavoriteCount: &t.FavoriteCount,
+		RetweetCount:  &t.RetweetCount,
+		Hashtags:      make([]string, len(t.Entities.Hashtags)),
+		Symbols:       []string{},
+		UserMentions:  make([]string, len(t.Entities.UserMentions)),
+		Urls:          make([]string, len(t.Entities.Urls)),
 	}
 
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Write([]byte(`"ok."`))
+	tp, err := t.CreatedAtTime()
+	if err != nil {
+		return err
+	}
+	tweet.Posted = tp
+
+	for i, v := range t.Entities.Hashtags {
+		tweet.Hashtags[i] = v.Text
+	}
+
+	for i, v := range t.Entities.Urls {
+		tweet.Urls[i] = v.ExpandedURL
+	}
+
+	for i, v := range t.Entities.UserMentions {
+		tweet.UserMentions[i] = v.ScreenName
+	}
+
+	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
+	mut := `
+  mutation ($t: NewTweet!) {
+      upsertLink(input: $t) {
+        id
+      }
+    }
+  `
+	gqlClient.Log = func(s string) { log.Debug(s) }
+
+	req := graphql.NewRequest(mut)
+	req.Var("t", tweet)
+	req.Header.Add("Authorization", graphqlToken)
+	err = gqlClient.Run(ctx, req, nil)
+	if err != nil {
+		log.WithError(err).Error("error talking to graphql")
+		return err
+	}
+
+	return nil
 }
