@@ -39,9 +39,10 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken, consu
 	}
 
 	userTimelineParams := &twitter.UserTimelineParams{
-		ScreenName: user.ScreenName,
-		Count:      200,
-		TweetMode:  "extended",
+		ScreenName:      user.ScreenName,
+		Count:           200,
+		TweetMode:       "extended",
+		IncludeRetweets: true,
 	}
 	tweets, resp, err := client.Timelines.UserTimeline(userTimelineParams)
 	if resp.Header.Get("X-Rate-Limit-Remaining") == "0" {
