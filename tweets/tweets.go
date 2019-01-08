@@ -71,9 +71,17 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken, consu
 }
 
 func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t twitter.Tweet) error {
+
+	// I have no idea if this is right.
+	// https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
+	text := t.Text
+	if t.ExtendedTweet != nil {
+		text = t.ExtendedTweet.FullText
+	}
+
 	tweet := gql.NewTweet{
 		ID:            t.IDStr,
-		Text:          t.FullText,
+		Text:          text,
 		ScreenName:    t.User.ScreenName,
 		FavoriteCount: t.FavoriteCount,
 		RetweetCount:  t.RetweetCount,
