@@ -125,6 +125,8 @@ github.com/icco/graphql v0.0.0-20190108125036-b01fbd668bf4 h1:bgOuemYDraIWCfeIWk
 github.com/icco/graphql v0.0.0-20190108125036-b01fbd668bf4/go.mod h1:dYlQZz+4/r45sTx8eyjALOc2cQYssNaReUwPZRXIJ8I=
 github.com/icco/graphql v0.0.0-20190108134012-133928a92681 h1:0o+XSNoRtxJ5kj2CD0IyDgwEbaHVBnmy4pcuqlND8Ls=
 github.com/icco/graphql v0.0.0-20190108134012-133928a92681/go.mod h1:dYlQZz+4/r45sTx8eyjALOc2cQYssNaReUwPZRXIJ8I=
+github.com/icco/graphql v0.0.0-20190108160603-dd363c3e195d h1:DyVwgVYcRliGoiAiUu6YUXuuD6uBWPTOnOS46U73ikA=
+github.com/icco/graphql v0.0.0-20190108160603-dd363c3e195d/go.mod h1:dYlQZz+4/r45sTx8eyjALOc2cQYssNaReUwPZRXIJ8I=
 github.com/icco/logrus-stackdriver-formatter v0.1.1-0.20181229063138-933aa6fd9d09/go.mod h1:9o92ge+KSFpkiGGU7yxkAkd8TN6g3NW1eznlUPURHu4=
 github.com/icco/logrus-stackdriver-formatter v0.2.0 h1:v8dfGRT8DbMGBgym8bpt5sRaHjawh16IFK+0S8/E8O8=
 github.com/icco/logrus-stackdriver-formatter v0.2.0/go.mod h1:7zpAjcNYqbMYPaqZWBvgguHNrhROQI5gwMGtuHlorpQ=
@@ -220,6 +222,8 @@ golang.org/x/net v0.0.0-20181220203305-927f97764cc3 h1:eH6Eip3UpmR+yM/qI9Ijluzb1
 golang.org/x/net v0.0.0-20181220203305-927f97764cc3/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20190107210223-45ffb0cd1ba0 h1:1DW40AJQ7AP4nY6ORUGUdkpXyEC9W2GAXcOPaMZK0K8=
 golang.org/x/net v0.0.0-20190107210223-45ffb0cd1ba0/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
+golang.org/x/net v0.0.0-20190108155000-395948e2f546 h1:tkMg6+6TF2qZ/3I8fw+DiNgPSsABxdVIqWE90w8Vxzk=
+golang.org/x/net v0.0.0-20190108155000-395948e2f546/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/oauth2 v0.0.0-20180603041954-1e0a3fa8ba9a h1:1Fy38jwe/QZhQfFQBy6dMj9F/WU1C+jo3/zLNr/WhW4=
 golang.org/x/oauth2 v0.0.0-20180603041954-1e0a3fa8ba9a/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
