@@ -24,7 +24,7 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken, consu
 
 	config := oauth1.NewConfig(consumerKey, consumerSecret)
 	token := oauth1.NewToken(accessToken, accessSecret)
-	httpClient := config.Client(oauth1.NoContext, token)
+	httpClient := config.Client(ctx, token)
 	client := twitter.NewClient(httpClient)
 
 	// Verify Credentials
@@ -75,7 +75,8 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 	// I have no idea if this is right.
 	// https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
 	text := t.Text
-	if t.ExtendedTweet != nil {
+	log.WithField("tweet", t).Debug("examining text fields")
+	if t.ExtendedTweet != nil && t.ExtendedTweet.FullText != "" {
 		text = t.ExtendedTweet.FullText
 	}
 
