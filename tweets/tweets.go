@@ -74,10 +74,23 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 
 	// I have no idea if this is right.
 	// https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
-	text := t.Text
+	text := t.FullText
 	log.WithField("tweet", t).Debug("examining text fields")
+	if text == "" && t.Text != "" {
+		text = t.Text
+	}
+
 	if t.ExtendedTweet != nil && t.ExtendedTweet.FullText != "" {
 		text = t.ExtendedTweet.FullText
+	}
+
+	if t.Retweeted {
+		go func() {
+			err := UploadTweet(ctx, log, graphqlToken, *t.RetweetedStatus)
+			if err != nil {
+				log.WithError(err).Error("Error posting retweet")
+			}
+		}()
 	}
 
 	tweet := gql.NewTweet{
