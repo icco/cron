@@ -74,8 +74,8 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 
 	// I have no idea if this is right.
 	// https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
+	//log.WithField("tweet", t).Debug("examining text fields")
 	text := t.FullText
-	log.WithField("tweet", t).Debug("examining text fields")
 	if text == "" && t.Text != "" {
 		text = t.Text
 	}
