@@ -62,7 +62,7 @@ func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlT
       }
     }
   `
-	gqlClient.Log = func(s string) { log.Debug(s) }
+	//gqlClient.Log = func(s string) { log.Debug(s) }
 
 	for _, p := range posts {
 		req := graphql.NewRequest(mut)

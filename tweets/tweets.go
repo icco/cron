@@ -131,7 +131,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
       }
     }
   `
-	gqlClient.Log = func(s string) { log.Debug(s) }
+	//gqlClient.Log = func(s string) { log.Debug(s) }
 
 	req := graphql.NewRequest(mut)
 	req.Var("t", tweet)
