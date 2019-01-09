@@ -85,12 +85,12 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 	}
 
 	if t.Retweeted {
-		go func() {
+		go func(ctx context.Context, log *logrus.Logger, graphqlToken string, t twitter.Tweet) {
 			err := UploadTweet(ctx, log, graphqlToken, *t.RetweetedStatus)
 			if err != nil {
 				log.WithError(err).Error("Error posting retweet")
 			}
-		}()
+		}(ctx, log, graphqlToken, t)
 	}
 
 	tweet := gql.NewTweet{
