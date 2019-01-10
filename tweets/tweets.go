@@ -13,17 +13,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken, consumerKey, consumerSecret, accessToken, accessSecret string) error {
-	if graphqlToken == "" {
-		return fmt.Errorf("GraphQL Token is empty")
+type TwitterAuth struct {
+	ConsumerKey    string
+	ConsumerSecret string
+	AccessToken    string
+	AccessSecret   string
+}
+
+func (t *TwitterAuth) Validate(ctx context.Context, log *logrus.Logger) (*twitter.Client, *twitter.User, error) {
+	if t.ConsumerKey == "" || t.ConsumerSecret == "" || t.AccessToken == "" || t.AccessSecret == "" {
+		return nil, nil, fmt.Errorf("Consumer key/secret and Access token/secret required")
 	}
 
-	if consumerKey == "" || consumerSecret == "" || accessToken == "" || accessSecret == "" {
-		return fmt.Errorf("Consumer key/secret and Access token/secret required")
-	}
-
-	config := oauth1.NewConfig(consumerKey, consumerSecret)
-	token := oauth1.NewToken(accessToken, accessSecret)
+	config := oauth1.NewConfig(t.ConsumerKey, t.ConsumerSecret)
+	token := oauth1.NewToken(t.AccessToken, t.AccessSecret)
 	httpClient := config.Client(ctx, token)
 	client := twitter.NewClient(httpClient)
 
@@ -34,7 +37,20 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken, consu
 	}
 	user, resp, err := client.Accounts.VerifyCredentials(verifyParams)
 	if err != nil {
-		log.WithError(err).Errorf("Error verifying creds: %+v", resp)
+		log.WithError(err).WithField("response", resp).Errorf("error verifying creds")
+		return nil, nil, err
+	}
+
+	return client, user, nil
+}
+
+func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string, tAuth *TwitterAuth) error {
+	if graphqlToken == "" {
+		return fmt.Errorf("GraphQL Token is empty")
+	}
+
+	client, user, err := tAuth.Validate(ctx, log)
+	if err != nil {
 		return err
 	}
 
@@ -68,6 +84,10 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken, consu
 	}
 
 	return nil
+}
+
+func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth) (*twitter.Tweet, error) {
+	return nil, nil
 }
 
 func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t twitter.Tweet) error {
