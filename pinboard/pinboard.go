@@ -71,7 +71,7 @@ func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlT
 		req.Var("uri", p.URL)
 		req.Var("desc", p.Description)
 		req.Var("time", p.Time)
-		req.Header.Add("Authorization", graphqlToken)
+		req.Header.Add("X-API-AUTH", graphqlToken)
 
 		err := gqlClient.Run(ctx, req, nil)
 		if err != nil {
