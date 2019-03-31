@@ -86,6 +86,17 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string
 	return nil
 }
 
+type tweetids struct {
+	data struct {
+		homeTimelineURLs []struct {
+			tweetIDs []int64
+			tweets   []struct {
+				ID int64
+			}
+		}
+	}
+}
+
 func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken string, tAuth *TwitterAuth) error {
 	query := `query {
     homeTimelineURLs {
@@ -100,7 +111,7 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
 	gqlClient.Log = func(s string) { log.Debug(s) }
 
-	var resp interface{}
+	var resp tweetids
 	req := graphql.NewRequest(query)
 	req.Header.Add("X-API-AUTH", graphqlToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
@@ -110,7 +121,7 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
 		return err
 	}
 
-	log.Debugf("%+v", resp)
+	log.Debugf("%+v", resp.data.homeTimelineURLs)
 
 	return nil
 }
