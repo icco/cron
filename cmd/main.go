@@ -15,7 +15,7 @@ var (
 
 func main() {
 	cmd := os.Args[1:]
-	if len(cmd) < 2 && cmd[0] != "send" {
+	if len(cmd) < 2 || cmd[0] != "send" {
 		fmt.Printf("Usage: $ %s send message", os.Args[0])
 		return
 	}
