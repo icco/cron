@@ -86,8 +86,33 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string
 	return nil
 }
 
-func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth) (*twitter.Tweet, error) {
-	return nil, nil
+func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth, id int64) (*twitter.Tweet, error) {
+	client, _, err := tAuth.Validate(ctx, log)
+	if err != nil {
+		return nil, err
+	}
+
+	params := &twitter.StatusShowParams{
+		IncludeEntities: twitter.Bool(true),
+	}
+
+	tweet, resp, err := client.Statuses.Show(id, params)
+	if resp.Header.Get("X-Rate-Limit-Remaining") == "0" {
+		i, err := strconv.ParseInt(resp.Header.Get("X-Rate-Limit-Reset"), 10, 64)
+		if err != nil {
+			log.WithError(err).Error("Error converting int")
+			return err
+		}
+		tm := time.Unix(i, 0)
+		return nil, fmt.Errorf("Out of Rate Limit. Returns: %+v", tm)
+	}
+
+	if err != nil {
+		log.WithError(err).Errorf("Error getting tweets: %+v", resp)
+		return nil, err
+	}
+
+	return tweet, nil
 }
 
 func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t twitter.Tweet) error {
