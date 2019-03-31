@@ -16,7 +16,7 @@ require (
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190203031600-7a902570cb17 // indirect
 	github.com/hellofresh/logging-go v0.3.0
-	github.com/icco/graphql v0.0.0-20190331012332-f6fe4e711070
+	github.com/icco/graphql v0.0.0-20190331022447-8118e61fcc16
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
 	github.com/machinebox/graphql v0.2.2
 	github.com/mattn/go-runewidth v0.0.4 // indirect
