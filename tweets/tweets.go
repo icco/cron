@@ -101,7 +101,7 @@ func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth, id in
 		i, err := strconv.ParseInt(resp.Header.Get("X-Rate-Limit-Reset"), 10, 64)
 		if err != nil {
 			log.WithError(err).Error("Error converting int")
-			return err
+			return nil, err
 		}
 		tm := time.Unix(i, 0)
 		return nil, fmt.Errorf("Out of Rate Limit. Returns: %+v", tm)
@@ -148,7 +148,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 		Hashtags:      make([]string, len(t.Entities.Hashtags)),
 		Symbols:       []string{},
 		UserMentions:  make([]string, len(t.Entities.UserMentions)),
-		Urls:          make([]string, len(t.Entities.Urls)),
+		Urls:          make([]gql.URI, len(t.Entities.Urls)),
 	}
 
 	tp, err := t.CreatedAtTime()
@@ -162,7 +162,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 	}
 
 	for i, v := range t.Entities.Urls {
-		tweet.Urls[i] = v.ExpandedURL
+		tweet.Urls[i] = gql.NewURI(v.ExpandedURL)
 	}
 
 	for i, v := range t.Entities.UserMentions {

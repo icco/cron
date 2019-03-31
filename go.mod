@@ -15,7 +15,7 @@ require (
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190203031600-7a902570cb17 // indirect
 	github.com/hellofresh/logging-go v0.3.0
-	github.com/icco/graphql v0.0.0-20190329030646-ff129d7c2efc
+	github.com/icco/graphql v0.0.0-20190331012332-f6fe4e711070
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
 	github.com/machinebox/graphql v0.2.2
 	github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90 // indirect
