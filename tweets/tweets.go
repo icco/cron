@@ -103,6 +103,7 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
 	var resp interface{}
 	req := graphql.NewRequest(query)
 	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err := gqlClient.Run(ctx, req, resp)
 	if err != nil {
 		log.WithError(err).Error("error talking to graphql")
