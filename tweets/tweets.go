@@ -211,6 +211,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 	req := graphql.NewRequest(mut)
 	req.Var("t", tweet)
 	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err = gqlClient.Run(ctx, req, nil)
 	if err != nil {
 		log.WithError(err).Error("error talking to graphql")
