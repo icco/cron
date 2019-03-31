@@ -31,6 +31,10 @@ func Act(ctx context.Context, job string) error {
 			return err
 		}
 	case "hourly":
+		err := tweets.CacheRandomTweets(ctx, log, gqlToken, twitterAuth)
+		if err != nil {
+			return err
+		}
 	default:
 		return fmt.Errorf("Unknown job type: %s", job)
 	}
