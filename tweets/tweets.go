@@ -86,6 +86,34 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string
 	return nil
 }
 
+func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken string, tAuth *TwitterAuth) error {
+	query := `query {
+    homeTimelineURLs {
+      tweetIDs
+      tweets {
+        id
+      }
+    }
+  }
+  `
+
+	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
+	gqlClient.Log = func(s string) { log.Debug(s) }
+
+	var resp interface{}
+	req := graphql.NewRequest(query)
+	req.Header.Add("X-API-AUTH", graphqlToken)
+	err := gqlClient.Run(ctx, req, resp)
+	if err != nil {
+		log.WithError(err).Error("error talking to graphql")
+		return err
+	}
+
+	log.Debugf("%+v", resp)
+
+	return nil
+}
+
 func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth, id int64) (*twitter.Tweet, error) {
 	client, _, err := tAuth.Validate(ctx, log)
 	if err != nil {
