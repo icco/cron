@@ -2,7 +2,9 @@ package tweets
 
 import (
 	"context"
+	//"encoding/json"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 
@@ -80,6 +82,62 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string
 		err := UploadTweet(ctx, log, graphqlToken, t)
 		if err != nil {
 			return nil
+		}
+	}
+
+	return nil
+}
+
+type tweetids struct {
+	HomeTimelineURLs []struct {
+		TweetIDs []string `json:"tweetIDs"`
+	} `json:"homeTimelineURLs"`
+}
+
+func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken string, tAuth *TwitterAuth) error {
+	query := `query {
+    homeTimelineURLs {
+      tweetIDs
+    }
+  }
+  `
+
+	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
+	//gqlClient.Log = func(s string) { log.Debug(s) }
+
+	var data tweetids
+
+	req := graphql.NewRequest(query)
+	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("User-Agent", "icco-cron/1.0")
+	err := gqlClient.Run(ctx, req, &data)
+	if err != nil {
+		log.WithError(err).Error("error talking to graphql")
+		return err
+	}
+
+	ids := []string{}
+	for _, u := range data.HomeTimelineURLs {
+		ids = append(ids, u.TweetIDs...)
+	}
+
+	for i := 0; i < 200; i++ {
+		idString := ids[rand.Intn(len(ids))]
+		id, err := strconv.ParseInt(idString, 10, 64)
+		if err != nil {
+			return err
+		}
+
+		t, err := GetTweet(ctx, log, tAuth, id)
+		if err != nil {
+			return err
+		}
+
+		if t != nil {
+			err = UploadTweet(ctx, log, graphqlToken, *t)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
@@ -182,6 +240,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 	req := graphql.NewRequest(mut)
 	req.Var("t", tweet)
 	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err = gqlClient.Run(ctx, req, nil)
 	if err != nil {
 		log.WithError(err).Error("error talking to graphql")
