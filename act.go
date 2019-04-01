@@ -29,11 +29,11 @@ func Act(ctx context.Context, job string) error {
 
 	switch job {
 	case "minute":
+	case "five-minute":
 		err := tweets.SaveUserTweets(ctx, log, gqlToken, twitterAuth)
 		if err != nil {
 			return err
 		}
-	case "five-minute":
 	case "fifteen-minute":
 		err := pinboard.UpdatePins(ctx, log, pinboardToken, gqlToken)
 		if err != nil {
