@@ -3,6 +3,7 @@ package tweets
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 
@@ -90,9 +91,6 @@ type tweetids struct {
 	data struct {
 		homeTimelineURLs []struct {
 			tweetIDs []int64
-			tweets   []struct {
-				ID int64
-			}
 		}
 	}
 }
@@ -101,9 +99,6 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
 	query := `query {
     homeTimelineURLs {
       tweetIDs
-      tweets {
-        id
-      }
     }
   }
   `
@@ -121,7 +116,24 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
 		return err
 	}
 
-	log.Debugf("%+v", resp.data.homeTimelineURLs)
+	ids := []int64{}
+	for _, u := range resp.data.homeTimelineURLs {
+		ids = append(ids, u.tweetIDs...)
+	}
+
+	for i := 0; i < 200; i++ {
+		t, err := GetTweet(ctx, log, tAuth, ids[rand.Intn(len(ids)-1)])
+		if err != nil {
+			return err
+		}
+
+		if t != nil {
+			err = UploadTweet(ctx, log, graphqlToken, *t)
+			if err != nil {
+				return err
+			}
+		}
+	}
 
 	return nil
 }
