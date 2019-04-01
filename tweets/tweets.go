@@ -121,7 +121,7 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
 		ids = append(ids, u.TweetIDs...)
 	}
 
-	for i := 0; i < 200; i++ {
+	for i := 0; i < 10; i++ {
 		idString := ids[rand.Intn(len(ids))]
 		id, err := strconv.ParseInt(idString, 10, 64)
 		if err != nil {
