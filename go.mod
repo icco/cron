@@ -8,6 +8,7 @@ require (
 	github.com/dghubble/go-twitter v0.0.0-20190305084156-0022a70e9bee
 	github.com/dghubble/oauth1 v0.5.0
 	github.com/felixge/httpsnoop v1.0.0
+	github.com/franklinhu/go-goodreads v0.0.0-20180415215853-6b5441de9639
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
