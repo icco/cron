@@ -104,10 +104,8 @@ func recieveMessages(ctx context.Context, subName string) error {
 			err = cron.Act(ctx, data["job"])
 			if err != nil {
 				log.WithError(err).Error("Problem running job.")
-				msg.Nack()
-			} else {
-				msg.Ack()
 			}
+			msg.Ack()
 
 			// TODO: Add metrics for message recieve
 		}

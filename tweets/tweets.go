@@ -2,7 +2,9 @@ package tweets
 
 import (
 	"context"
+	//"encoding/json"
 	"fmt"
+	"math/rand"
 	"strconv"
 	"time"
 
@@ -86,8 +88,89 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string
 	return nil
 }
 
-func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth) (*twitter.Tweet, error) {
-	return nil, nil
+type tweetids struct {
+	HomeTimelineURLs []struct {
+		TweetIDs []string `json:"tweetIDs"`
+	} `json:"homeTimelineURLs"`
+}
+
+func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken string, tAuth *TwitterAuth) error {
+	query := `query {
+    homeTimelineURLs {
+      tweetIDs
+    }
+  }
+  `
+
+	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
+	//gqlClient.Log = func(s string) { log.Debug(s) }
+
+	var data tweetids
+
+	req := graphql.NewRequest(query)
+	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("User-Agent", "icco-cron/1.0")
+	err := gqlClient.Run(ctx, req, &data)
+	if err != nil {
+		log.WithError(err).Error("error talking to graphql")
+		return err
+	}
+
+	ids := []string{}
+	for _, u := range data.HomeTimelineURLs {
+		ids = append(ids, u.TweetIDs...)
+	}
+
+	for i := 0; i < 10; i++ {
+		idString := ids[rand.Intn(len(ids))]
+		id, err := strconv.ParseInt(idString, 10, 64)
+		if err != nil {
+			return err
+		}
+
+		t, err := GetTweet(ctx, log, tAuth, id)
+		if err != nil {
+			return err
+		}
+
+		if t != nil {
+			err = UploadTweet(ctx, log, graphqlToken, *t)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth, id int64) (*twitter.Tweet, error) {
+	client, _, err := tAuth.Validate(ctx, log)
+	if err != nil {
+		return nil, err
+	}
+
+	params := &twitter.StatusShowParams{
+		IncludeEntities: twitter.Bool(true),
+	}
+
+	tweet, resp, err := client.Statuses.Show(id, params)
+	if resp.Header.Get("X-Rate-Limit-Remaining") == "0" {
+		i, err := strconv.ParseInt(resp.Header.Get("X-Rate-Limit-Reset"), 10, 64)
+		if err != nil {
+			log.WithError(err).Error("Error converting int")
+			return nil, err
+		}
+		tm := time.Unix(i, 0)
+		return nil, fmt.Errorf("Out of Rate Limit. Returns: %+v", tm)
+	}
+
+	if err != nil {
+		log.WithError(err).Errorf("Error getting tweets: %+v", resp)
+		return nil, err
+	}
+
+	return tweet, nil
 }
 
 func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t twitter.Tweet) error {
@@ -123,7 +206,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 		Hashtags:      make([]string, len(t.Entities.Hashtags)),
 		Symbols:       []string{},
 		UserMentions:  make([]string, len(t.Entities.UserMentions)),
-		Urls:          make([]string, len(t.Entities.Urls)),
+		Urls:          make([]gql.URI, len(t.Entities.Urls)),
 	}
 
 	tp, err := t.CreatedAtTime()
@@ -137,7 +220,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 	}
 
 	for i, v := range t.Entities.Urls {
-		tweet.Urls[i] = v.ExpandedURL
+		tweet.Urls[i] = gql.NewURI(v.ExpandedURL)
 	}
 
 	for i, v := range t.Entities.UserMentions {
@@ -157,6 +240,7 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
 	req := graphql.NewRequest(mut)
 	req.Var("t", tweet)
 	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err = gqlClient.Run(ctx, req, nil)
 	if err != nil {
 		log.WithError(err).Error("error talking to graphql")

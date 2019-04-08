@@ -37,7 +37,7 @@ func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlT
 		log.WithError(err).Error("time parsing")
 		return err
 	}
-	from := time.Now().Add(oneDay * 90)
+	from := time.Now().Add(oneDay * 30)
 	to := time.Now()
 
 	posts, _, err := pinClient.Posts.All(tags, start, results, &from, &to)
