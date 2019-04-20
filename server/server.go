@@ -68,7 +68,7 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(cron.LoggingMiddleware())
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		err := w.Write([]byte("ok."))
+		_, err := w.Write([]byte("ok."))
 		if err != nil {
 			log.WithError(err).Error("could not write response")
 		}
