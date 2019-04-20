@@ -35,17 +35,32 @@ func Act(ctx context.Context, job string) error {
 
 	switch job {
 	case "user-tweets":
-		err := tweets.SaveUserTweets(ctx, log, gqlToken, twitterAuth)
+		t := tweets.Twitter{
+			TwitterAuth:  twitterAuth,
+			Log:          log,
+			GraphQLToken: gqlToken,
+		}
+		err := t.SaveUserTweets(ctx)
 		if err != nil {
 			return err
 		}
 	case "pinboard":
-		err := pinboard.UpdatePins(ctx, log, pinboardToken, gqlToken)
+		p := &pinboard.Pinboard{
+			Token:        pinboardToken,
+			Log:          log,
+			GraphQLToken: gqlToken,
+		}
+		err := p.UpdatePins(ctx)
 		if err != nil {
 			return err
 		}
 	case "random-tweets":
-		err := tweets.CacheRandomTweets(ctx, log, gqlToken, twitterAuth)
+		t := &tweets.Twitter{
+			TwitterAuth:  twitterAuth,
+			Log:          log,
+			GraphQLToken: gqlToken,
+		}
+		err := t.CacheRandomTweets(ctx)
 		if err != nil {
 			return err
 		}
