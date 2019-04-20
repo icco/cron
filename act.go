@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
 	"github.com/icco/cron/tweets"
 )
@@ -27,20 +28,34 @@ func Act(ctx context.Context, job string) error {
 		return fmt.Errorf("PINBOARD_TOKEN is unset")
 	}
 
+	goodreadsToken := os.Getenv("GOODREADS_TOKEN")
+	if goodreadsToken == "" {
+		return fmt.Errorf("GOODREADS_TOKEN is unset")
+	}
+
 	switch job {
-	case "minute":
-	case "five-minute":
+	case "user-tweets":
 		err := tweets.SaveUserTweets(ctx, log, gqlToken, twitterAuth)
 		if err != nil {
 			return err
 		}
-	case "fifteen-minute":
+	case "pinboard":
 		err := pinboard.UpdatePins(ctx, log, pinboardToken, gqlToken)
 		if err != nil {
 			return err
 		}
-	case "hourly":
+	case "random-tweets":
 		err := tweets.CacheRandomTweets(ctx, log, gqlToken, twitterAuth)
+		if err != nil {
+			return err
+		}
+	case "goodreads":
+		g := &goodreads.Goodreads{
+			Log:          log,
+			Token:        goodreadsToken,
+			GraphQLToken: gqlToken,
+		}
+		err := g.UpsertBooks(ctx)
 		if err != nil {
 			return err
 		}

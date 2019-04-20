@@ -11,8 +11,9 @@ import (
 
 // Goodreads contains the scope for doing work against the goodreads API.
 type Goodreads struct {
-	Token string
-	log   *logrus.Logger
+	Token        string
+	Log          *logrus.Logger
+	GraphQLToken string
 }
 
 func (g *Goodreads) GetBooks(ctx context.Context) ([]goodreads.Review, error) {
@@ -20,13 +21,14 @@ func (g *Goodreads) GetBooks(ctx context.Context) ([]goodreads.Review, error) {
 	return c.GetLastRead("18143346.Nat_Welch", 100)
 }
 
-func (g *Goodreads) UpsertBooks(ctx context.Context, graphqlToken string) error {
+func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 	reviews, err := g.GetBooks(ctx)
 	if err != nil {
 		return err
 	}
+
 	for _, r := range reviews {
-		err := g.UploadBook(ctx, graphqlToken, r.Book)
+		err := g.UploadBook(ctx, r.Book)
 		if err != nil {
 			return err
 		}
@@ -35,7 +37,7 @@ func (g *Goodreads) UpsertBooks(ctx context.Context, graphqlToken string) error 
 	return nil
 }
 
-func (g *Goodreads) UploadBook(ctx context.Context, graphqlToken string, b goodreads.Book) error {
+func (g *Goodreads) UploadBook(ctx context.Context, b goodreads.Book) error {
 	tweet := gql.EditBook{
 		ID:    &b.ID,
 		Title: &b.Title,
@@ -49,15 +51,15 @@ func (g *Goodreads) UploadBook(ctx context.Context, graphqlToken string, b goodr
       }
     }
   `
-	gqlClient.Log = func(s string) { g.log.Debug(s) }
+	gqlClient.Log = func(s string) { g.Log.Debug(s) }
 
 	req := graphql.NewRequest(mut)
 	req.Var("t", tweet)
-	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("X-API-AUTH", g.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err := gqlClient.Run(ctx, req, nil)
 	if err != nil {
-		g.log.WithError(err).Error("error talking to graphql")
+		g.Log.WithError(err).Error("error talking to graphql")
 		return err
 	}
 
