@@ -108,6 +108,8 @@ github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385/go.mod h1:0vRUJqYpeSZi
 github.com/felixge/httpsnoop v1.0.0 h1:gh8fMGz0rlOv/1WmRZm7OgncIOTsAj21iNJot48omJQ=
 github.com/felixge/httpsnoop v1.0.0/go.mod h1:3+D9sFq0ahK/JeJPhCBUV1xlf4/eIYrUQaxulT0VzX8=
 github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568/go.mod h1:xEzjJPgXI435gkrCt3MPfRiAkVrwSbHsst4LCFVfpJc=
+github.com/franklinhu/go-goodreads v0.0.0-20180415215853-6b5441de9639 h1:WZHl8rPHkcyYHRRzG159/e4abV+UbNg3d/pijjSTJeQ=
+github.com/franklinhu/go-goodreads v0.0.0-20180415215853-6b5441de9639/go.mod h1:fyjOj2CN8q/cM45R6+2Y77mlU0OvHEad9o8beZNMbaU=
 github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMoQvtojpjFo=
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/gliderlabs/ssh v0.1.1/go.mod h1:U7qILu1NlMHj9FlMhZLlkCdDnU1DBEAqr0aevW3Awn0=
@@ -194,8 +196,8 @@ github.com/icco/cron v0.0.0-20190121032237-b4835d3918f3/go.mod h1:rFBnlYHrnQWD9v
 github.com/icco/graphql v0.0.0-20190108160603-dd363c3e195d/go.mod h1:dYlQZz+4/r45sTx8eyjALOc2cQYssNaReUwPZRXIJ8I=
 github.com/icco/graphql v0.0.0-20190109022133-390239061cdf/go.mod h1:fs6UOuDKtjYiqGx8ox+4BxH9Ic2iXhi4vpK+naVK4MM=
 github.com/icco/graphql v0.0.0-20190203211859-7ccb702358d8/go.mod h1:B58lbu8IgvLE1oi7wtyOg0ixiPe/9l+aBhA8pRAas2A=
-github.com/icco/graphql v0.0.0-20190420160821-4d36b69f8982 h1:u9YVbZToTGSrcSojj49oIa2k1xI6bn02v3L4lmZ+Ips=
-github.com/icco/graphql v0.0.0-20190420160821-4d36b69f8982/go.mod h1:0ev6M1+kr48scX2UwUE/CCAn5e++YKeX50gNR5ZmqoU=
+github.com/icco/graphql v0.0.0-20190420161410-5681f8d6293e h1:nkpI8vA+3A6CJFt+v+18c0NBJ97ZavrMDklgE9zOaXk=
+github.com/icco/graphql v0.0.0-20190420161410-5681f8d6293e/go.mod h1:0ev6M1+kr48scX2UwUE/CCAn5e++YKeX50gNR5ZmqoU=
 github.com/icco/logrus-stackdriver-formatter v0.3.0 h1:zHmQDEEDUla29/SXKorLD2enT/i0TKARdcLNJ8Y55lc=
 github.com/icco/logrus-stackdriver-formatter v0.3.0/go.mod h1:yMdTvFwqQmahvdaaefL60hLkBAFIqCe4M5xZfz8gHXg=
 github.com/jellevandenhooff/dkim v0.0.0-20150330215556-f50fe3d243e1/go.mod h1:E0B/fFc00Y+Rasa88328GlI/XbtyysCtTHZS8h7IrBU=

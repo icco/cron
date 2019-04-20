@@ -8,6 +8,7 @@ require (
 	github.com/dghubble/go-twitter v0.0.0-20190305084156-0022a70e9bee
 	github.com/dghubble/oauth1 v0.5.0
 	github.com/felixge/httpsnoop v1.0.0
+	github.com/franklinhu/go-goodreads v0.0.0-20180415215853-6b5441de9639
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-logfmt/logfmt v0.4.0 // indirect
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
@@ -15,7 +16,7 @@ require (
 	github.com/gorilla/websocket v1.4.0 // indirect
 	github.com/gregjones/httpcache v0.0.0-20190203031600-7a902570cb17 // indirect
 	github.com/hellofresh/logging-go v0.3.0
-	github.com/icco/graphql v0.0.0-20190420160821-4d36b69f8982
+	github.com/icco/graphql v0.0.0-20190420161410-5681f8d6293e
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
 	github.com/machinebox/graphql v0.2.2
 	github.com/prometheus/client_model v0.0.0-20190129233127-fd36f4220a90 // indirect

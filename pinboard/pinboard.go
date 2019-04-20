@@ -12,16 +12,16 @@ import (
 	"github.com/zachlatta/pin"
 )
 
-func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlToken string) error {
-	if pinboardToken == "" {
-		return fmt.Errorf("Pinboard Token is empty")
-	}
+// Pinboard contains the context needed to call pinboard.
+type Pinboard struct {
+	Token        string
+	Log          *logrus.Logger
+	GraphQLToken string
+}
 
-	if graphqlToken == "" {
-		return fmt.Errorf("GraphQL Token is empty")
-	}
-
-	tokenParts := strings.Split(pinboardToken, ":")
+// UpdatePins gets and uploads pinned websites to graphql.
+func (p *Pinboard) UpdatePins(ctx context.Context) error {
+	tokenParts := strings.Split(p.Token, ":")
 	if len(tokenParts) != 2 {
 		return fmt.Errorf("Pinboard Token is malformed")
 	}
@@ -34,7 +34,7 @@ func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlT
 	// Only get pins from the last 90d
 	oneDay, err := time.ParseDuration("-24h")
 	if err != nil {
-		log.WithError(err).Error("time parsing")
+		p.Log.WithError(err).Error("time parsing")
 		return err
 	}
 	from := time.Now().Add(oneDay * 30)
@@ -42,7 +42,7 @@ func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlT
 
 	posts, _, err := pinClient.Posts.All(tags, start, results, &from, &to)
 	if err != nil {
-		log.WithError(err).Error("failure talking to pinboard")
+		p.Log.WithError(err).Error("failure talking to pinboard")
 		return err
 	}
 
@@ -62,20 +62,18 @@ func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlT
       }
     }
   `
-	//gqlClient.Log = func(s string) { log.Debug(s) }
-
-	for _, p := range posts {
+	for _, po := range posts {
 		req := graphql.NewRequest(mut)
-		req.Var("title", p.Title)
-		req.Var("tags", p.Tags)
-		req.Var("uri", p.URL)
-		req.Var("desc", p.Description)
-		req.Var("time", p.Time)
-		req.Header.Add("X-API-AUTH", graphqlToken)
+		req.Var("title", po.Title)
+		req.Var("tags", po.Tags)
+		req.Var("uri", po.URL)
+		req.Var("desc", po.Description)
+		req.Var("time", po.Time)
+		req.Header.Add("X-API-AUTH", p.GraphQLToken)
 
 		err := gqlClient.Run(ctx, req, nil)
 		if err != nil {
-			log.WithError(err).Error("error talking to graphql")
+			p.Log.WithError(err).Error("error talking to graphql")
 			return err
 		}
 	}
@@ -84,11 +82,11 @@ func UpdatePins(ctx context.Context, log *logrus.Logger, pinboardToken, graphqlT
 	var resp json.RawMessage
 	err = gqlClient.Run(ctx, req, &resp)
 	if err != nil {
-		log.WithError(err).Error("error talking to graphql")
+		p.Log.WithError(err).Error("error talking to graphql")
 		return err
 	}
 
-	log.WithField("link_count", string(resp)).Infof("New Database Counts: %+v", string(resp))
+	p.Log.WithField("link_count", string(resp)).Infof("New Database Counts: %+v", string(resp))
 
 	return nil
 }

@@ -15,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// TwitterAuth holds the auth strings needed to talk to twitter.
 type TwitterAuth struct {
 	ConsumerKey    string
 	ConsumerSecret string
@@ -22,6 +23,14 @@ type TwitterAuth struct {
 	AccessSecret   string
 }
 
+// Twitter contains the context needed for working with twitter.
+type Twitter struct {
+	TwitterAuth  *TwitterAuth
+	Log          *logrus.Logger
+	GraphQLToken string
+}
+
+// Validate gets a twitter client and the current twitter user.
 func (t *TwitterAuth) Validate(ctx context.Context, log *logrus.Logger) (*twitter.Client, *twitter.User, error) {
 	if t.ConsumerKey == "" || t.ConsumerSecret == "" || t.AccessToken == "" || t.AccessSecret == "" {
 		return nil, nil, fmt.Errorf("Consumer key/secret and Access token/secret required")
@@ -46,12 +55,9 @@ func (t *TwitterAuth) Validate(ctx context.Context, log *logrus.Logger) (*twitte
 	return client, user, nil
 }
 
-func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string, tAuth *TwitterAuth) error {
-	if graphqlToken == "" {
-		return fmt.Errorf("GraphQL Token is empty")
-	}
-
-	client, user, err := tAuth.Validate(ctx, log)
+// SaveUserTweets gets a users timeline and uploads it to graphql.
+func (t *Twitter) SaveUserTweets(ctx context.Context) error {
+	client, user, err := t.TwitterAuth.Validate(ctx, t.Log)
 	if err != nil {
 		return err
 	}
@@ -66,7 +72,7 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string
 	if resp.Header.Get("X-Rate-Limit-Remaining") == "0" {
 		i, err := strconv.ParseInt(resp.Header.Get("X-Rate-Limit-Reset"), 10, 64)
 		if err != nil {
-			log.WithError(err).Error("Error converting int")
+			t.Log.WithError(err).Error("Error converting int")
 			return err
 		}
 		tm := time.Unix(i, 0)
@@ -74,12 +80,12 @@ func SaveUserTweets(ctx context.Context, log *logrus.Logger, graphqlToken string
 	}
 
 	if err != nil {
-		log.WithError(err).Errorf("Error getting tweets: %+v", resp)
+		t.Log.WithError(err).Errorf("Error getting tweets: %+v", resp)
 		return err
 	}
 
-	for _, t := range tweets {
-		err := UploadTweet(ctx, log, graphqlToken, t)
+	for _, tw := range tweets {
+		err := t.UploadTweet(ctx, tw)
 		if err != nil {
 			return nil
 		}
@@ -94,7 +100,9 @@ type tweetids struct {
 	} `json:"homeTimelineURLs"`
 }
 
-func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken string, tAuth *TwitterAuth) error {
+// CacheRandomTweets gets random tweets from graphql, and if we are missing
+// their data, gets it from twitter and uploads to graphql.
+func (t *Twitter) CacheRandomTweets(ctx context.Context) error {
 	query := `query {
     homeTimelineURLs {
       tweetIDs
@@ -103,16 +111,15 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
   `
 
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
-	//gqlClient.Log = func(s string) { log.Debug(s) }
 
 	var data tweetids
 
 	req := graphql.NewRequest(query)
-	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("X-API-AUTH", t.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err := gqlClient.Run(ctx, req, &data)
 	if err != nil {
-		log.WithError(err).Error("error talking to graphql")
+		t.Log.WithError(err).Error("error talking to graphql")
 		return err
 	}
 
@@ -128,13 +135,13 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
 			return err
 		}
 
-		t, err := GetTweet(ctx, log, tAuth, id)
+		tw, err := t.GetTweet(ctx, id)
 		if err != nil {
 			return err
 		}
 
-		if t != nil {
-			err = UploadTweet(ctx, log, graphqlToken, *t)
+		if tw != nil {
+			err = t.UploadTweet(ctx, *tw)
 			if err != nil {
 				return err
 			}
@@ -144,8 +151,9 @@ func CacheRandomTweets(ctx context.Context, log *logrus.Logger, graphqlToken str
 	return nil
 }
 
-func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth, id int64) (*twitter.Tweet, error) {
-	client, _, err := tAuth.Validate(ctx, log)
+// GetTweet gets a single tweet.
+func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error) {
+	client, _, err := t.TwitterAuth.Validate(ctx, t.Log)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +166,7 @@ func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth, id in
 	if resp.Header.Get("X-Rate-Limit-Remaining") == "0" {
 		i, err := strconv.ParseInt(resp.Header.Get("X-Rate-Limit-Reset"), 10, 64)
 		if err != nil {
-			log.WithError(err).Error("Error converting int")
+			t.Log.WithError(err).Error("Error converting int")
 			return nil, err
 		}
 		tm := time.Unix(i, 0)
@@ -166,64 +174,51 @@ func GetTweet(ctx context.Context, log *logrus.Logger, tAuth *TwitterAuth, id in
 	}
 
 	if err != nil {
-		log.WithError(err).Errorf("Error getting tweets: %+v", resp)
+		t.Log.WithError(err).Errorf("Error getting tweets: %+v", resp)
 		return nil, err
 	}
 
 	return tweet, nil
 }
 
-func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t twitter.Tweet) error {
-
-	// I have no idea if this is right.
-	// https://developer.twitter.com/en/docs/tweets/data-dictionary/overview/tweet-object
-	//log.WithField("tweet", t).Debug("examining text fields")
-	text := t.FullText
-	if text == "" && t.Text != "" {
-		text = t.Text
+// UploadTweet uploads a single tweet.
+func (t *Twitter) UploadTweet(ctx context.Context, tw twitter.Tweet) error {
+	text := tw.FullText
+	if text == "" && tw.Text != "" {
+		text = tw.Text
 	}
 
-	if t.ExtendedTweet != nil && t.ExtendedTweet.FullText != "" {
-		text = t.ExtendedTweet.FullText
+	if tw.ExtendedTweet != nil && tw.ExtendedTweet.FullText != "" {
+		text = tw.ExtendedTweet.FullText
 	}
-
-	// This is broken
-	//	if t.Retweeted {
-	//		if t.RetweetedStatus != nil {
-	//			err := UploadTweet(ctx, log, graphqlToken, *t.RetweetedStatus)
-	//			if err != nil {
-	//				log.WithError(err).Error("Error posting retweet")
-	//			}
-	//		}
-	//	}
 
 	tweet := gql.NewTweet{
-		ID:            t.IDStr,
+		ID:            tw.IDStr,
 		Text:          text,
-		ScreenName:    t.User.ScreenName,
-		FavoriteCount: t.FavoriteCount,
-		RetweetCount:  t.RetweetCount,
-		Hashtags:      make([]string, len(t.Entities.Hashtags)),
+		ScreenName:    tw.User.ScreenName,
+		FavoriteCount: tw.FavoriteCount,
+		RetweetCount:  tw.RetweetCount,
+		Hashtags:      make([]string, len(tw.Entities.Hashtags)),
 		Symbols:       []string{},
-		UserMentions:  make([]string, len(t.Entities.UserMentions)),
-		Urls:          make([]gql.URI, len(t.Entities.Urls)),
+		UserMentions:  make([]string, len(tw.Entities.UserMentions)),
+		Urls:          make([]gql.URI, len(tw.Entities.Urls)),
 	}
 
-	tp, err := t.CreatedAtTime()
+	tp, err := tw.CreatedAtTime()
 	if err != nil {
 		return err
 	}
 	tweet.Posted = tp
 
-	for i, v := range t.Entities.Hashtags {
+	for i, v := range tw.Entities.Hashtags {
 		tweet.Hashtags[i] = v.Text
 	}
 
-	for i, v := range t.Entities.Urls {
+	for i, v := range tw.Entities.Urls {
 		tweet.Urls[i] = gql.NewURI(v.ExpandedURL)
 	}
 
-	for i, v := range t.Entities.UserMentions {
+	for i, v := range tw.Entities.UserMentions {
 		tweet.UserMentions[i] = v.ScreenName
 	}
 
@@ -235,15 +230,14 @@ func UploadTweet(ctx context.Context, log *logrus.Logger, graphqlToken string, t
       }
     }
   `
-	//gqlClient.Log = func(s string) { log.Debug(s) }
 
 	req := graphql.NewRequest(mut)
 	req.Var("t", tweet)
-	req.Header.Add("X-API-AUTH", graphqlToken)
+	req.Header.Add("X-API-AUTH", t.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err = gqlClient.Run(ctx, req, nil)
 	if err != nil {
-		log.WithError(err).Error("error talking to graphql")
+		t.Log.WithError(err).Error("error talking to graphql")
 		return err
 	}
 
