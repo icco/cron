@@ -16,11 +16,13 @@ type Goodreads struct {
 	GraphQLToken string
 }
 
+// GetBooks gets the 100 most recent reviews for Nat.
 func (g *Goodreads) GetBooks(ctx context.Context) ([]goodreads.Review, error) {
 	c := goodreads.NewClient(g.Token)
 	return c.GetLastRead("18143346.Nat_Welch", 100)
 }
 
+// UpsertBooks gets books and uploads them.
 func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 	reviews, err := g.GetBooks(ctx)
 	if err != nil {
@@ -37,6 +39,7 @@ func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 	return nil
 }
 
+// UploadBook uploads a single book.
 func (g *Goodreads) UploadBook(ctx context.Context, b goodreads.Book) error {
 	tweet := gql.EditBook{
 		ID:    &b.ID,

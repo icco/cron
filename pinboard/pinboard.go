@@ -12,12 +12,14 @@ import (
 	"github.com/zachlatta/pin"
 )
 
+// Pinboard contains the context needed to call pinboard.
 type Pinboard struct {
 	Token        string
 	Log          *logrus.Logger
 	GraphQLToken string
 }
 
+// UpdatePins gets and uploads pinned websites to graphql.
 func (p *Pinboard) UpdatePins(ctx context.Context) error {
 	tokenParts := strings.Split(p.Token, ":")
 	if len(tokenParts) != 2 {

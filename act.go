@@ -10,6 +10,7 @@ import (
 	"github.com/icco/cron/tweets"
 )
 
+// Act takes a job and calls a sub project to do work.
 func Act(ctx context.Context, job string) error {
 	gqlToken := os.Getenv("GQL_TOKEN")
 	if gqlToken == "" {

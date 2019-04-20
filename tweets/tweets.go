@@ -15,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// TwitterAuth holds the auth strings needed to talk to twitter.
 type TwitterAuth struct {
 	ConsumerKey    string
 	ConsumerSecret string
@@ -22,12 +23,14 @@ type TwitterAuth struct {
 	AccessSecret   string
 }
 
+// Twitter contains the context needed for working with twitter.
 type Twitter struct {
 	TwitterAuth  *TwitterAuth
 	Log          *logrus.Logger
 	GraphQLToken string
 }
 
+// Validate gets a twitter client and the current twitter user.
 func (t *TwitterAuth) Validate(ctx context.Context, log *logrus.Logger) (*twitter.Client, *twitter.User, error) {
 	if t.ConsumerKey == "" || t.ConsumerSecret == "" || t.AccessToken == "" || t.AccessSecret == "" {
 		return nil, nil, fmt.Errorf("Consumer key/secret and Access token/secret required")
@@ -52,6 +55,7 @@ func (t *TwitterAuth) Validate(ctx context.Context, log *logrus.Logger) (*twitte
 	return client, user, nil
 }
 
+// SaveUserTweets gets a users timeline and uploads it to graphql.
 func (t *Twitter) SaveUserTweets(ctx context.Context) error {
 	client, user, err := t.TwitterAuth.Validate(ctx, t.Log)
 	if err != nil {
@@ -96,6 +100,8 @@ type tweetids struct {
 	} `json:"homeTimelineURLs"`
 }
 
+// CacheRandomTweets gets random tweets from graphql, and if we are missing
+// their data, gets it from twitter and uploads to graphql.
 func (t *Twitter) CacheRandomTweets(ctx context.Context) error {
 	query := `query {
     homeTimelineURLs {
@@ -105,7 +111,6 @@ func (t *Twitter) CacheRandomTweets(ctx context.Context) error {
   `
 
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
-	//gqlClient.t.Log = func(s string) { t.Log.Debug(s) }
 
 	var data tweetids
 
@@ -146,6 +151,7 @@ func (t *Twitter) CacheRandomTweets(ctx context.Context) error {
 	return nil
 }
 
+// GetTweet gets a single tweet.
 func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error) {
 	client, _, err := t.TwitterAuth.Validate(ctx, t.Log)
 	if err != nil {
@@ -175,6 +181,7 @@ func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error
 	return tweet, nil
 }
 
+// UploadTweet uploads a single tweet.
 func (t *Twitter) UploadTweet(ctx context.Context, tw twitter.Tweet) error {
 	text := tw.FullText
 	if text == "" && tw.Text != "" {
