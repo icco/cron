@@ -35,6 +35,8 @@ func Act(ctx context.Context, job string) error {
 	}
 
 	switch job {
+	case "minute":
+		log.Info("> heartbeat")
 	case "user-tweets":
 		t := tweets.Twitter{
 			TwitterAuth:  twitterAuth,
