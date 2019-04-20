@@ -55,7 +55,10 @@ func main() {
 	go func() {
 		ctx := context.Background()
 		for {
-			recieveMessages(ctx, "cron-client")
+			err := recieveMessages(ctx, "cron-client")
+			if err != nil {
+				log.WithError(err).Error("could not process message")
+			}
 		}
 	}()
 
@@ -65,7 +68,10 @@ func main() {
 	r.Use(middleware.Recoverer)
 	r.Use(cron.LoggingMiddleware())
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok."))
+		err := w.Write([]byte("ok."))
+		if err != nil {
+			log.WithError(err).Error("could not write response")
+		}
 	})
 	h := &ochttp.Handler{
 		Handler:     r,
