@@ -1,5 +1,7 @@
 # cron
 
+[![GoDoc](https://godoc.org/github.com/icco/cron?status.svg)](https://godoc.org/github.com/icco/cron)
+
 A bunch of cron jobs that run on my infra
 
 Right now, the following messages are sent to this job at least once during the time period.
