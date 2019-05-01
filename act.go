@@ -8,6 +8,7 @@ import (
 	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
 	"github.com/icco/cron/tweets"
+	"github.com/icco/cron/updater"
 )
 
 // Act takes a job and calls a sub project to do work.
@@ -37,6 +38,8 @@ func Act(ctx context.Context, job string) error {
 	switch job {
 	case "minute":
 		log.Info("> heartbeat")
+	case "update-deployments":
+		updater.UpdateWorkspaces(&updater.Config{Log: log})
 	case "user-tweets":
 		t := tweets.Twitter{
 			TwitterAuth:  twitterAuth,
