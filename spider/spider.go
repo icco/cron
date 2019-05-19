@@ -13,13 +13,16 @@ type Config struct {
 	URL string
 }
 
-var c *Config
+var (
+	c        *Config
+	messages chan string
+)
 
 func Crawl(conf *Config) {
 	c = conf
 
 	// Create channels for message passing.
-	messages := make(chan string)
+	messages = make(chan string)
 
 	// Pass in init url
 	messages <- c.URL
@@ -30,21 +33,22 @@ func Crawl(conf *Config) {
 	go func() {
 		select {
 		case msg := <-messages:
-			c.Log.Println("received message", msg)
-			ScrapeUrl(msg)
+			err := ScrapeUrl(msg)
+			if err != nil {
+				c.Log.WithError(err).Error("scrape error")
+			}
 		default:
-			c.Log.Println("no message received")
+			c.Log.Debug("no message received")
 		}
 	}()
 	close(messages)
 }
 
-func ScrapeUrl(uri string) ([]string, error) {
+func ScrapeUrl(uri string) error {
 	response, err := http.Get(uri)
-	ret := []string{}
 
 	if err != nil {
-		return nil, err
+		return err
 	} else {
 		defer response.Body.Close()
 		z := html.NewTokenizer(response.Body)
@@ -55,7 +59,7 @@ func ScrapeUrl(uri string) ([]string, error) {
 			switch {
 			case tt == html.ErrorToken:
 				// End of the document, we're done
-				return ret, nil
+				return nil
 			case tt == html.StartTagToken:
 				t := z.Token()
 
@@ -67,8 +71,8 @@ func ScrapeUrl(uri string) ([]string, error) {
 								continue
 							} else {
 								if u.IsAbs() {
-									c.Log.Printf("Found %+v", attr.Val)
-									ret = append(ret, attr.Val)
+									c.Log.Debugf("Found %+v", attr.Val)
+									messages <- attr.Val
 								}
 							}
 						}
@@ -78,5 +82,5 @@ func ScrapeUrl(uri string) ([]string, error) {
 		}
 	}
 
-	return ret, nil
+	return nil
 }
