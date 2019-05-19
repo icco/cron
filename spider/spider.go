@@ -45,6 +45,7 @@ func Crawl(conf *Config) {
 }
 
 func ScrapeUrl(uri string) error {
+	c.Log.Infof("visiting %+v", uri)
 	response, err := http.Get(uri)
 
 	if err != nil {
@@ -72,7 +73,7 @@ func ScrapeUrl(uri string) error {
 							continue
 						} else {
 							if u.IsAbs() {
-								c.Log.Debugf("Found %+v", attr.Val)
+								c.Log.Debugf("found %+v", attr.Val)
 								messages <- attr.Val
 							}
 						}
