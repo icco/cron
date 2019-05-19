@@ -42,7 +42,7 @@ func Act(ctx context.Context, job string) error {
 	case "update-deployments":
 		updater.UpdateWorkspaces(&updater.Config{Log: log})
 	case "spider":
-		spider.Crawl(&spider.Config{Log: log, URI: "https://writing.natwelch.com/"})
+		spider.Crawl(&spider.Config{Log: log, URL: "https://writing.natwelch.com/"})
 	case "user-tweets":
 		t := tweets.Twitter{
 			TwitterAuth:  twitterAuth,
