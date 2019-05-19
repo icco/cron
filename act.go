@@ -7,6 +7,7 @@ import (
 
 	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
+	"github.com/icco/cron/spider"
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
 )
@@ -40,6 +41,8 @@ func Act(ctx context.Context, job string) error {
 		log.Info("> heartbeat")
 	case "update-deployments":
 		updater.UpdateWorkspaces(&updater.Config{Log: log})
+	case "spider":
+		spider.Crawl(&spider.Config{Log: log, URL: "https://writing.natwelch.com/"})
 	case "user-tweets":
 		t := tweets.Twitter{
 			TwitterAuth:  twitterAuth,

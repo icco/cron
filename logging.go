@@ -20,7 +20,7 @@ func InitLogging() *logrus.Logger {
 	log.Level = logrus.DebugLevel
 	log.SetOutput(os.Stdout)
 
-	log.Info("Logger successfully initialised!")
+	log.Info("Logger successfully initialized!")
 
 	return log
 }
