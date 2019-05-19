@@ -49,31 +49,31 @@ func ScrapeUrl(uri string) error {
 
 	if err != nil {
 		return err
-	} else {
-		defer response.Body.Close()
-		z := html.NewTokenizer(response.Body)
+	}
 
-		for {
-			tt := z.Next()
+	defer response.Body.Close()
+	z := html.NewTokenizer(response.Body)
 
-			switch {
-			case tt == html.ErrorToken:
-				// End of the document, we're done
-				return nil
-			case tt == html.StartTagToken:
-				t := z.Token()
+	for {
+		tt := z.Next()
 
-				if t.Data == "a" {
-					for _, attr := range t.Attr {
-						if attr.Key == "href" {
-							u, err := url.ParseRequestURI(attr.Val)
-							if err != nil {
-								continue
-							} else {
-								if u.IsAbs() {
-									c.Log.Debugf("Found %+v", attr.Val)
-									messages <- attr.Val
-								}
+		switch {
+		case tt == html.ErrorToken:
+			// End of the document, we're done
+			return nil
+		case tt == html.StartTagToken:
+			t := z.Token()
+
+			if t.Data == "a" {
+				for _, attr := range t.Attr {
+					if attr.Key == "href" {
+						u, err := url.ParseRequestURI(attr.Val)
+						if err != nil {
+							continue
+						} else {
+							if u.IsAbs() {
+								c.Log.Debugf("Found %+v", attr.Val)
+								messages <- attr.Val
 							}
 						}
 					}
@@ -81,6 +81,4 @@ func ScrapeUrl(uri string) error {
 			}
 		}
 	}
-
-	return nil
 }
