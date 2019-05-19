@@ -1,20 +1,28 @@
 package spider
 
 import (
-	"log"
 	"net/http"
 	"net/url"
-	"os"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/net/html"
 )
 
-func Crawl(url string) {
+type Config struct {
+	Log *logrus.Logger
+	URL string
+}
+
+var c *Config
+
+func Crawl(conf *Config) {
+	c = conf
+
 	// Create channels for message passing.
 	messages := make(chan string)
 
 	// Pass in init url
-	messages <- url
+	messages <- c.URL
 
 	// Each channel will receive a value after some amount
 	// of time, to simulate e.g. blocking RPC operations
@@ -22,10 +30,10 @@ func Crawl(url string) {
 	go func() {
 		select {
 		case msg := <-messages:
-			log.Println("received message", msg)
+			c.Log.Println("received message", msg)
 			ScrapeUrl(msg)
 		default:
-			log.Println("no message received")
+			c.Log.Println("no message received")
 		}
 	}()
 	close(messages)
@@ -59,7 +67,7 @@ func ScrapeUrl(uri string) ([]string, error) {
 								continue
 							} else {
 								if u.IsAbs() {
-									log.Printf("Found %+v", attr.Val)
+									c.Log.Printf("Found %+v", attr.Val)
 									ret = append(ret, attr.Val)
 								}
 							}
