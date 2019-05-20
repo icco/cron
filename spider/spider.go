@@ -22,14 +22,11 @@ func Crawl(conf *Config) {
 	c = conf
 
 	// Create channels for message passing.
-	messages = make(chan string)
+	messages = make(chan string, 100)
 
 	// Pass in init url
 	messages <- c.URL
 
-	// Each channel will receive a value after some amount
-	// of time, to simulate e.g. blocking RPC operations
-	// executing in concurrent goroutines.
 	go func() {
 		select {
 		case msg := <-messages:
@@ -41,7 +38,6 @@ func Crawl(conf *Config) {
 			c.Log.Debug("no message received")
 		}
 	}()
-	close(messages)
 }
 
 func ScrapeUrl(uri string) error {
