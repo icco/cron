@@ -3,6 +3,7 @@ package spider
 import (
 	"net/http"
 	"net/url"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/html"
@@ -14,33 +15,38 @@ type Config struct {
 }
 
 var (
-	c        *Config
-	messages chan string
+	c  *Config
+	wg sync.WaitGroup
 )
 
 func Crawl(conf *Config) {
 	c = conf
 
 	// Create channels for message passing.
-	messages = make(chan string, 100)
+	messages := make(chan string, 100)
 
 	// Pass in init url
 	messages <- c.URL
+	wg.Add(1)
 
-	go func() {
-		select {
-		case msg := <-messages:
-			err := ScrapeUrl(msg)
-			if err != nil {
-				c.Log.WithError(err).Error("scrape error")
-			}
-		default:
-			c.Log.Debug("no message received")
-		}
-	}()
+	go worker(messages)
+
+	wg.Wait()
+	defer close(messages)
 }
 
-func ScrapeUrl(uri string) error {
+func worker(msgChan chan string) {
+	defer wg.Done()
+
+	for msg := range msgChan {
+		err := ScrapeUrl(msg, msgChan)
+		if err != nil {
+			c.Log.WithError(err).Error("scrape error")
+		}
+	}
+}
+
+func ScrapeUrl(uri string, msgChan chan string) error {
 	c.Log.Infof("visiting %+v", uri)
 	response, err := http.Get(uri)
 
@@ -70,7 +76,7 @@ func ScrapeUrl(uri string) error {
 						} else {
 							if u.IsAbs() {
 								c.Log.Debugf("found %+v", attr.Val)
-								messages <- attr.Val
+								msgChan <- attr.Val
 							}
 						}
 					}
