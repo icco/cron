@@ -1,9 +1,10 @@
 package spider
 
 import (
+	"context"
 	"net/http"
 	"net/url"
-	"sync"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/html"
@@ -15,8 +16,7 @@ type Config struct {
 }
 
 var (
-	c  *Config
-	wg sync.WaitGroup
+	c *Config
 )
 
 func Crawl(conf *Config) {
@@ -27,21 +27,24 @@ func Crawl(conf *Config) {
 
 	// Pass in init url
 	messages <- c.URL
-	wg.Add(1)
 
-	go worker(messages)
+	// Pass a context with a timeout to tell a blocking function that it should
+	// abandon its work after the timeout elapses.
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 
-	wg.Wait()
-	defer close(messages)
+	go worker(ctx, messages)
 }
 
-func worker(msgChan chan string) {
-	defer wg.Done()
-
-	for msg := range msgChan {
-		err := ScrapeUrl(msg, msgChan)
-		if err != nil {
-			c.Log.WithError(err).Error("scrape error")
+func worker(ctx context.Context, msgChan chan string) {
+	for {
+		select {
+		case msg := <-msgChan:
+			err := ScrapeUrl(msg, msgChan)
+			if err != nil {
+				c.Log.WithError(err).Error("scrape error")
+			}
+		case <-ctx.Done():
+			return
 		}
 	}
 }
