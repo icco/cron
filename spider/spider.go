@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/html"
@@ -27,34 +26,39 @@ func Crawl(conf *Config) {
 
 	// Pass in init url
 	messages <- c.URL
-
-	// Pass a context with a timeout to tell a blocking function that it should
-	// abandon its work after the timeout elapses.
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx := context.TODO()
 
 	go worker(ctx, messages)
 }
 
-func worker(ctx context.Context, msgChan chan string) {
+func worker(ctx context.Context, msgChan <-chan string) {
+	c.Log.Debug("work")
 	for {
 		select {
 		case msg := <-msgChan:
-			err := ScrapeUrl(msg, msgChan)
+			urls, err := ScrapeUrl(msg)
 			if err != nil {
-				c.Log.WithError(err).Error("scrape error")
+				c.Log.WithError(err).WithContext(ctx).Error("scrape error")
+			}
+
+			for _, u := range urls {
+				//msgChan <- u
+				c.Log.Debug(u)
 			}
 		case <-ctx.Done():
+			c.Log.Warn(ctx.Err())
 			return
 		}
 	}
 }
 
-func ScrapeUrl(uri string, msgChan chan string) error {
+func ScrapeUrl(uri string) ([]string, error) {
 	c.Log.Infof("visiting %+v", uri)
 	response, err := http.Get(uri)
+	ret := []string{}
 
 	if err != nil {
-		return err
+		return ret, err
 	}
 
 	defer response.Body.Close()
@@ -66,7 +70,7 @@ func ScrapeUrl(uri string, msgChan chan string) error {
 		switch {
 		case tt == html.ErrorToken:
 			// End of the document, we're done
-			return nil
+			return ret, nil
 		case tt == html.StartTagToken:
 			t := z.Token()
 
@@ -79,7 +83,7 @@ func ScrapeUrl(uri string, msgChan chan string) error {
 						} else {
 							if u.IsAbs() {
 								c.Log.Debugf("found %+v", attr.Val)
-								msgChan <- attr.Val
+								ret = append(ret, attr.Val)
 							}
 						}
 					}
