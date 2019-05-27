@@ -1,11 +1,15 @@
 package spider
 
 import (
+	"context"
+	"crypto/tls"
 	"net/http"
 	"net/url"
+	"sync/atomic"
+	"time"
 
+	"github.com/jackdanger/collectlinks"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/html"
 )
 
 type Config struct {
@@ -14,71 +18,73 @@ type Config struct {
 }
 
 var (
-	c        *Config
-	messages chan string
+	c       *Config
+	ops     uint64
+	visited map[string]bool
 )
 
 func Crawl(conf *Config) {
 	c = conf
 
-	// Create channels for message passing.
-	messages = make(chan string)
+	queue := make(chan string, 100)
+	visited = make(map[string]bool)
+	ctx, cncl := context.WithTimeout(context.Background(), 30*time.Second)
 
-	// Pass in init url
-	messages <- c.URL
+	go func() { queue <- c.URL }()
 
-	// Each channel will receive a value after some amount
-	// of time, to simulate e.g. blocking RPC operations
-	// executing in concurrent goroutines.
-	go func() {
-		select {
-		case msg := <-messages:
-			err := ScrapeUrl(msg)
-			if err != nil {
-				c.Log.WithError(err).Error("scrape error")
-			}
-		default:
-			c.Log.Debug("no message received")
+	for uri := range queue {
+		enqueue(ctx, uri, queue)
+
+		if ctx.Err() != nil {
+			c.Log.Warn(ctx.Err())
+			cncl()
+			return
 		}
-	}()
-	close(messages)
+	}
+
+	cncl()
 }
 
-func ScrapeUrl(uri string) error {
-	response, err := http.Get(uri)
+func enqueue(ctx context.Context, uri string, queue chan string) {
+	atomic.AddUint64(&ops, 1)
+	c.Log.WithContext(ctx).Printf("ops: %d, %s", atomic.LoadUint64(&ops), uri)
 
-	if err != nil {
-		return err
+	visited[uri] = true
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
 	}
 
-	defer response.Body.Close()
-	z := html.NewTokenizer(response.Body)
+	client := http.Client{Transport: transport}
+	resp, err := client.Get(uri)
+	if err != nil {
+		c.Log.WithContext(ctx).WithError(err).Info("error scrapping")
+		return
+	}
+	defer resp.Body.Close()
 
-	for {
-		tt := z.Next()
+	links := collectlinks.All(resp.Body)
 
-		switch {
-		case tt == html.ErrorToken:
-			// End of the document, we're done
-			return nil
-		case tt == html.StartTagToken:
-			t := z.Token()
-
-			if t.Data == "a" {
-				for _, attr := range t.Attr {
-					if attr.Key == "href" {
-						u, err := url.ParseRequestURI(attr.Val)
-						if err != nil {
-							continue
-						} else {
-							if u.IsAbs() {
-								c.Log.Debugf("Found %+v", attr.Val)
-								messages <- attr.Val
-							}
-						}
-					}
-				}
+	for _, link := range links {
+		absolute := fixUrl(link, uri)
+		if uri != "" {
+			if !visited[absolute] {
+				go func() { queue <- absolute }()
 			}
 		}
 	}
+}
+
+func fixUrl(href, base string) string {
+	uri, err := url.Parse(href)
+	if err != nil {
+		return ""
+	}
+	baseUrl, err := url.Parse(base)
+	if err != nil {
+		return ""
+	}
+	uri = baseUrl.ResolveReference(uri)
+	return uri.String()
 }
