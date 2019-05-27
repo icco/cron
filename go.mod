@@ -22,6 +22,7 @@ require (
 	github.com/hellofresh/logging-go v0.3.0
 	github.com/icco/graphql v0.0.0-20190519020834-6b57b301b910
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
+	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/machinebox/graphql v0.2.2
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
 	github.com/onsi/ginkgo v1.7.0 // indirect
