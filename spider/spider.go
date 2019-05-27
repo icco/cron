@@ -48,8 +48,6 @@ func worker(ctx context.Context, msgChan chan string) {
 			return
 		}
 	}
-
-	return
 }
 
 func ScrapeUrl(uri string) ([]string, error) {
