@@ -1,10 +1,12 @@
 package spider
 
 import (
+	"context"
 	"crypto/tls"
 	"net/http"
 	"net/url"
 	"sync/atomic"
+	"time"
 
 	"github.com/jackdanger/collectlinks"
 	"github.com/sirupsen/logrus"
@@ -26,17 +28,24 @@ func Crawl(conf *Config) {
 
 	queue := make(chan string, 100)
 	visited = make(map[string]bool)
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
 
 	go func() { queue <- c.URL }()
 
 	for uri := range queue {
-		enqueue(uri, queue)
+		enqueue(ctx, uri, queue)
+
+		if ctx.Err() != nil {
+			c.Log.Warn(ctx.Err())
+			return
+		}
 	}
 }
 
-func enqueue(uri string, queue chan string) {
+func enqueue(ctx context.Context, uri string, queue chan string) {
 	atomic.AddUint64(&ops, 1)
-	c.Log.Printf("ops: %d, %s", atomic.LoadUint64(&ops), uri)
+	c.Log.WithContext(ctx).Printf("ops: %d, %s", atomic.LoadUint64(&ops), uri)
+
 	visited[uri] = true
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -47,6 +56,7 @@ func enqueue(uri string, queue chan string) {
 	client := http.Client{Transport: transport}
 	resp, err := client.Get(uri)
 	if err != nil {
+		c.Log.WithContext(ctx).WithError(err).Info("error scrapping")
 		return
 	}
 	defer resp.Body.Close()
