@@ -28,7 +28,7 @@ func Crawl(conf *Config) {
 
 	queue := make(chan string, 100)
 	visited = make(map[string]bool)
-	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cncl := context.WithTimeout(context.Background(), 30*time.Second)
 
 	go func() { queue <- c.URL }()
 
@@ -40,6 +40,8 @@ func Crawl(conf *Config) {
 			return
 		}
 	}
+
+	cncl()
 }
 
 func enqueue(ctx context.Context, uri string, queue chan string) {
