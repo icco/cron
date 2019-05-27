@@ -32,7 +32,6 @@ func Crawl(conf *Config) {
 	for uri := range queue {
 		enqueue(uri, queue)
 	}
-
 }
 
 func enqueue(uri string, queue chan string) {
@@ -44,6 +43,7 @@ func enqueue(uri string, queue chan string) {
 			InsecureSkipVerify: true,
 		},
 	}
+
 	client := http.Client{Transport: transport}
 	resp, err := client.Get(uri)
 	if err != nil {
