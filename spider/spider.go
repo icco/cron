@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"net/url"
+	"sync/atomic"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -16,31 +17,44 @@ type Config struct {
 }
 
 var (
-	c *Config
+	c   *Config
+	ops uint64
 )
 
 func Crawl(conf *Config) {
 	c = conf
 
 	messages := make(chan string, 100)
+	results := make(chan string, 100)
+
+	ctx, _ := context.WithTimeout(context.Background(), 30*time.Second)
+
+	// This starts up 3 workers, initially blocked
+	// because there are no jobs yet.
+	for w := 0; w < 5; w++ {
+		go worker(ctx, messages, results)
+	}
 
 	// Pass in init url
 	messages <- c.URL
-	ctx, cncl := context.WithTimeout(context.Background(), 30*time.Second)
-
-	worker(ctx, messages)
-	cncl()
+	for u := range results {
+		messages <- u
+	}
 }
 
-func worker(ctx context.Context, msgChan chan string) {
+func worker(ctx context.Context, msgChan <-chan string, results chan<- string) {
 	for msg := range msgChan {
 		urls, err := ScrapeUrl(msg)
+
+		atomic.AddUint64(&ops, 1)
+		c.Log.WithContext(ctx).Printf("ops: %d, %s", atomic.LoadUint64(&ops), msg)
+
 		if err != nil {
 			c.Log.WithError(err).WithContext(ctx).Error("scrape error")
 		}
 
 		for _, u := range urls {
-			msgChan <- u
+			results <- u
 		}
 
 		if ctx.Err() != nil {
