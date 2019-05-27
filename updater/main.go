@@ -1,6 +1,7 @@
 package updater
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -122,7 +123,7 @@ var (
 	}
 )
 
-func UpdateWorkspaces(conf *Config) {
+func UpdateWorkspaces(ctx context.Context, conf *Config) {
 	repoFmt := "gcr.io/icco-cloud/%s:%s"
 	c = conf
 
@@ -130,14 +131,14 @@ func UpdateWorkspaces(conf *Config) {
 		sha := GetSHA(r.Owner, r.Repo)
 		repo := fmt.Sprintf(repoFmt, r.Repo, sha)
 		c.Log.Printf(repo)
-		err := UpdateKube(r, repo)
+		err := UpdateKube(ctx, r, repo)
 		if err != nil {
-			c.Log.Fatal(err)
+			c.Log.WithError(err).WithContext(ctx).Fatal(err)
 		}
 	}
 }
 
-func UpdateKube(r SiteMap, pkg string) error {
+func UpdateKube(ctx context.Context, r SiteMap, pkg string) error {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return err
@@ -164,7 +165,7 @@ func UpdateKube(r SiteMap, pkg string) error {
 		return fmt.Errorf("Update failed: %v", retryErr)
 	}
 
-	c.Log.Print("Updated deployment...")
+	c.Log.WithContext(ctx).Print("Updated deployment...")
 
 	return nil
 }

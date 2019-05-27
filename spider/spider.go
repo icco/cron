@@ -23,12 +23,12 @@ var (
 	visited map[string]bool
 )
 
-func Crawl(conf *Config) {
+func Crawl(octx context.Context, conf *Config) {
 	c = conf
 
 	queue := make(chan string, 100)
 	visited = make(map[string]bool)
-	ctx, cncl := context.WithTimeout(context.Background(), 30*time.Second)
+	ctx, cncl := context.WithTimeout(octx, 30*time.Second)
 
 	go func() { queue <- c.URL }()
 
