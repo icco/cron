@@ -37,6 +37,7 @@ func Crawl(conf *Config) {
 
 		if ctx.Err() != nil {
 			c.Log.Warn(ctx.Err())
+			cncl()
 			return
 		}
 	}
