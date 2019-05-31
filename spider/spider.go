@@ -10,6 +10,8 @@ import (
 
 	"github.com/jackdanger/collectlinks"
 	"github.com/sirupsen/logrus"
+	"go.opencensus.io/plugin/ochttp"
+	"go.opencensus.io/stats/view"
 )
 
 type Config struct {
@@ -49,15 +51,20 @@ func enqueue(ctx context.Context, uri string, queue chan string) {
 	atomic.AddUint64(&ops, 1)
 	c.Log.WithContext(ctx).Printf("ops: %d, %s", atomic.LoadUint64(&ops), uri)
 
-	visited[uri] = true
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true,
-		},
+	if err := view.Register(
+		ochttp.ClientSentBytesDistribution,
+		ochttp.ClientReceivedBytesDistribution,
+		ochttp.ClientRoundtripLatencyDistribution,
+	); err != nil {
+		log.Fatal(err)
 	}
 
-	client := http.Client{Transport: transport}
+	client := &http.Client{
+		Transport: &ochttp.Transport{},
+	}
+
 	resp, err := client.Get(uri)
+	visited[uri] = true
 	if err != nil {
 		c.Log.WithContext(ctx).WithError(err).Info("error scrapping")
 		return
