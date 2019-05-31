@@ -21,9 +21,23 @@ import (
 )
 
 var (
-	log     = cron.InitLogging()
-	msgRecv = stats.Int64("natwelch.com/message/recieved", "recieved message from Pub/Sub", stats.UnitDimensionless)
-	msgAck  = stats.Int64("natwelch.com/message/acknowledged", "acknowledged message from Pub/Sub", stats.UnitDimensionless)
+	log = cron.InitLogging()
+
+	msgRecv     = stats.Int64("natwelch.com/stats/message/recieved", "recieved message from Pub/Sub", stats.UnitDimensionless)
+	msgRecvView = &view.View{
+		Name:        "natwelch.com/views/message/recieved",
+		Description: "recieved message from Pub/Sub",
+		Measure:     msgRecv,
+		Aggregation: view.Count(),
+	}
+
+	msgAck     = stats.Int64("natwelch.com/stats/message/acknowledged", "acknowledged message from Pub/Sub", stats.UnitDimensionless)
+	msgAckView = &view.View{
+		Name:        "natwelch.com/views/message/acknowledged",
+		Description: "acknowledged message from Pub/Sub",
+		Measure:     msgRecv,
+		Aggregation: view.Count(),
+	}
 )
 
 func main() {
@@ -84,12 +98,12 @@ func main() {
 		ochttp.ServerRequestCountView,
 		ochttp.ServerResponseCountByStatusCode,
 	}...); err != nil {
-		log.WithError(err).Fatal("Failed to register ochttp.DefaultServerViews")
+		log.WithError(err).Fatal("Failed to register ochttp views")
 	}
 
 	if err := view.Register([]*view.View{
-		msgRecv,
-		msgAck,
+		msgRecvView,
+		msgAckView,
 	}...); err != nil {
 		log.WithError(err).Fatal("Failed to register server metrics")
 	}
