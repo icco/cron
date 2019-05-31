@@ -15,12 +15,15 @@ import (
 	"github.com/icco/cron"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ochttp"
+	"go.opencensus.io/stats"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
 
 var (
-	log = cron.InitLogging()
+	log     = cron.InitLogging()
+	msgRecv = stats.Int64("natwelch.com/message/recieved", "recieved message from Pub/Sub", stats.UnitDimensionless)
+	msgAck  = stats.Int64("natwelch.com/message/acknowledged", "acknowledged message from Pub/Sub", stats.UnitDimensionless)
 )
 
 func main() {
@@ -103,9 +106,12 @@ func recieveMessages(ctx context.Context, subName string) error {
 	}
 
 	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		stats.Record(ctx, msgRecv.M(1))
+
 		data := map[string]string{}
 		err := json.Unmarshal(msg.Data, &data)
 		logFields := logrus.Fields{"parsed": data, "unparsed": string(msg.Data)}
+
 		if err != nil {
 			log.WithError(err).WithFields(logFields).Warn("Couldn't decode json.")
 		} else {
@@ -116,7 +122,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 			}
 			msg.Ack()
 
-			// TODO: Add metrics for message recieve
+			stats.Record(ctx, msgAck.M(1))
 		}
 	})
 	if err != nil {
