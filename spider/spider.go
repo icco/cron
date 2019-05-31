@@ -2,7 +2,6 @@ package spider
 
 import (
 	"context"
-	"crypto/tls"
 	"net/http"
 	"net/url"
 	"sync/atomic"
@@ -56,7 +55,7 @@ func enqueue(ctx context.Context, uri string, queue chan string) {
 		ochttp.ClientReceivedBytesDistribution,
 		ochttp.ClientRoundtripLatencyDistribution,
 	); err != nil {
-		log.Fatal(err)
+		c.Log.Fatal(err)
 	}
 
 	client := &http.Client{
