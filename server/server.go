@@ -87,6 +87,13 @@ func main() {
 		log.WithError(err).Fatal("Failed to register ochttp.DefaultServerViews")
 	}
 
+	if err := view.Register([]*view.View{
+		msgRecv,
+		msgAck,
+	}...); err != nil {
+		log.WithError(err).Fatal("Failed to register server metrics")
+	}
+
 	log.Fatal(http.ListenAndServe(":"+port, h))
 }
 
