@@ -43,6 +43,12 @@ var (
 			Deployment: "charts",
 		},
 		SiteMap{
+			Host:       "code.natwelch.com",
+			Owner:      "icco",
+			Repo:       "code.natwelch.com",
+			Deployment: "code",
+		},
+		SiteMap{
 			Host:       "cron.natwelch.com",
 			Owner:      "icco",
 			Repo:       "cron",
