@@ -15,12 +15,29 @@ import (
 	"github.com/icco/cron"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ochttp"
+	"go.opencensus.io/stats"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 )
 
 var (
 	log = cron.InitLogging()
+
+	msgRecv     = stats.Int64("natwelch.com/stats/message/recieved", "recieved message from Pub/Sub", stats.UnitDimensionless)
+	msgRecvView = &view.View{
+		Name:        "natwelch.com/views/message/recieved",
+		Description: "recieved message from Pub/Sub",
+		Measure:     msgRecv,
+		Aggregation: view.Count(),
+	}
+
+	msgAck     = stats.Int64("natwelch.com/stats/message/acknowledged", "acknowledged message from Pub/Sub", stats.UnitDimensionless)
+	msgAckView = &view.View{
+		Name:        "natwelch.com/views/message/acknowledged",
+		Description: "acknowledged message from Pub/Sub",
+		Measure:     msgRecv,
+		Aggregation: view.Count(),
+	}
 )
 
 func main() {
@@ -81,7 +98,14 @@ func main() {
 		ochttp.ServerRequestCountView,
 		ochttp.ServerResponseCountByStatusCode,
 	}...); err != nil {
-		log.WithError(err).Fatal("Failed to register ochttp.DefaultServerViews")
+		log.WithError(err).Fatal("Failed to register ochttp views")
+	}
+
+	if err := view.Register([]*view.View{
+		msgRecvView,
+		msgAckView,
+	}...); err != nil {
+		log.WithError(err).Fatal("Failed to register server metrics")
 	}
 
 	log.Fatal(http.ListenAndServe(":"+port, h))
@@ -103,9 +127,12 @@ func recieveMessages(ctx context.Context, subName string) error {
 	}
 
 	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		stats.Record(ctx, msgRecv.M(1))
+
 		data := map[string]string{}
 		err := json.Unmarshal(msg.Data, &data)
 		logFields := logrus.Fields{"parsed": data, "unparsed": string(msg.Data)}
+
 		if err != nil {
 			log.WithError(err).WithFields(logFields).Warn("Couldn't decode json.")
 		} else {
@@ -116,7 +143,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 			}
 			msg.Ack()
 
-			// TODO: Add metrics for message recieve
+			stats.Record(ctx, msgAck.M(1))
 		}
 	})
 	if err != nil {

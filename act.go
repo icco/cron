@@ -10,10 +10,22 @@ import (
 	"github.com/icco/cron/spider"
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
+	"go.opencensus.io/tag"
 )
 
 // Act takes a job and calls a sub project to do work.
-func Act(ctx context.Context, job string) error {
+func Act(octx context.Context, job string) error {
+	jobKey, err := tag.NewKey("natwelch.com/keys/job")
+	if err != nil {
+		log.WithError(err).Warn("could not create oc tag")
+	}
+	ctx, err := tag.New(octx,
+		tag.Upsert(jobKey, job),
+	)
+	if err != nil {
+		log.WithError(err).Warn("could not add oc tag")
+	}
+
 	gqlToken := os.Getenv("GQL_TOKEN")
 	if gqlToken == "" {
 		return fmt.Errorf("GQL_TOKEN is unset")
