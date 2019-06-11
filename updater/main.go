@@ -194,11 +194,11 @@ func GetSHA(owner string, repo string) string {
 
 	err = json.Unmarshal(body, sha)
 	if err != nil {
-		c.Log.Fatal(err)
+		c.Log.WithFields(logrus.Fields{"body": body}).Fatal(err)
 	}
 
 	if sha.SHA == "" {
-		c.Log.Fatalf("github.com/%s/%s is not a valid repo", owner, repo)
+		c.Log.WithFields(logrus.Fields{"body": body}).Fatalf("github.com/%s/%s is not a valid repo", owner, repo)
 	}
 
 	return sha.SHA
