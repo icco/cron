@@ -2,11 +2,9 @@ package updater
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 
+	"github.com/google/go-github/v26/github"
 	"github.com/sirupsen/logrus"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -134,10 +132,15 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 	c = conf
 
 	for _, r := range siteMaps {
-		sha := GetSHA(r.Owner, r.Repo)
+		sha, err := GetSHA(ctx, r.Owner, r.Repo)
+		if _, ok := err.(*github.RateLimitError); ok {
+			c.Log.WithContext(ctx).WithError(err).Warn("hit rate limit")
+			break
+		}
+
 		repo := fmt.Sprintf(repoFmt, r.Repo, sha)
 		c.Log.Printf(repo)
-		err := UpdateKube(ctx, r, repo)
+		err = UpdateKube(ctx, r, repo)
 		if err != nil {
 			c.Log.WithError(err).WithContext(ctx).Fatal(err)
 		}
@@ -176,30 +179,20 @@ func UpdateKube(ctx context.Context, r SiteMap, pkg string) error {
 	return nil
 }
 
-func GetSHA(owner string, repo string) string {
-	sha := &struct {
-		SHA string `json:"sha"`
-	}{}
-
-	apiEndpoint := "https://api.github.com/repos/%s/%s/commits/master"
-	resp, err := http.Get(fmt.Sprintf(apiEndpoint, owner, repo))
+func GetSHA(ctx context.Context, owner string, repo string) (string, error) {
+	client := github.NewClient(nil)
+	branch, _, err := client.Repositories.GetBranch(ctx, owner, repo, "master")
 	if err != nil {
-		c.Log.Fatal(err)
+		return "", err
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		c.Log.Fatal(err)
+	if branch != nil {
+		if branch.Commit != nil {
+			if branch.Commit.SHA != nil {
+				return *branch.Commit.SHA, nil
+			}
+		}
 	}
 
-	err = json.Unmarshal(body, sha)
-	if err != nil {
-		c.Log.WithFields(logrus.Fields{"body": body}).Fatal(err)
-	}
-
-	if sha.SHA == "" {
-		c.Log.WithFields(logrus.Fields{"body": body}).Fatalf("github.com/%s/%s is not a valid repo", owner, repo)
-	}
-
-	return sha.SHA
+	return "", fmt.Errorf("could not get %s/%s", owner, repo)
 }

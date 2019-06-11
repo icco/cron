@@ -11,6 +11,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.0
 	github.com/franklinhu/go-goodreads v0.0.0-20180415215853-6b5441de9639
 	github.com/gogo/protobuf v1.2.0 // indirect
+	github.com/google/go-github/v26 v26.0.2
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/gorilla/context v1.1.1 // indirect
