@@ -8,9 +8,16 @@ Right now, the following messages are sent to this job at least once during the 
 
 ```
 {"job": "goodreads"}
+{"job": "minute"}
 {"job": "pinboard"}
 {"job": "random-tweets"}
 {"job": "user-tweets"}
+```
+
+The following is disabled:
+
+```
+{"job": "spider"}
 ```
 
 These can be configured at https://console.cloud.google.com/cloudscheduler?project=icco-cloud
