@@ -3,6 +3,7 @@ module github.com/icco/cron
 go 1.12
 
 require (
+	cloud.google.com/go v0.38.0
 	dmitri.shuralyov.com/app/changes v0.0.0-20181114035150-5af16e21babb // indirect
 	dmitri.shuralyov.com/service/change v0.0.0-20190203163610-217368fe4577 // indirect
 	github.com/cenkalti/backoff v2.2.0+incompatible // indirect
@@ -11,6 +12,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.0
 	github.com/franklinhu/go-goodreads v0.0.0-20180415215853-6b5441de9639
 	github.com/gogo/protobuf v1.2.0 // indirect
+	github.com/golang/protobuf v1.3.1
 	github.com/google/go-github/v26 v26.0.2
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
@@ -45,6 +47,8 @@ require (
 	go4.org v0.0.0-20181109185143-00e24f1b2599 // indirect
 	golang.org/x/exp v0.0.0-20190125153040-c74c464bbbf2 // indirect
 	golang.org/x/perf v0.0.0-20190124201629-844a5f5b46f4 // indirect
+	google.golang.org/api v0.4.0
+	google.golang.org/genproto v0.0.0-20190425155659-357c62f0e4bb
 	honnef.co/go/tools v0.0.0-20190128043916-71123fcbb8fe // indirect
 	k8s.io/api v0.0.0-20190602205700-9b8cae951d65
 	k8s.io/apimachinery v0.0.0-20190607205628-5fbcd19f360b

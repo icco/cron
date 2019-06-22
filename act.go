@@ -10,6 +10,7 @@ import (
 	"github.com/icco/cron/spider"
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
+	"github.com/icco/cron/uptime"
 	"go.opencensus.io/tag"
 )
 
@@ -92,6 +93,15 @@ func Act(octx context.Context, job string) error {
 			GraphQLToken: gqlToken,
 		}
 		err := g.UpsertBooks(ctx)
+		if err != nil {
+			return err
+		}
+	case "uptime":
+		c := &uptime.Config{
+			Log:       log,
+			ProjectID: "icco-cloud",
+		}
+		err := uptime.UpdateUptimeChecks(ctx, c)
 		if err != nil {
 			return err
 		}

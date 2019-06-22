@@ -26,8 +26,10 @@ type SiteMap struct {
 }
 
 var (
-	c        *Config
-	siteMaps = []SiteMap{
+	c *Config
+
+	// AllSites contains a list of all domains I update from my code.
+	AllSites = []SiteMap{
 		SiteMap{
 			Host:       "cacophony.natwelch.com",
 			Owner:      "icco",
