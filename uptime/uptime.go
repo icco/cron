@@ -2,8 +2,6 @@ package uptime
 
 import (
 	"context"
-	"fmt"
-	"io"
 	"sort"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
@@ -13,7 +11,6 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
-	"google.golang.org/genproto/protobuf/field_mask"
 )
 
 type Config struct {
@@ -27,7 +24,7 @@ var (
 
 // UpdateUptimeChecks makes sure there is an uptime check for all of my
 // domains.
-func UpdateUptimeChecks(ctx context.Context, conf *Config) error {
+func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	hosts := []string{}
 	for _, s := range ExtraHosts {
 		hosts = append(hosts, s)
@@ -38,7 +35,7 @@ func UpdateUptimeChecks(ctx context.Context, conf *Config) error {
 
 	sort.Strings(hosts)
 
-	existingChecks, err := conf.list(ctx)
+	existingChecks, err := c.list(ctx)
 	if err != nil {
 		return err
 	}
@@ -46,6 +43,8 @@ func UpdateUptimeChecks(ctx context.Context, conf *Config) error {
 	for _, check := range existingChecks {
 		c.Log.Debugf("%+v", check)
 	}
+
+	return nil
 }
 
 // create creates an example uptime check.
@@ -87,10 +86,10 @@ func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeC
 }
 
 // list is an example of listing the uptime checks in projectID.
-func (c *Config) list(ctx context.Context, host string) ([]*monitoringpb.UptimeCheckConfig, error) {
+func (c *Config) list(ctx context.Context) ([]*monitoringpb.UptimeCheckConfig, error) {
 	client, err := monitoring.NewUptimeCheckClient(ctx)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer client.Close()
 	req := &monitoringpb.ListUptimeCheckConfigsRequest{
