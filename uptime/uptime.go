@@ -28,9 +28,7 @@ var (
 // domains.
 func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	hosts := []string{}
-	for _, s := range ExtraHosts {
-		hosts = append(hosts, s)
-	}
+	hosts = append(hosts, ExtraHosts...)
 	for _, s := range updater.AllSites {
 		hosts = append(hosts, s.Host)
 	}
