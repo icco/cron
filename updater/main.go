@@ -26,8 +26,10 @@ type SiteMap struct {
 }
 
 var (
-	c        *Config
-	siteMaps = []SiteMap{
+	c *Config
+
+	// AllSites contains a list of all domains I update from my code.
+	AllSites = []SiteMap{
 		SiteMap{
 			Host:       "cacophony.natwelch.com",
 			Owner:      "icco",
@@ -131,7 +133,7 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 	repoFmt := "gcr.io/icco-cloud/%s:%s"
 	c = conf
 
-	for _, r := range siteMaps {
+	for _, r := range AllSites {
 		sha, err := GetSHA(ctx, r.Owner, r.Repo)
 		if _, ok := err.(*github.RateLimitError); ok {
 			c.Log.WithContext(ctx).WithError(err).Warn("hit rate limit")
