@@ -133,7 +133,7 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 	repoFmt := "gcr.io/icco-cloud/%s:%s"
 	c = conf
 
-	for _, r := range siteMaps {
+	for _, r := range AllSites {
 		sha, err := GetSHA(ctx, r.Owner, r.Repo)
 		if _, ok := err.(*github.RateLimitError); ok {
 			c.Log.WithContext(ctx).WithError(err).Warn("hit rate limit")
