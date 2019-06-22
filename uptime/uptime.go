@@ -19,7 +19,9 @@ type Config struct {
 }
 
 var (
-	ExtraHosts = []string{}
+	ExtraHosts = []string{
+		"corybooker.com",
+	}
 )
 
 // UpdateUptimeChecks makes sure there is an uptime check for all of my
@@ -41,10 +43,24 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	}
 
 	for _, check := range existingChecks {
-		c.Log.Debugf("%+v", check)
+		mr := check.GetMonitoredResource()
+		c.Log.Debugf("host found: %+v", mr.Labels["host"])
+		i := sort.SearchStrings(hosts, mr.Labels["host"])
+		if i >= 0 && i < len(hosts) {
+			hosts = remove(hosts, i)
+		}
+	}
+
+	for _, host := range hosts {
+		c.create(ctx, host)
 	}
 
 	return nil
+}
+
+func remove(s []string, i int) []string {
+	s[i] = s[len(s)-1]
+	return s[:len(s)-1]
 }
 
 // create creates an example uptime check.
@@ -78,6 +94,7 @@ func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeC
 			Period:  &duration.Duration{Seconds: 60},
 		},
 	}
+	c.Log.Infof("creating %+v", req)
 	config, err := client.CreateUptimeCheckConfig(ctx, req)
 	if err != nil {
 		return nil, err
