@@ -56,16 +56,21 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 		i := sort.SearchStrings(existingHosts, host)
 
 		if i >= len(existingHosts) {
-			c.create(ctx, host)
+			_, err := c.create(ctx, host)
+			if err != nil {
+				return err
+			}
 		} else {
-			c.update(ctx, host, checkHostMap[host])
+			_, err := c.update(ctx, host, checkHostMap[host])
+			if err != nil {
+				return err
+			}
 		}
 	}
 
 	return nil
 }
 
-// create creates an example uptime check.
 func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeCheckConfig, error) {
 	client, err := monitoring.NewUptimeCheckClient(ctx)
 	if err != nil {
@@ -100,7 +105,6 @@ func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeC
 	return client.CreateUptimeCheckConfig(ctx, req)
 }
 
-// list is an example of listing the uptime checks in projectID.
 func (c *Config) list(ctx context.Context) ([]*monitoringpb.UptimeCheckConfig, error) {
 	client, err := monitoring.NewUptimeCheckClient(ctx)
 	if err != nil {
@@ -126,7 +130,6 @@ func (c *Config) list(ctx context.Context) ([]*monitoringpb.UptimeCheckConfig, e
 	return ret, nil
 }
 
-// update is an example of updating an uptime check.
 func (c *Config) update(ctx context.Context, host, id string) (*monitoringpb.UptimeCheckConfig, error) {
 	client, err := monitoring.NewUptimeCheckClient(ctx)
 	if err != nil {
