@@ -5,6 +5,8 @@
 
 A bunch of cron jobs that run on my infra
 
+This is documented on my blog at https://writing.natwelch.com/post/699.
+
 Right now, the following messages are sent to this job at least once during the time period.
 
 ```
