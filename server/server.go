@@ -23,10 +23,10 @@ import (
 var (
 	log = cron.InitLogging()
 
-	msgRecv     = stats.Int64("natwelch.com/stats/message/recieved", "recieved message from Pub/Sub", stats.UnitDimensionless)
+	msgRecv     = stats.Int64("natwelch.com/stats/message/received", "received message from Pub/Sub", stats.UnitDimensionless)
 	msgRecvView = &view.View{
-		Name:        "natwelch.com/views/message/recieved",
-		Description: "recieved message from Pub/Sub",
+		Name:        "natwelch.com/views/message/received",
+		Description: "received message from Pub/Sub",
 		Measure:     msgRecv,
 		Aggregation: view.Count(),
 	}
