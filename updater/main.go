@@ -30,97 +30,97 @@ var (
 
 	// AllSites contains a list of all domains I update from my code.
 	AllSites = []SiteMap{
-		SiteMap{
+		{
 			Host:       "cacophony.natwelch.com",
 			Owner:      "icco",
 			Repo:       "cacophony",
 			Deployment: "cacophony",
 		},
-		SiteMap{
+		{
 			Host:       "chartopia.app",
 			Owner:      "icco",
 			Repo:       "charts",
 			Deployment: "charts",
 		},
-		SiteMap{
+		{
 			Host:       "code.natwelch.com",
 			Owner:      "icco",
 			Repo:       "code.natwelch.com",
 			Deployment: "code",
 		},
-		SiteMap{
+		{
 			Host:       "cron.natwelch.com",
 			Owner:      "icco",
 			Repo:       "cron",
 			Deployment: "cron",
 		},
-		SiteMap{
+		{
 			Host:       "etu.natwelch.com",
 			Owner:      "icco",
 			Repo:       "etu",
 			Deployment: "etu",
 		},
-		SiteMap{
+		{
 			Host:       "gotak.app",
 			Owner:      "icco",
 			Repo:       "gotak",
 			Deployment: "gotak",
 		},
-		SiteMap{
+		{
 			Host:       "graphql.natwelch.com",
 			Owner:      "icco",
 			Repo:       "graphql",
 			Deployment: "graphql",
 		},
-		SiteMap{
+		{
 			Host:       "hello.natwelch.com",
 			Owner:      "icco",
 			Repo:       "hello",
 			Deployment: "hello",
 		},
-		SiteMap{
+		{
 			Host:       "inspiration.natwelch.com",
 			Owner:      "icco",
 			Repo:       "inspiration",
 			Deployment: "inspiration",
 		},
-		SiteMap{
+		{
 			Host:       "life.natwelch.com",
 			Owner:      "icco",
 			Repo:       "lifeline",
 			Deployment: "life",
 		},
-		SiteMap{
+		{
 			Host:       "melandnat.com",
 			Owner:      "icco",
 			Repo:       "melandnat.com",
 			Deployment: "melandnat",
 		},
-		SiteMap{
+		{
 			Host:       "natwelch.com",
 			Owner:      "icco",
 			Repo:       "natwelch.com",
 			Deployment: "natwelch",
 		},
-		SiteMap{
+		{
 			Host:       "quotes.natwelch.com",
 			Owner:      "icco",
 			Repo:       "crackquotes",
 			Deployment: "quotes",
 		},
-		SiteMap{
+		{
 			Host:       "resume.natwelch.com",
 			Owner:      "icco",
 			Repo:       "resume",
 			Deployment: "resume",
 		},
-		SiteMap{
+		{
 			Host:       "walls.natwelch.com",
 			Owner:      "icco",
 			Repo:       "wallpapers",
 			Deployment: "walls",
 		},
-		SiteMap{
+		{
 			Host:       "writing.natwelch.com",
 			Owner:      "icco",
 			Repo:       "writing",
