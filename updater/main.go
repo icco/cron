@@ -103,6 +103,12 @@ var (
 			Deployment: "natwelch",
 		},
 		{
+			Host:       "photos.natwelch.com",
+			Owner:      "icco",
+			Repo:       "photos",
+			Deployment: "photos",
+		},
+		{
 			Host:       "quotes.natwelch.com",
 			Owner:      "icco",
 			Repo:       "crackquotes",
