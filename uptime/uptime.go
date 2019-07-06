@@ -11,6 +11,7 @@ import (
 	"google.golang.org/api/iterator"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"google.golang.org/genproto/protobuf/field_mask"
 )
 
 type Config struct {
@@ -172,7 +173,11 @@ func (c *Config) update(ctx context.Context, host, id string) (*monitoringpb.Upt
 	config.Period = &duration.Duration{Seconds: 60}
 	req := &monitoringpb.UpdateUptimeCheckConfigRequest{
 		UptimeCheckConfig: config,
+		UpdateMask: &field_mask.FieldMask{
+			Paths: []string{"display_name", "http_check", "timeout"},
+		},
 	}
+	c.Log.Debugf("config: %+v", config)
 
 	return client.UpdateUptimeCheckConfig(ctx, req)
 }

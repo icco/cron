@@ -58,7 +58,7 @@ func main() {
 		})
 
 		if err != nil {
-			log.Fatalf("Failed to create the Stackdriver exporter: %v", err)
+			log.WithError(err).Fatalf("failed to create the stackdriver exporter")
 		}
 		defer sd.Flush()
 
