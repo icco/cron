@@ -50,23 +50,26 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	}
 	sort.Strings(existingHosts)
 
+	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
 		i := sort.SearchStrings(existingHosts, host)
 
 		if i >= len(existingHosts) {
-			_, err := c.create(ctx, host)
+			cfg, err := c.create(ctx, host)
 			if err != nil {
 				return err
 			}
+			hostConfigMap[host] = cfg
 		} else {
-			_, err := c.update(ctx, host, checkHostMap[host])
+			cfg, err := c.update(ctx, host, checkHostMap[host])
 			if err != nil {
 				return err
 			}
+			hostConfigMap[host] = cfg
 		}
 	}
 
-	return nil
+	return c.upsertAlertPolicies(ctx, hostConfigMap)
 }
 
 func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeCheckConfig, error) {
@@ -162,5 +165,42 @@ func (c *Config) update(ctx context.Context, host, id string) (*monitoringpb.Upt
 	req := &monitoringpb.UpdateUptimeCheckConfigRequest{
 		UptimeCheckConfig: config,
 	}
+
 	return client.UpdateUptimeCheckConfig(ctx, req)
+}
+
+func (c *Config) upsertAlertPolicies(ctx context.Context, hostConfigMap map[string]*monitoringpb.UptimeCheckConfig) error {
+	client, err := monitoring.NewAlertPolicyClient(ctx)
+	if err != nil {
+		return err
+	}
+
+	req := &monitoringpb.ListAlertPoliciesRequest{
+		Name: "projects/" + c.ProjectID,
+	}
+	it := client.ListAlertPolicies(ctx, req)
+	for {
+		a, err := it.Next()
+		if err == iterator.Done {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		c.Log.WithFields(logrus.Fields{
+			"policy": a,
+		}).Debugf("alert policy %v", a.Name)
+
+		//a.Enabled = &wrappers.BoolValue{Value: true}
+		//req := &monitoringpb.UpdateAlertPolicyRequest{
+		//	AlertPolicy: a,
+		//}
+		//if _, err := client.UpdateAlertPolicy(ctx, req); err != nil {
+		//	return err
+		//}
+
+	}
+
+	return nil
 }
