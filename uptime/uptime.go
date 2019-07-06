@@ -51,21 +51,26 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	}
 	sort.Strings(existingHosts)
 
+	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
 		i := sort.SearchStrings(existingHosts, host)
 
 		if i >= len(existingHosts) {
-			_, err := c.create(ctx, host)
+			cfg, err := c.create(ctx, host)
 			if err != nil {
 				return err
 			}
+			hostConfigMap[host] = cfg
 		} else {
-			_, err := c.update(ctx, host, checkHostMap[host])
+			cfg, err := c.update(ctx, host, checkHostMap[host])
 			if err != nil {
 				return err
 			}
+			hostConfigMap[host] = cfg
 		}
 	}
+
+	c.Log.WithFields(logrus.Fields{"hosts": hostConfigMap}).Debugf("uptime configs %v", len(hostConfigMap))
 
 	return nil
 }
@@ -163,5 +168,6 @@ func (c *Config) update(ctx context.Context, host, id string) (*monitoringpb.Upt
 	req := &monitoringpb.UpdateUptimeCheckConfigRequest{
 		UptimeCheckConfig: config,
 	}
+
 	return client.UpdateUptimeCheckConfig(ctx, req)
 }
