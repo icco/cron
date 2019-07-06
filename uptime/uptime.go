@@ -50,6 +50,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 		checkHostMap[host] = check.Name
 	}
 	sort.Strings(existingHosts)
+	c.Log.WithFields(logrus.Fields{"existingHosts": len(existingHosts), "hosts": len(hosts)}).Debug("hosts to check")
 
 	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
