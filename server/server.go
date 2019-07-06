@@ -90,6 +90,12 @@ func main() {
 			log.WithError(err).Error("could not write response")
 		}
 	})
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte("Cron Party!"))
+		if err != nil {
+			log.WithError(err).Error("could not write response")
+		}
+	})
 	h := &ochttp.Handler{
 		Handler:     r,
 		Propagation: &propagation.HTTPFormat{},
