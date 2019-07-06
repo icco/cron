@@ -60,17 +60,21 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 			if err != nil {
 				return err
 			}
+
+			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("created uptime check")
 			hostConfigMap[host] = cfg
 		} else {
 			cfg, err := c.update(ctx, host, checkHostMap[host])
 			if err != nil {
 				return err
 			}
+
+			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("updated uptime check")
 			hostConfigMap[host] = cfg
 		}
 	}
 
-	c.Log.WithFields(logrus.Fields{"hosts": hostConfigMap}).Debugf("uptime configs %v", len(hostConfigMap))
+	c.Log.WithFields(logrus.Fields{"hosts": hostConfigMap}).Debugf("uptime configs")
 
 	return nil
 }
@@ -105,7 +109,7 @@ func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeC
 			Period:  &duration.Duration{Seconds: 60},
 		},
 	}
-	c.Log.Infof("creating %+v", req)
+
 	return client.CreateUptimeCheckConfig(ctx, req)
 }
 
