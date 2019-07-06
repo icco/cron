@@ -147,7 +147,6 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 		}
 
 		repo := fmt.Sprintf(repoFmt, r.Repo, sha)
-		c.Log.Debugf(repo)
 		err = UpdateKube(ctx, r, repo)
 		if err != nil {
 			c.Log.WithError(err).WithContext(ctx).Fatal(err)
@@ -182,7 +181,10 @@ func UpdateKube(ctx context.Context, r SiteMap, pkg string) error {
 		return fmt.Errorf("Update failed: %v", retryErr)
 	}
 
-	c.Log.WithContext(ctx).Debug("Updated deployment...")
+	c.Log.WithContext(ctx).WithFields(logrus.Fields{
+		"package":    pkg,
+		"deployment": r.Deployment,
+	}).Debug("updated deployment")
 
 	return nil
 }
