@@ -41,37 +41,33 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	if err != nil {
 		return errors.Wrap(err, "list checks")
 	}
-	existingHosts := []string{}
 	checkHostMap := map[string]string{}
 
 	for _, check := range existingChecks {
 		mr := check.GetMonitoredResource()
 		host := mr.Labels["host"]
-		existingHosts = append(existingHosts, host)
 		checkHostMap[host] = check.Name
 	}
-	sort.Strings(existingHosts)
-	c.Log.WithFields(logrus.Fields{"existingHosts": existingHosts, "hosts": hosts}).Debug("hosts to check")
+	c.Log.WithFields(logrus.Fields{"hosts": hosts}).Debug("hosts to check")
 
 	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
-		i := sort.SearchStrings(existingHosts, host)
 
-		if i >= len(existingHosts) {
+		if val, ok := checkHostMap[host]; ok {
+			cfg, err := c.update(ctx, host, val)
+			if err != nil {
+				return errors.Wrapf(err, "update check %s", host)
+			}
+
+			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("updated uptime check")
+			hostConfigMap[host] = cfg
+		} else {
 			cfg, err := c.create(ctx, host)
 			if err != nil {
 				return errors.Wrapf(err, "create check %s", host)
 			}
 
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("created uptime check")
-			hostConfigMap[host] = cfg
-		} else {
-			cfg, err := c.update(ctx, host, checkHostMap[host])
-			if err != nil {
-				return errors.Wrapf(err, "update check %s", host)
-			}
-
-			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("updated uptime check")
 			hostConfigMap[host] = cfg
 		}
 	}
