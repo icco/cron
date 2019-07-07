@@ -219,8 +219,8 @@ github.com/icco/cron v0.0.0-20190121032237-b4835d3918f3/go.mod h1:rFBnlYHrnQWD9v
 github.com/icco/graphql v0.0.0-20190108160603-dd363c3e195d/go.mod h1:dYlQZz+4/r45sTx8eyjALOc2cQYssNaReUwPZRXIJ8I=
 github.com/icco/graphql v0.0.0-20190109022133-390239061cdf/go.mod h1:fs6UOuDKtjYiqGx8ox+4BxH9Ic2iXhi4vpK+naVK4MM=
 github.com/icco/graphql v0.0.0-20190203211859-7ccb702358d8/go.mod h1:B58lbu8IgvLE1oi7wtyOg0ixiPe/9l+aBhA8pRAas2A=
-github.com/icco/graphql v0.0.0-20190630040719-88054b5c5304 h1:s7wMNkqh1fDAyJDVxczMgZGzNpPcZ+aDl7W9aAlz678=
-github.com/icco/graphql v0.0.0-20190630040719-88054b5c5304/go.mod h1:N3UoerpXzc52C52kQKsw8eaBhbJ2IMd9eJMri7M6Cxc=
+github.com/icco/graphql v0.0.0-20190706191736-52a616d4e33e h1:1vk+eKRGnTvQKdK4iuRFCE4x6fnAJWZBWCgd/23lZAo=
+github.com/icco/graphql v0.0.0-20190706191736-52a616d4e33e/go.mod h1:N3UoerpXzc52C52kQKsw8eaBhbJ2IMd9eJMri7M6Cxc=
 github.com/icco/logrus-stackdriver-formatter v0.3.0 h1:zHmQDEEDUla29/SXKorLD2enT/i0TKARdcLNJ8Y55lc=
 github.com/icco/logrus-stackdriver-formatter v0.3.0/go.mod h1:yMdTvFwqQmahvdaaefL60hLkBAFIqCe4M5xZfz8gHXg=
 github.com/imdario/mergo v0.3.5/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
