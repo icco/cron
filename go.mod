@@ -28,6 +28,7 @@ require (
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/machinebox/graphql v0.2.2
 	github.com/microcosm-cc/bluemonday v1.0.2 // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/shurcooL/go v0.0.0-20190121191506-3fef8c783dec // indirect
 	github.com/shurcooL/gofontwoff v0.0.0-20181114050219-180f79e6909d // indirect
 	github.com/shurcooL/highlight_diff v0.0.0-20181222201841-111da2e7d480 // indirect
