@@ -23,10 +23,10 @@ import (
 var (
 	log = cron.InitLogging()
 
-	msgRecv     = stats.Int64("natwelch.com/stats/message/recieved", "recieved message from Pub/Sub", stats.UnitDimensionless)
+	msgRecv     = stats.Int64("natwelch.com/stats/message/received", "received message from Pub/Sub", stats.UnitDimensionless)
 	msgRecvView = &view.View{
-		Name:        "natwelch.com/views/message/recieved",
-		Description: "recieved message from Pub/Sub",
+		Name:        "natwelch.com/views/message/received",
+		Description: "received message from Pub/Sub",
 		Measure:     msgRecv,
 		Aggregation: view.Count(),
 	}
@@ -58,7 +58,7 @@ func main() {
 		})
 
 		if err != nil {
-			log.Fatalf("Failed to create the Stackdriver exporter: %v", err)
+			log.WithError(err).Fatalf("failed to create the stackdriver exporter")
 		}
 		defer sd.Flush()
 
@@ -86,6 +86,12 @@ func main() {
 	r.Use(cron.LoggingMiddleware())
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("ok."))
+		if err != nil {
+			log.WithError(err).Error("could not write response")
+		}
+	})
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		_, err := w.Write([]byte("Cron Party!"))
 		if err != nil {
 			log.WithError(err).Error("could not write response")
 		}

@@ -7,10 +7,12 @@ import (
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/icco/cron/updater"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/iterator"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"google.golang.org/genproto/protobuf/field_mask"
 )
 
 type Config struct {
@@ -21,6 +23,7 @@ type Config struct {
 var (
 	ExtraHosts = []string{
 		"corybooker.com",
+		"mood.natwelch.com",
 	}
 )
 
@@ -36,35 +39,40 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 
 	existingChecks, err := c.list(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "list checks")
 	}
-	existingHosts := []string{}
 	checkHostMap := map[string]string{}
 
 	for _, check := range existingChecks {
 		mr := check.GetMonitoredResource()
 		host := mr.Labels["host"]
-		c.Log.Debugf("host found: %+v", host)
-		existingHosts = append(existingHosts, host)
 		checkHostMap[host] = check.Name
 	}
-	sort.Strings(existingHosts)
+	c.Log.WithFields(logrus.Fields{"hosts": hosts}).Debug("hosts to check")
 
+	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
-		i := sort.SearchStrings(existingHosts, host)
 
-		if i >= len(existingHosts) {
-			_, err := c.create(ctx, host)
+		if val, ok := checkHostMap[host]; ok {
+			cfg, err := c.update(ctx, host, val)
 			if err != nil {
-				return err
+				return errors.Wrapf(err, "update check %s", host)
 			}
+
+			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("updated uptime check")
+			hostConfigMap[host] = cfg
 		} else {
-			_, err := c.update(ctx, host, checkHostMap[host])
+			cfg, err := c.create(ctx, host)
 			if err != nil {
-				return err
+				return errors.Wrapf(err, "create check %s", host)
 			}
+
+			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("created uptime check")
+			hostConfigMap[host] = cfg
 		}
 	}
+
+	c.Log.WithFields(logrus.Fields{"hosts": hostConfigMap}).Debugf("uptime configs")
 
 	return nil
 }
@@ -99,7 +107,7 @@ func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeC
 			Period:  &duration.Duration{Seconds: 60},
 		},
 	}
-	c.Log.Infof("creating %+v", req)
+
 	return client.CreateUptimeCheckConfig(ctx, req)
 }
 
@@ -161,6 +169,10 @@ func (c *Config) update(ctx context.Context, host, id string) (*monitoringpb.Upt
 	config.Period = &duration.Duration{Seconds: 60}
 	req := &monitoringpb.UpdateUptimeCheckConfigRequest{
 		UptimeCheckConfig: config,
+		UpdateMask: &field_mask.FieldMask{
+			Paths: []string{"display_name", "http_check", "timeout"},
+		},
 	}
+
 	return client.UpdateUptimeCheckConfig(ctx, req)
 }

@@ -54,7 +54,6 @@ func (g *Goodreads) UploadBook(ctx context.Context, b goodreads.Book) error {
       }
     }
   `
-	gqlClient.Log = func(s string) { g.Log.Debug(s) }
 
 	req := graphql.NewRequest(mut)
 	req.Var("t", tweet)

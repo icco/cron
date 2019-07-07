@@ -31,13 +31,13 @@ func (p *Pinboard) UpdatePins(ctx context.Context) error {
 	start := 0   // 0 means most recent
 	results := 0 // 0 means all
 
-	// Only get pins from the last 90d
-	oneDay, err := time.ParseDuration("-24h")
+	// Only get pins from the last 30m
+	thirtyMin, err := time.ParseDuration("-30m")
 	if err != nil {
 		p.Log.WithError(err).Error("time parsing")
 		return err
 	}
-	from := time.Now().Add(oneDay * 30)
+	from := time.Now().Add(thirtyMin)
 	to := time.Now()
 
 	posts, _, err := pinClient.Posts.All(tags, start, results, &from, &to)

@@ -201,7 +201,7 @@ func (t *Twitter) UploadTweet(ctx context.Context, tw twitter.Tweet) error {
 		Hashtags:      make([]string, len(tw.Entities.Hashtags)),
 		Symbols:       []string{},
 		UserMentions:  make([]string, len(tw.Entities.UserMentions)),
-		Urls:          make([]gql.URI, len(tw.Entities.Urls)),
+		Urls:          make([]*gql.URI, len(tw.Entities.Urls)),
 	}
 
 	tp, err := tw.CreatedAtTime()

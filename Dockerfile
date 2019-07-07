@@ -1,6 +1,6 @@
 FROM golang:1.12-alpine
 
-ENV GOPROXY=""
+ENV GOPROXY="https://proxy.golang.org"
 ENV GO111MODULE=on
 ENV NAT_ENV="production"
 
