@@ -7,6 +7,7 @@ import (
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/icco/cron/updater"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/iterator"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
@@ -38,7 +39,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 
 	existingChecks, err := c.list(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "list checks")
 	}
 	existingHosts := []string{}
 	checkHostMap := map[string]string{}
@@ -46,12 +47,11 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	for _, check := range existingChecks {
 		mr := check.GetMonitoredResource()
 		host := mr.Labels["host"]
-		c.Log.Debugf("host found: %+v", host)
 		existingHosts = append(existingHosts, host)
 		checkHostMap[host] = check.Name
 	}
 	sort.Strings(existingHosts)
-	c.Log.WithFields(logrus.Fields{"existingHosts": len(existingHosts), "hosts": len(hosts)}).Debug("hosts to check")
+	c.Log.WithFields(logrus.Fields{"existingHosts": existingHosts, "hosts": hosts}).Debug("hosts to check")
 
 	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
@@ -60,7 +60,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 		if i >= len(existingHosts) {
 			cfg, err := c.create(ctx, host)
 			if err != nil {
-				return err
+				return errors.Wrapf(err, "create check %s", host)
 			}
 
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("created uptime check")
@@ -68,7 +68,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 		} else {
 			cfg, err := c.update(ctx, host, checkHostMap[host])
 			if err != nil {
-				return err
+				return errors.Wrapf(err, "update check %s", host)
 			}
 
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("updated uptime check")
