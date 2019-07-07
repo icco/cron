@@ -173,7 +173,6 @@ func (c *Config) update(ctx context.Context, host, id string) (*monitoringpb.Upt
 			Paths: []string{"display_name", "http_check", "timeout"},
 		},
 	}
-	c.Log.Debugf("config: %+v", config)
 
 	return client.UpdateUptimeCheckConfig(ctx, req)
 }
