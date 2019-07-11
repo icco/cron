@@ -7,16 +7,14 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.12.2
 	dmitri.shuralyov.com/app/changes v0.0.0-20181114035150-5af16e21babb // indirect
 	dmitri.shuralyov.com/service/change v0.0.0-20190203163610-217368fe4577 // indirect
-	github.com/cenkalti/backoff v2.2.0+incompatible // indirect
-	github.com/dghubble/go-twitter v0.0.0-20190512073027-53f972dc4b06
-	github.com/dghubble/oauth1 v0.5.0
-	github.com/dghubble/sling v1.3.0 // indirect
+	github.com/dghubble/go-twitter v0.0.0-20190711044719-dc9b50841e5b
+	github.com/dghubble/oauth1 v0.6.0
 	github.com/felixge/httpsnoop v1.0.0
 	github.com/franklinhu/go-goodreads v0.0.0-20180415215853-6b5441de9639
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/gogo/protobuf v1.2.0 // indirect
-	github.com/golang/protobuf v1.3.1
-	github.com/google/go-github/v26 v26.0.10
+	github.com/golang/protobuf v1.3.2
+	github.com/google/go-github/v26 v26.1.3+incompatible
 	github.com/googleapis/gax-go v2.0.2+incompatible // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20181103185306-d547d1d9531e // indirect
 	github.com/gorilla/context v1.1.1 // indirect
@@ -49,9 +47,9 @@ require (
 	go4.org v0.0.0-20181109185143-00e24f1b2599 // indirect
 	golang.org/x/perf v0.0.0-20190124201629-844a5f5b46f4 // indirect
 	google.golang.org/api v0.7.0
-	google.golang.org/genproto v0.0.0-20190701230453-710ae3a149df
-	k8s.io/api v0.0.0-20190703205437-39734b2a72fe
-	k8s.io/apimachinery v0.0.0-20190703205208-4cfb76a8bf76
+	google.golang.org/genproto v0.0.0-20190708153700-3bdd9d9f5532
+	k8s.io/api v0.0.0-20190711103429-37c3b8b1ca65
+	k8s.io/apimachinery v0.0.0-20190711103026-7bf792636534
 	k8s.io/client-go v12.0.0+incompatible
 	sourcegraph.com/sqs/pbtypes v1.0.0 // indirect
 )
