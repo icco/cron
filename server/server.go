@@ -75,7 +75,7 @@ func main() {
 		for {
 			err := recieveMessages(ctx, "cron-client")
 			if err != nil {
-				log.WithError(err).Error("could not process message")
+				log.WithError(err).Fatal("could not process message")
 			}
 		}
 	}()
