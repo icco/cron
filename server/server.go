@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/icco/cron"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/stats"
@@ -74,7 +75,7 @@ func main() {
 		for {
 			err := recieveMessages(ctx, "cron-client")
 			if err != nil {
-				log.WithError(err).Error("could not process message")
+				log.WithError(err).Fatal("could not process message")
 			}
 		}
 	}()
@@ -152,8 +153,9 @@ func recieveMessages(ctx context.Context, subName string) error {
 			stats.Record(ctx, msgAck.M(1))
 		}
 	})
+
 	if err != nil {
-		return err
+		return errors.Wrap(err, "recieving messages")
 	}
 
 	return nil

@@ -6,7 +6,10 @@ require (
 	cloud.google.com/go v0.41.0
 	dmitri.shuralyov.com/app/changes v0.0.0-20181114035150-5af16e21babb // indirect
 	dmitri.shuralyov.com/service/change v0.0.0-20190203163610-217368fe4577 // indirect
+<<<<<<< HEAD
 	github.com/KyleBanks/goodreads v0.0.0-20190528090811-8ecffb10279d
+=======
+>>>>>>> c0b8aef955a56d07fa0ee7de1282017dabf33f1d
 	github.com/dghubble/go-twitter v0.0.0-20190711044719-dc9b50841e5b
 	github.com/dghubble/oauth1 v0.6.0
 	github.com/felixge/httpsnoop v1.0.0
@@ -46,8 +49,13 @@ require (
 	golang.org/x/perf v0.0.0-20190124201629-844a5f5b46f4 // indirect
 	google.golang.org/api v0.7.0
 	google.golang.org/genproto v0.0.0-20190708153700-3bdd9d9f5532
+<<<<<<< HEAD
 	k8s.io/api v0.0.0-20190712022805-31fe033ae6f9
 	k8s.io/apimachinery v0.0.0-20190712095106-75ce4d1e60f1
+=======
+	k8s.io/api v0.0.0-20190711103429-37c3b8b1ca65
+	k8s.io/apimachinery v0.0.0-20190711103026-7bf792636534
+>>>>>>> c0b8aef955a56d07fa0ee7de1282017dabf33f1d
 	k8s.io/client-go v12.0.0+incompatible
 	sourcegraph.com/sqs/pbtypes v1.0.0 // indirect
 )
