@@ -3,7 +3,7 @@ package goodreads
 import (
 	"context"
 
-	"github.com/franklinhu/go-goodreads"
+	"github.com/KyleBanks/goodreads"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
 	"github.com/sirupsen/logrus"
@@ -19,7 +19,7 @@ type Goodreads struct {
 // GetBooks gets the 100 most recent reviews for Nat.
 func (g *Goodreads) GetBooks(ctx context.Context) ([]goodreads.Review, error) {
 	c := goodreads.NewClient(g.Token)
-	return c.GetLastRead("18143346.Nat_Welch", 100)
+	return c.ReviewList("18143346.Nat_Welch", "read", "date_read", "", "d", 1, 200)
 }
 
 // UpsertBooks gets books and uploads them.
