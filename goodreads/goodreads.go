@@ -41,14 +41,14 @@ func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 
 // UploadBook uploads a single book.
 func (g *Goodreads) UploadBook(ctx context.Context, b goodreads.Book) error {
-	tweet := gql.EditBook{
+	book := gql.EditBook{
 		ID:    &b.ID,
 		Title: &b.Title,
 	}
 
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
 	mut := `
-  mutation ($t: EditBook!) {
+  mutation ($b: EditBook!) {
       upsertBook(input: $t) {
         id
       }
@@ -56,7 +56,7 @@ func (g *Goodreads) UploadBook(ctx context.Context, b goodreads.Book) error {
   `
 
 	req := graphql.NewRequest(mut)
-	req.Var("t", tweet)
+	req.Var("b", book)
 	req.Header.Add("X-API-AUTH", g.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err := gqlClient.Run(ctx, req, nil)
