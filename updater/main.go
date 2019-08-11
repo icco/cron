@@ -121,6 +121,12 @@ var (
 			Deployment: "resume",
 		},
 		{
+			Host:       "sadnat.com",
+			Owner:      "icco",
+			Repo:       "sadnat.com",
+			Deployment: "sadnat",
+		},
+		{
 			Host:       "walls.natwelch.com",
 			Owner:      "icco",
 			Repo:       "wallpapers",
