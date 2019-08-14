@@ -20,6 +20,7 @@ require (
 	github.com/edsrzf/mmap-go v1.0.0 // indirect
 	github.com/felixge/httpsnoop v1.0.0
 	github.com/go-chi/chi v4.0.2+incompatible
+	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-github/v26 v26.1.3+incompatible
 	github.com/hellofresh/logging-go v0.3.0
