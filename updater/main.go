@@ -152,6 +152,11 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 			break
 		}
 
+		if sha == "" {
+			c.Log.WithContext(ctx).WithFields(logrus.Fields{"owner": r.Owner, "repo": r.Repo}).Error("SHA is empty")
+			break
+		}
+
 		repo := fmt.Sprintf(repoFmt, r.Repo, sha)
 		err = UpdateKube(ctx, r, repo)
 		if err != nil {
