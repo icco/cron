@@ -115,6 +115,12 @@ var (
 			Deployment: "quotes",
 		},
 		{
+			Host:       "reportd.natwelch.com",
+			Owner:      "icco",
+			Repo:       "reportd",
+			Deployment: "reportd",
+		},
+		{
 			Host:       "resume.natwelch.com",
 			Owner:      "icco",
 			Repo:       "resume",
