@@ -61,6 +61,12 @@ var (
 			Deployment: "etu",
 		},
 		{
+			Host:       "goals.natwelch.com",
+			Owner:      "icco",
+			Repo:       "goals",
+			Deployment: "goals",
+		},
+		{
 			Host:       "gotak.app",
 			Owner:      "icco",
 			Repo:       "gotak",
