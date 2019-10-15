@@ -6,6 +6,7 @@ import (
 	"github.com/KyleBanks/goodreads"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -26,13 +27,13 @@ func (g *Goodreads) GetBooks(ctx context.Context) ([]goodreads.Review, error) {
 func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 	reviews, err := g.GetBooks(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "get books")
 	}
 
 	for _, r := range reviews {
 		err := g.UploadBook(ctx, r.Book)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "upload book")
 		}
 	}
 
