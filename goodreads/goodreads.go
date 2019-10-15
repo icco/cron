@@ -20,7 +20,7 @@ type Goodreads struct {
 // GetBooks gets the 100 most recent reviews for Nat.
 func (g *Goodreads) GetBooks(ctx context.Context) ([]goodreads.Review, error) {
 	c := goodreads.NewClient(g.Token)
-	return c.ReviewList("18143346.Nat_Welch", "read", "date_read", "", "d", 1, 200)
+	return c.ReviewList("18143346", "read", "date_read", "", "d", 1, 200)
 }
 
 // UpsertBooks gets books and uploads them.
