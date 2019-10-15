@@ -37,7 +37,7 @@ func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 		}
 	}
 
-	log.Infof("uploaded books: %d", len(reviews))
+	g.Log.Infof("uploaded books: %d", len(reviews))
 
 	return nil
 }
