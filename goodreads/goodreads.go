@@ -50,7 +50,7 @@ func (g *Goodreads) UploadBook(ctx context.Context, b goodreads.Book) error {
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
 	mut := `
   mutation ($b: EditBook!) {
-      upsertBook(input: $t) {
+      upsertBook(input: $b) {
         id
       }
     }
