@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/go-github/v26/github"
+	"github.com/google/go-github/v28/github"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -15,7 +16,8 @@ import (
 )
 
 type Config struct {
-	Log *logrus.Logger
+	Log         *logrus.Logger
+	GithubToken string
 }
 
 type SiteMap struct {
@@ -158,7 +160,7 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 	c = conf
 
 	for _, r := range AllSites {
-		sha, err := GetSHA(ctx, r.Owner, r.Repo)
+		sha, err := c.GetSHA(ctx, r.Owner, r.Repo)
 		if _, ok := err.(*github.RateLimitError); ok {
 			c.Log.WithContext(ctx).WithError(err).Warn("hit rate limit")
 			break
@@ -212,8 +214,13 @@ func UpdateKube(ctx context.Context, r SiteMap, pkg string) error {
 	return nil
 }
 
-func GetSHA(ctx context.Context, owner string, repo string) (string, error) {
-	client := github.NewClient(nil)
+func (c *Config) GetSHA(ctx context.Context, owner string, repo string) (string, error) {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: c.GithubToken},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	client := github.NewClient(tc)
+
 	branch, _, err := client.Repositories.GetBranch(ctx, owner, repo, "master")
 	if err != nil {
 		return "", err

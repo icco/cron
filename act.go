@@ -49,11 +49,19 @@ func Act(octx context.Context, job string) error {
 		return fmt.Errorf("GOODREADS_TOKEN is unset")
 	}
 
+	githubToken := os.Getenv("GITHUB_TOKEN")
+	if githubToken == "" {
+		return fmt.Errorf("GITHUB_TOKEN is unset")
+	}
+
 	switch job {
 	case "minute":
 		log.Info("> heartbeat")
 	case "update-deployments":
-		updater.UpdateWorkspaces(ctx, &updater.Config{Log: log})
+		updater.UpdateWorkspaces(ctx, &updater.Config{
+			Log:         log,
+			GithubToken: githubToken,
+		})
 	case "spider":
 		spider.Crawl(ctx, &spider.Config{Log: log, URL: "https://writing.natwelch.com/"})
 	case "user-tweets":
