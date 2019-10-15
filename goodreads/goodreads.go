@@ -6,6 +6,7 @@ import (
 	"github.com/KyleBanks/goodreads"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,22 +20,24 @@ type Goodreads struct {
 // GetBooks gets the 100 most recent reviews for Nat.
 func (g *Goodreads) GetBooks(ctx context.Context) ([]goodreads.Review, error) {
 	c := goodreads.NewClient(g.Token)
-	return c.ReviewList("18143346.Nat_Welch", "read", "date_read", "", "d", 1, 200)
+	return c.ReviewList("18143346", "read", "date_read", "", "d", 1, 200)
 }
 
 // UpsertBooks gets books and uploads them.
 func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 	reviews, err := g.GetBooks(ctx)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "get books")
 	}
 
 	for _, r := range reviews {
 		err := g.UploadBook(ctx, r.Book)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "upload book")
 		}
 	}
+
+	log.Infof("uploaded books: %d", len(reviews))
 
 	return nil
 }
@@ -49,7 +52,7 @@ func (g *Goodreads) UploadBook(ctx context.Context, b goodreads.Book) error {
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
 	mut := `
   mutation ($b: EditBook!) {
-      upsertBook(input: $t) {
+      upsertBook(input: $b) {
         id
       }
     }
