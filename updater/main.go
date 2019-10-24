@@ -117,6 +117,12 @@ var (
 			Deployment: "photos",
 		},
 		{
+			Host:       "postmortems.app",
+			Owner:      "icco",
+			Repo:       "postmortems",
+			Deployment: "postmortems",
+		},
+		{
 			Host:       "quotes.natwelch.com",
 			Owner:      "icco",
 			Repo:       "crackquotes",
