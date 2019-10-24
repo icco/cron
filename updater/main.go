@@ -49,7 +49,7 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 	}
 }
 
-func UpdateKube(ctx context.Context, r SiteMap, pkg string) error {
+func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return err
