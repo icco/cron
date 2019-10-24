@@ -6,7 +6,7 @@ import (
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/icco/cron/updater"
+	"github.com/icco/cron/sites"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/iterator"
@@ -32,7 +32,7 @@ var (
 func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	hosts := []string{}
 	hosts = append(hosts, ExtraHosts...)
-	for _, s := range updater.AllSites {
+	for _, s := range sites.All {
 		hosts = append(hosts, s.Host)
 	}
 	sort.Strings(hosts)
