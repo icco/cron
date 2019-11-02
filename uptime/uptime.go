@@ -23,7 +23,11 @@ type Config struct {
 var (
 	ExtraHosts = []string{
 		"corybooker.com",
+		"dcwelch.com",
+		"lydiadehn.com",
 		"mood.natwelch.com",
+		"traviscwelch.com",
+		"www.natwelch.com",
 	}
 )
 
