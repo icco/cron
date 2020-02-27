@@ -28,6 +28,7 @@ var (
 		"mood.natwelch.com",
 		"traviscwelch.com",
 		"www.natwelch.com",
+ "newyork.welch.io",
 	}
 )
 
