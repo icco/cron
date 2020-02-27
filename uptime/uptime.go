@@ -26,9 +26,9 @@ var (
 		"dcwelch.com",
 		"lydiadehn.com",
 		"mood.natwelch.com",
+		"newyork.welch.io",
 		"traviscwelch.com",
 		"www.natwelch.com",
- "newyork.welch.io",
 	}
 )
 
