@@ -106,6 +106,12 @@ var All = []SiteMap{
 		Deployment: "quotes",
 	},
 	{
+		Host:       "relay.natwelch.com",
+		Owner:      "icco",
+		Repo:       "relay",
+		Deployment: "relay",
+	},
+	{
 		Host:       "reportd.natwelch.com",
 		Owner:      "icco",
 		Repo:       "reportd",
