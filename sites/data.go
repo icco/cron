@@ -82,6 +82,12 @@ var All = []SiteMap{
 		Deployment: "melandnat",
 	},
 	{
+		Host:       "numbers.natwelch.com",
+		Owner:      "icco",
+		Repo:       "numbers",
+		Deployment: "numbers",
+	},
+	{
 		Host:       "natwelch.com",
 		Owner:      "icco",
 		Repo:       "natwelch.com",
