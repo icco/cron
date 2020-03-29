@@ -116,7 +116,9 @@ func main() {
 			log.WithError(err).Error("could not parse template")
 		}
 
-		data := []string{}
+		data := []string{
+			fmt.Sprintf("%d sites", len(sites.All)),
+		}
 		if err := tmpl.Execute(w, data); err != nil {
 			log.WithError(err).Error("could not write response")
 		}
@@ -160,9 +162,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		stats.Record(ctx, msgRecv.M(1))
 
-		data := map[string]string{
-			fmt.Sprintf("%d sites", len(sites.All)),
-		}
+		data := map[string]string{}
 		err := json.Unmarshal(msg.Data, &data)
 		logFields := logrus.Fields{"parsed": data, "unparsed": string(msg.Data)}
 
