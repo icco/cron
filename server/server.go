@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 
@@ -13,6 +15,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/icco/cron"
+	"github.com/icco/cron/sites"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ochttp"
@@ -39,6 +42,22 @@ var (
 		Measure:     msgRecv,
 		Aggregation: view.Count(),
 	}
+
+	rootTmpl = `
+<html>
+<head>
+<title>Cron!</title>
+</head>
+<body>
+<h1>Cron Party!</h1>
+<ul>
+{{ range . }}
+<li>{{ . }}</li>
+{{ end }}
+</ul>
+</body>
+</html>
+`
 )
 
 func main() {
@@ -92,8 +111,13 @@ func main() {
 		}
 	})
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		_, err := w.Write([]byte("Cron Party!"))
+		tmpl, err := template.New("root").Parse(rootTmpl)
 		if err != nil {
+			log.WithError(err).Error("could not parse template")
+		}
+
+		data := []string{}
+		if err := tmpl.Execute(w, data); err != nil {
 			log.WithError(err).Error("could not write response")
 		}
 	})
@@ -136,7 +160,9 @@ func recieveMessages(ctx context.Context, subName string) error {
 	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		stats.Record(ctx, msgRecv.M(1))
 
-		data := map[string]string{}
+		data := map[string]string{
+			fmt.Sprintf("%d sites", len(sites.All)),
+		}
 		err := json.Unmarshal(msg.Data, &data)
 		logFields := logrus.Fields{"parsed": data, "unparsed": string(msg.Data)}
 
