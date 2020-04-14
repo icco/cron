@@ -29,6 +29,7 @@ var (
 		"newyork.welch.io",
 		"traviscwelch.com",
 		"www.natwelch.com",
+		"toor.changeip.name",
 	}
 )
 
