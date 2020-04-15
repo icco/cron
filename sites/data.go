@@ -136,6 +136,12 @@ var All = []SiteMap{
 		Deployment: "sadnat",
 	},
 	{
+		Host:       "validator.natwelch.com",
+		Owner:      "icco",
+		Repo:       "validator",
+		Deployment: "validator",
+	},
+	{
 		Host:       "walls.natwelch.com",
 		Owner:      "icco",
 		Repo:       "wallpapers",
