@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/KyleBanks/goodreads"
+	"github.com/KyleBanks/goodreads/responses"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
 	"github.com/pkg/errors"
@@ -18,7 +19,7 @@ type Goodreads struct {
 }
 
 // GetBooks gets the 100 most recent reviews for Nat.
-func (g *Goodreads) GetBooks(ctx context.Context) ([]goodreads.Review, error) {
+func (g *Goodreads) GetBooks(ctx context.Context) ([]responses.Review, error) {
 	c := goodreads.NewClient(g.Token)
 	return c.ReviewList("18143346", "read", "date_read", "", "d", 1, 200)
 }
@@ -43,7 +44,7 @@ func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 }
 
 // UploadBook uploads a single book.
-func (g *Goodreads) UploadBook(ctx context.Context, b goodreads.Book) error {
+func (g *Goodreads) UploadBook(ctx context.Context, b responses.AuthorBook) error {
 	book := gql.EditBook{
 		ID:    &b.ID,
 		Title: &b.Title,
