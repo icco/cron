@@ -2,7 +2,9 @@ package updater
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/google/go-github/v28/github"
 	"github.com/icco/cron/sites"
@@ -63,17 +65,37 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
 
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		result, getErr := deploymentsClient.Get(r.Deployment, metav1.GetOptions{})
+		dep, getErr := deploymentsClient.Get(r.Deployment, metav1.GetOptions{})
 		if getErr != nil {
 			return (fmt.Errorf("Failed to get latest version of Deployment: %v", getErr))
 		}
 
-		result.Spec.Template.Spec.Containers[0].Image = pkg
-		_, updateErr := deploymentsClient.Update(result)
-		return updateErr
+		oldPkg := dep.Spec.Template.Spec.Containers[0].Image
+		dep.Spec.Template.Spec.Containers[0].Image = pkg
+		_, updateErr := deploymentsClient.Update(dep)
+		if updateErr != nil {
+			return updateErr
+		}
+
+		if oldPkg != pkg {
+			d, err := json.Marshal(map[string]string{
+				"cloud deployment": r.Deployment,
+				"old pkg":          oldPkg,
+				"new pkg":          pkg,
+			})
+			if err != nil {
+				return err
+			}
+			_, err = http.Post("https://relay.natwelch.com/hook", "application/json", d)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
 	})
 	if retryErr != nil {
-		return fmt.Errorf("Update failed: %v", retryErr)
+		return fmt.Errorf("Update failed: %w", retryErr)
 	}
 
 	c.Log.WithContext(ctx).WithFields(logrus.Fields{
