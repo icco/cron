@@ -1,6 +1,7 @@
 package updater
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -86,7 +87,7 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 			if err != nil {
 				return err
 			}
-			_, err = http.Post("https://relay.natwelch.com/hook", "application/json", d)
+			_, err = http.Post("https://relay.natwelch.com/hook", "application/json", bytes.NewBuffer(d))
 			if err != nil {
 				return err
 			}
