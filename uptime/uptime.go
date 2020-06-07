@@ -22,6 +22,8 @@ type Config struct {
 
 var (
 	ExtraHosts = []string{
+		"a.natwelch.com",
+		"archive.natwelch.com",
 		"corybooker.com",
 		"dcwelch.com",
 		"lydiadehn.com",
