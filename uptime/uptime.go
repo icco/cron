@@ -62,7 +62,6 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 
 	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
-
 		if val, ok := checkHostMap[host]; ok {
 			cfg, err := c.update(ctx, host, val)
 			if err != nil {
@@ -108,9 +107,10 @@ func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeC
 			},
 			CheckRequestType: &monitoringpb.UptimeCheckConfig_HttpCheck_{
 				HttpCheck: &monitoringpb.UptimeCheckConfig_HttpCheck{
-					Path:   "/",
-					Port:   443,
-					UseSsl: true,
+					Path:        "/",
+					Port:        443,
+					UseSsl:      true,
+					ValidateSsl: true,
 				},
 			},
 			Timeout: &duration.Duration{Seconds: 5},
@@ -170,9 +170,10 @@ func (c *Config) update(ctx context.Context, host, id string) (*monitoringpb.Upt
 	}
 	config.CheckRequestType = &monitoringpb.UptimeCheckConfig_HttpCheck_{
 		HttpCheck: &monitoringpb.UptimeCheckConfig_HttpCheck{
-			Path:   "/",
-			Port:   443,
-			UseSsl: true,
+			Path:        "/",
+			Port:        443,
+			UseSsl:      true,
+			ValidateSsl: true,
 		},
 	}
 	config.Timeout = &duration.Duration{Seconds: 5}
