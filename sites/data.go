@@ -10,6 +10,12 @@ type SiteMap struct {
 // All contains a list of all domains I update from my code.
 var All = []SiteMap{
 	{
+		Host:       "a.natwelch.com",
+		Owner:      "icco",
+		Repo:       "analytics",
+		Deployment: "a",
+	},
+	{
 		Host:       "aniplaxt.natwelch.com",
 		Owner:      "icco",
 		Repo:       "aniplaxt",
