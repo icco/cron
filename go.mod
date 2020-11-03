@@ -9,9 +9,11 @@ require (
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.4
 	github.com/99designs/gqlgen v0.13.0 // indirect
 	github.com/Azure/go-autorest/autorest v0.9.0 // indirect
+	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
 	github.com/aws/aws-sdk-go v1.35.20 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
+	github.com/cznic/ql v1.2.0 // indirect
 	github.com/dghubble/go-twitter v0.0.0-20201011215211-4b180d0cc78d
 	github.com/dghubble/oauth1 v0.6.0
 	github.com/felixge/httpsnoop v1.0.1
@@ -28,7 +30,9 @@ require (
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
 	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
+	github.com/jarcoal/httpmock v1.0.6 // indirect
 	github.com/machinebox/graphql v0.2.2
+	github.com/matryer/is v1.4.0 // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
