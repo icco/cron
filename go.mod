@@ -17,17 +17,22 @@ require (
 	github.com/dghubble/oauth1 v0.6.0
 	github.com/felixge/httpsnoop v1.0.1
 	github.com/go-chi/chi v4.1.2+incompatible
+	github.com/go-logr/logr v0.3.0 // indirect
 	github.com/golang/protobuf v1.4.3
 	github.com/google/go-github/v28 v28.1.1
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.3 // indirect
+	github.com/gophercloud/gophercloud v0.1.0 // indirect
+	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
 	github.com/hellofresh/logging-go v0.4.0
 	github.com/icco/graphql v0.0.0-20200801174005-aa8047a32151
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
+	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.6 // indirect
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
+	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
@@ -42,7 +47,7 @@ require (
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20201103154000-415bd0cd5df6
 	gopkg.in/yaml.v2 v2.3.0 // indirect
-	k8s.io/api v0.17.0
-	k8s.io/apimachinery v0.17.0
-	k8s.io/client-go v0.17.0
+	k8s.io/api v0.19.3
+	k8s.io/apimachinery v0.19.3
+	k8s.io/client-go v0.19.3
 )
