@@ -22,17 +22,13 @@ require (
 	github.com/google/go-github/v28 v28.1.1
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.3 // indirect
-	github.com/gophercloud/gophercloud v0.1.0 // indirect
-	github.com/gregjones/httpcache v0.0.0-20180305231024-9cad4c3443a7 // indirect
 	github.com/hellofresh/logging-go v0.4.0
 	github.com/icco/graphql v0.0.0-20200801174005-aa8047a32151
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
-	github.com/imdario/mergo v0.3.5 // indirect
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.6 // indirect
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
-	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
