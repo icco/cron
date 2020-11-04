@@ -67,7 +67,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			req := &monitoringpb.UpdateServiceRequest{
 				Service: wanted,
 			}
-			if _, err := c.UpdateService(ctx, req); err != nil {
+			if _, err := client.UpdateService(ctx, req); err != nil {
 				return err
 			}
 		}
