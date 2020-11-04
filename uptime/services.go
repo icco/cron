@@ -36,7 +36,6 @@ func UpdateServices(ctx context.Context, c *Config) error {
 	}
 
 	for _, s := range sites.All {
-
 		wanted := &monitoringpb.Service{
 			DisplayName: s.Deployment,
 			Identifier:  &monitoringpb.Service_Custom_{},
@@ -56,13 +55,14 @@ func UpdateServices(ctx context.Context, c *Config) error {
 
 		if !exists {
 			req := &monitoringpb.CreateServiceRequest{
-				Parent:    "projects/" + c.ProjectID,
-				ServiceId: s.Deployment,
-				Service:   wanted,
+				Parent:  "projects/" + c.ProjectID,
+				Service: wanted,
 			}
-			if _, err := client.CreateService(ctx, req); err != nil {
+			resp, err := client.CreateService(ctx, req)
+			if err != nil {
 				return err
 			}
+			wanted.Name = resp.Name
 		} else {
 			req := &monitoringpb.UpdateServiceRequest{
 				Service: wanted,
@@ -70,6 +70,21 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			if _, err := client.UpdateService(ctx, req); err != nil {
 				return err
 			}
+		}
+
+		req := &monitoringpb.ListServiceLevelObjectivesRequest{
+			Parent: wanted.Name,
+		}
+		it := client.ListServiceLevelObjectives(ctx, req)
+		for {
+			resp, err := it.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			log.Infof("found SLO: %+v", resp)
 		}
 	}
 
