@@ -36,10 +36,20 @@ func UpdateServices(ctx context.Context, c *Config) error {
 	}
 
 	for _, s := range sites.All {
+
+		wanted := &monitoringpb.Service{
+			DisplayName: s.Deployment,
+			Identifier:  &monitoringpb.Service_Custom_{},
+			Telemetry: &monitoringpb.Service_Telemetry{
+				ResourceName: fmt.Sprintf("//container.googleapis.com/projects/%s/locations/us-central1/clusters/nat-cluster-2/k8s/namespaces/default/services/%s-service", c.ProjectID, s.Deployment),
+			},
+		}
+
 		exists := false
 		for _, svc := range svcs {
 			if svc.DisplayName == s.Deployment {
 				exists = true
+				wanted.Name = svc.Name
 				break
 			}
 		}
@@ -48,12 +58,16 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			req := &monitoringpb.CreateServiceRequest{
 				Parent:    "projects/" + c.ProjectID,
 				ServiceId: s.Deployment,
-				Service: &monitoringpb.Service{
-					DisplayName: s.Deployment,
-					Identifier:  &monitoringpb.Service_Custom_{},
-				},
+				Service:   wanted,
 			}
 			if _, err := client.CreateService(ctx, req); err != nil {
+				return err
+			}
+		} else {
+			req := &monitoringpb.UpdateServiceRequest{
+				Service: wanted,
+			}
+			if _, err := c.UpdateService(ctx, req); err != nil {
 				return err
 			}
 		}
