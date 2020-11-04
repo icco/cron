@@ -109,8 +109,12 @@ func Act(octx context.Context, job string) error {
 			Log:       log,
 			ProjectID: "icco-cloud",
 		}
-		err := uptime.UpdateUptimeChecks(ctx, c)
-		if err != nil {
+
+		if err := uptime.UpdateUptimeChecks(ctx, c); err != nil {
+			return err
+		}
+
+		if err := uptime.UpdateServices(ctx, c); err != nil {
 			return err
 		}
 	default:
