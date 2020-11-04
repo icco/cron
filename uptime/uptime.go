@@ -42,7 +42,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	}
 	sort.Strings(hosts)
 
-	existingChecks, err := c.list(ctx)
+	existingChecks, err := c.listChecks(ctx)
 	if err != nil {
 		return errors.Wrap(err, "list checks")
 	}
@@ -61,7 +61,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
 		if val, ok := checkHostMap[host]; ok {
-			cfg, err := c.update(ctx, host, val)
+			cfg, err := c.updateCheck(ctx, host, val)
 			if err != nil {
 				return errors.Wrapf(err, "update check %s", host)
 			}
@@ -69,7 +69,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("updated uptime check")
 			hostConfigMap[host] = cfg
 		} else {
-			cfg, err := c.create(ctx, host)
+			cfg, err := c.createCheck(ctx, host)
 			if err != nil {
 				return errors.Wrapf(err, "create check %s", host)
 			}
@@ -84,7 +84,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 	return nil
 }
 
-func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeCheckConfig, error) {
+func (c *Config) createCheck(ctx context.Context, host string) (*monitoringpb.UptimeCheckConfig, error) {
 	client, err := monitoring.NewUptimeCheckClient(ctx)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func (c *Config) create(ctx context.Context, host string) (*monitoringpb.UptimeC
 	return client.CreateUptimeCheckConfig(ctx, req)
 }
 
-func (c *Config) list(ctx context.Context) ([]*monitoringpb.UptimeCheckConfig, error) {
+func (c *Config) listChecks(ctx context.Context) ([]*monitoringpb.UptimeCheckConfig, error) {
 	client, err := monitoring.NewUptimeCheckClient(ctx)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func (c *Config) list(ctx context.Context) ([]*monitoringpb.UptimeCheckConfig, e
 	return ret, nil
 }
 
-func (c *Config) update(ctx context.Context, host, id string) (*monitoringpb.UptimeCheckConfig, error) {
+func (c *Config) updateCheck(ctx context.Context, host, id string) (*monitoringpb.UptimeCheckConfig, error) {
 	client, err := monitoring.NewUptimeCheckClient(ctx)
 	if err != nil {
 		return nil, err
