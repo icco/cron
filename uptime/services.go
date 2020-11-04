@@ -21,7 +21,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 	}
 
 	svcs := []*monitoringpb.Service{}
-	it := c.ListServices(ctx, req)
+	it := client.ListServices(ctx, req)
 	for {
 		svc, err := it.Next()
 		if err == iterator.Done {
@@ -56,7 +56,6 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			if _, err := client.CreateService(ctx, req); err != nil {
 				return err
 			}
-
 		}
 	}
 
