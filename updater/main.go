@@ -66,14 +66,14 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
 
 	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		dep, getErr := deploymentsClient.Get(r.Deployment, metav1.GetOptions{})
+		dep, getErr := deploymentsClient.Get(ctx, r.Deployment, metav1.GetOptions{})
 		if getErr != nil {
 			return (fmt.Errorf("Failed to get latest version of Deployment: %v", getErr))
 		}
 
 		oldPkg := dep.Spec.Template.Spec.Containers[0].Image
 		dep.Spec.Template.Spec.Containers[0].Image = pkg
-		_, updateErr := deploymentsClient.Update(dep)
+		_, updateErr := deploymentsClient.Update(ctx, dep, metav1.UpdateOptions{})
 		if updateErr != nil {
 			return updateErr
 		}
