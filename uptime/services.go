@@ -84,7 +84,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			if err != nil {
 				return err
 			}
-			log.Infof("found SLO: %+v", resp)
+			c.Log.Infof("found SLO: %+v", resp)
 		}
 	}
 
