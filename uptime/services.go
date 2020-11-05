@@ -9,6 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 func UpdateServices(ctx context.Context, c *Config) error {
@@ -76,7 +77,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "service": resp}).Debug("updated service")
 		}
 
-		if err := c.addSLO(ctx, s); err != nil {
+		if err := c.addSLO(ctx, s, wanted); err != nil {
 			return err
 		}
 	}
@@ -84,7 +85,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 	return nil
 }
 
-func (c *Config) addSLO(ctx context.Context, s sites.Site) error {
+func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.Service) error {
 	client, err := monitoring.NewServiceMonitoringClient(ctx)
 	if err != nil {
 		return fmt.Errorf("service monitoring: %w", err)
@@ -103,21 +104,25 @@ func (c *Config) addSLO(ctx context.Context, s sites.Site) error {
 			return err
 		}
 		slo = resp
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": s, "slo", resp}).Debug("found slo")
+		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("found slo")
 	}
 
 	metric := "loadbalancing.googleapis.com/https/backend_request_count"
 	resource := "https_lb_rule"
 	backend := fmt.Sprintf("k8s1-dc14e589-default-%s-service-8080-e07b1861", s.Deployment)
 	want := &monitoringpb.ServiceLevelObjective{
-		DisplayName:   fmt.Sprintf("Generated SLO for %s", s.Host),
-		RollingPeriod: {Seconds: 2419200},
-		Goal:          0.99,
-		ServiceLevelIndicator: {
-			RequestBased: {
-				GoodTotalRatio: {
-					BadServiceFilter:   fmt.Sprintf("metric.type=%q resource.type=%q resource.labels.backend_target_name=%q metric.labels.response_code_class=\"500\"", metric, resource, backend),
-					TotalServiceFilter: fmt.Sprintf("metric.type=%q resource.type=%q resource.labels.backend_target_name=%q", metric, resource, backend),
+		DisplayName: fmt.Sprintf("Generated SLO for %s", s.Host),
+		Period:      &monitoringpb.ServiceLevelObjective_RollingPeriod{RollingPeriod: &durationpb.Duration{Seconds: 2419200}},
+		Goal:        0.99,
+		ServiceLevelIndicator: &monitoringpb.ServiceLevelIndicator{
+			Type: &monitoringpb.ServiceLevelIndicator_RequestBased{
+				RequestBased: &monitoringpb.RequestBasedSli{
+					Method: &monitoringpb.RequestBasedSli_GoodTotalRatio{
+						GoodTotalRatio: &monitoringpb.TimeSeriesRatio{
+							BadServiceFilter:   fmt.Sprintf("metric.type=%q resource.type=%q resource.labels.backend_target_name=%q metric.labels.response_code_class=\"500\"", metric, resource, backend),
+							TotalServiceFilter: fmt.Sprintf("metric.type=%q resource.type=%q resource.labels.backend_target_name=%q", metric, resource, backend),
+						},
+					},
 				},
 			},
 		},
@@ -128,20 +133,20 @@ func (c *Config) addSLO(ctx context.Context, s sites.Site) error {
 		req := &monitoringpb.UpdateServiceLevelObjectiveRequest{
 			ServiceLevelObjective: want,
 		}
-		resp, err := c.UpdateServiceLevelObjective(ctx, req)
+		resp, err := client.UpdateServiceLevelObjective(ctx, req)
 		if err != nil {
 			return err
 		}
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": s, "slo", resp}).Debug("updated slo")
+		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("updated slo")
 	} else {
 		req := &monitoringpb.CreateServiceLevelObjectiveRequest{
 			ServiceLevelObjective: want,
 		}
-		resp, err := c.CreateServiceLevelObjective(ctx, req)
+		resp, err := client.CreateServiceLevelObjective(ctx, req)
 		if err != nil {
 			return err
 		}
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": s, "slo", resp}).Debug("created slo")
+		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("created slo")
 	}
 
 	return nil
