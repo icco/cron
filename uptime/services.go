@@ -171,7 +171,8 @@ func (c *Config) getBackend(ctx context.Context, dep string) (string, error) {
 	}
 
 	for _, b := range list.Items {
-		if strings.Contains(b.Name, dep) {
+		name := fmt.Sprintf("%s-service-8080", dep)
+		if strings.Contains(b.Name, name) {
 			return b.Name, nil
 		}
 	}
