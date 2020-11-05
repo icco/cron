@@ -141,6 +141,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("updated slo")
 	} else {
 		req := &monitoringpb.CreateServiceLevelObjectiveRequest{
+			Parent:                svc.Name,
 			ServiceLevelObjective: want,
 		}
 		resp, err := client.CreateServiceLevelObjective(ctx, req)
