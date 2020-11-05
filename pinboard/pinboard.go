@@ -71,18 +71,17 @@ func (p *Pinboard) UpdatePins(ctx context.Context) error {
 		req.Var("time", po.Time)
 		req.Header.Add("X-API-AUTH", p.GraphQLToken)
 
-		err := gqlClient.Run(ctx, req, nil)
-		if err != nil {
-			p.Log.WithError(err).Error("error talking to graphql")
+		var resp json.RawMessage
+		if err := gqlClient.Run(ctx, req, &resp); err != nil {
+			p.Log.WithError(err).WithField("request", req).Error("graphql error on link upsert")
 			return err
 		}
 	}
 
 	req := graphql.NewRequest(`query { counts { key, value } }`)
 	var resp json.RawMessage
-	err = gqlClient.Run(ctx, req, &resp)
-	if err != nil {
-		p.Log.WithError(err).Error("error talking to graphql")
+	if err = gqlClient.Run(ctx, req, &resp); err != nil {
+		p.Log.WithError(err).WithField("request", req).Error("graphql error on query counts")
 		return err
 	}
 
