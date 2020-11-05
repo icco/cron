@@ -160,8 +160,12 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 }
 
 func (c *Config) getBackend(ctx context.Context, dep string) (string, error) {
-	bs := &compute.BackendServicesListCall{}
-	list, err := bs.Context(ctx).Do()
+	computeService, err := compute.NewService(ctx)
+	if err != nil {
+		return "", fmt.Errorf("new compute: %w", err)
+	}
+
+	list, err := computeService.BackendServices.List(c.ProjectID).Do()
 	if err != nil {
 		return "", err
 	}
