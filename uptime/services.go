@@ -3,10 +3,12 @@ package uptime
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/icco/cron/sites"
 	"github.com/sirupsen/logrus"
+	compute "google.golang.org/api/compute/v1"
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 	"google.golang.org/protobuf/types/known/durationpb"
@@ -110,7 +112,10 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 
 	metric := "loadbalancing.googleapis.com/https/backend_request_count"
 	resource := "https_lb_rule"
-	backend := fmt.Sprintf("k8s1-dc14e589-default-%s-service-8080-e07b1861", s.Deployment)
+	backend, err := c.getBackend(ctx, s.Deployment)
+	if err != nil {
+		return fmt.Errorf("get backend: %w", err)
+	}
 	want := &monitoringpb.ServiceLevelObjective{
 		DisplayName: fmt.Sprintf("Generated SLO for %s", s.Host),
 		Period:      &monitoringpb.ServiceLevelObjective_RollingPeriod{RollingPeriod: &durationpb.Duration{Seconds: 2419200}},
@@ -152,4 +157,20 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 	}
 
 	return nil
+}
+
+func (c *Config) getBackend(ctx context.Context, dep string) (string, error) {
+	bs := &compute.BackendServicesListCall{}
+	list, err := bs.Context(ctx).Do()
+	if err != nil {
+		return "", err
+	}
+
+	for _, b := range list.Items {
+		if strings.Contains(b.Name, dep) {
+			return b.Name, nil
+		}
+	}
+
+	return "", fmt.Errorf("no backends found")
 }
