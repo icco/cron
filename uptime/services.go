@@ -30,7 +30,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			break
 		}
 		if err != nil {
-			return err
+			return fmt.Errorf("list services: %w", err)
 		}
 
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc}).Debug("found service")
@@ -62,7 +62,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			}
 			resp, err := client.CreateService(ctx, req)
 			if err != nil {
-				return err
+				return fmt.Errorf("create service: %w", err)
 			}
 			wanted.Name = resp.Name
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "service": resp}).Debug("created service")
@@ -72,13 +72,13 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			}
 			resp, err := client.UpdateService(ctx, req)
 			if err != nil {
-				return err
+				return fmt.Errorf("update service: %w", err)
 			}
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "service": resp}).Debug("updated service")
 		}
 
 		if err := c.addSLO(ctx, s, wanted); err != nil {
-			return err
+			return fmt.Errorf("add slo: %w", err)
 		}
 	}
 
@@ -101,7 +101,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 			break
 		}
 		if err != nil {
-			return err
+			return fmt.Errorf("list slos: %w", err)
 		}
 		slo = resp
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("found slo")
@@ -135,7 +135,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 		}
 		resp, err := client.UpdateServiceLevelObjective(ctx, req)
 		if err != nil {
-			return err
+			return fmt.Errorf("update slo: %w", err)
 		}
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("updated slo")
 	} else {
@@ -144,7 +144,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 		}
 		resp, err := client.CreateServiceLevelObjective(ctx, req)
 		if err != nil {
-			return err
+			return fmt.Errorf("create slo: %w", err)
 		}
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("created slo")
 	}
