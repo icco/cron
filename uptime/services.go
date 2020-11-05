@@ -31,7 +31,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			return err
 		}
 
-		c.Log.Infof("found service: %+v", svc)
+		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc}).Debug("found service")
 		svcs = append(svcs, svc)
 	}
 
