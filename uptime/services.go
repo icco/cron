@@ -64,8 +64,8 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			if err != nil {
 				return fmt.Errorf("create service: %w", err)
 			}
-			wanted.Name = resp.Name
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "service": resp}).Debug("created service")
+			wanted = resp
 		} else {
 			req := &monitoringpb.UpdateServiceRequest{
 				Service: wanted,
@@ -75,6 +75,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 				return fmt.Errorf("update service: %w", err)
 			}
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "service": resp}).Debug("updated service")
+			wanted = resp
 		}
 
 		if err := c.addSLO(ctx, s, wanted); err != nil {
