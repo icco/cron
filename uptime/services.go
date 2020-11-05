@@ -34,6 +34,20 @@ func UpdateServices(ctx context.Context, c *Config) error {
 
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc}).Debug("found service")
 		svcs = append(svcs, svc)
+
+		it := client.ListServiceLevelObjectives(ctx, &monitoringpb.ListServiceLevelObjectivesRequest{
+			Parent: svc.Name,
+		})
+		for {
+			resp, err := it.Next()
+			if err == iterator.Done {
+				break
+			}
+			if err != nil {
+				return err
+			}
+			c.Log.Infof("found SLO: %+v", resp)
+		}
 	}
 
 	for _, s := range sites.All {
@@ -74,21 +88,6 @@ func UpdateServices(ctx context.Context, c *Config) error {
 				return err
 			}
 			c.Log.WithFields(logrus.Fields{"job": "uptime", "service": resp}).Debug("updated service")
-		}
-
-		req := &monitoringpb.ListServiceLevelObjectivesRequest{
-			Parent: wanted.Name,
-		}
-		it := client.ListServiceLevelObjectives(ctx, req)
-		for {
-			resp, err := it.Next()
-			if err == iterator.Done {
-				break
-			}
-			if err != nil {
-				return err
-			}
-			c.Log.Infof("found SLO: %+v", resp)
 		}
 	}
 
