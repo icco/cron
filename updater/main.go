@@ -17,6 +17,9 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/util/retry"
+  cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
+  	"google.golang.org/api/iterator"
+	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
 )
 
 type Config struct {
@@ -108,6 +111,27 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 }
 
 func UpdateTriggers(ctx context.Context, conf *Config) error {
+  c, err := cloudbuild.NewClient(ctx)
+	if err != nil {
+    return fmt.Errorf("could not create client: %w", err)
+	}
+
+	req := &cloudbuildpb.ListBuildTriggersRequest{
+		// TODO: Fill request struct fields.
+	}
+	it := c.ListBuildTriggers(ctx, req)
+	for {
+		resp, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			// TODO: Handle error.
+		}
+		// TODO: Use resp.
+		_ = resp
+	}
+
   return fmt.Errorf("unimplemented")
 }
 
