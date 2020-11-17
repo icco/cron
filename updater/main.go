@@ -152,15 +152,29 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 		if !exists {
 			req := &cloudbuildpb.CreateBuildTriggerRequest{
 				ProjectId: conf.GoogleProject,
-				Trigger:   &cloudbuildpb.BuildTrigger{},
+				Trigger: &cloudbuildpb.BuildTrigger{
+					Name: s.Repo,
+					Github: &cloudbuildpb.GitHubEventsConfig{
+						Name: s.Repo,
+						Event: &cloudbuildpb.GitHubEventsConfig_Push{
+							Push: &cloudbuildpb.PushFilter{
+								GitRef: &cloudbuildpb.PushFilter_Branch{
+									Branch: ".*",
+								},
+							},
+						},
+						Owner: s.Owner,
+					},
+				},
 			}
+
 			conf.Log.WithContext(ctx).WithFields(logrus.Fields{
 				"request": req,
 			}).Info("creating trigger")
 
-			//	if _, err := c.CreateBuildTrigger(ctx, req); err != nil {
-			//		return fmt.Errorf("could not create trigger %+v: %w", req, err)
-			//	}
+			if _, err := c.CreateBuildTrigger(ctx, req); err != nil {
+				return fmt.Errorf("could not create trigger %+v: %w", req, err)
+			}
 		}
 	}
 
