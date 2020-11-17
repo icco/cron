@@ -153,11 +153,10 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 		if !exists {
 			req := &cloudbuildpb.CreateBuildTriggerRequest{
 				ProjectId: conf.GoogleProject,
+				// https://issuetracker.google.com/issues/173534838
 				Trigger: &cloudbuildpb.BuildTrigger{
-					BuildTemplate: &cloudbuildpb.BuildTrigger_Filename{
-						Filename: "Dockerfile",
-					},
-					Name: s.Deployment,
+					BuildTemplate: &cloudbuildpb.BuildTrigger_Filename{},
+					Name:          s.Deployment,
 					Github: &cloudbuildpb.GitHubEventsConfig{
 						Name: s.Repo,
 						Event: &cloudbuildpb.GitHubEventsConfig_Push{
