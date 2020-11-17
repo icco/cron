@@ -23,8 +23,9 @@ import (
 )
 
 type Config struct {
-	Log         *logrus.Logger
-	GithubToken string
+	Log           *logrus.Logger
+	GithubToken   string
+	GoogleProject string
 }
 
 var (
@@ -32,7 +33,7 @@ var (
 )
 
 func UpdateWorkspaces(ctx context.Context, conf *Config) {
-	repoFmt := "gcr.io/icco-cloud/%s:%s"
+	repoFmt := "gcr.io/%s/%s:%s"
 	c = conf
 
 	for _, r := range sites.All {
@@ -47,7 +48,7 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 			break
 		}
 
-		repo := fmt.Sprintf(repoFmt, r.Repo, sha)
+		repo := fmt.Sprintf(repoFmt, conf.GoogleProject, r.Repo, sha)
 		err = UpdateKube(ctx, r, repo)
 		if err != nil {
 			c.Log.WithError(err).WithContext(ctx).Fatal(err)
@@ -116,8 +117,9 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 		return fmt.Errorf("could not create client: %w", err)
 	}
 
+	var trigs []*cloudbuildpb.BuildTrigger
 	req := &cloudbuildpb.ListBuildTriggersRequest{
-		// TODO: Fill request struct fields.
+		ProjectId: conf.GoogleProject,
 	}
 	it := c.ListBuildTriggers(ctx, req)
 	for {
@@ -126,13 +128,36 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 			break
 		}
 		if err != nil {
-			// TODO: Handle error.
+			return fmt.Errorf("failed while listing: %w", err)
 		}
-		// TODO: Use resp.
-		_ = resp
+		conf.Log.WithContext(ctx).WithFields(logrus.Fields{
+			"triggers": resp.Triggers,
+		}).Info("found triggers")
+		trigs = append(trigs, resp.Triggers...)
 	}
 
-	return fmt.Errorf("unimplemented")
+	for _, s := range sites.All {
+		exists := false
+		for _, t := range trigs {
+			if t.Name == s.Repo {
+				exists = true
+				// TODO: If exists, update.
+				break
+			}
+		}
+
+		//if !exists {
+		//	req := &cloudbuildpb.CreateBuildTriggerRequest{
+		//		ProjectId: conf.GoogleProject,
+		//		Trigger:   &cloudbuildpb.BuildTrigger{},
+		//	}
+		//	if _, err := c.CreateBuildTrigger(ctx, req); err != nil {
+		//		return fmt.Errorf("could not create trigger %+v: %w", req, err)
+		//	}
+		//}
+	}
+
+	return nil
 }
 
 func (c *Config) GetSHA(ctx context.Context, owner string, repo string) (string, error) {
