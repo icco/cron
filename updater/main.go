@@ -142,7 +142,7 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 	for _, s := range sites.All {
 		exists := false
 		for _, t := range trigs {
-			if t.Name == s.Repo {
+			if t.Name == s.Deployment {
 				exists = true
 				// TODO: If exists, update.
 				break
@@ -153,8 +153,10 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 			req := &cloudbuildpb.CreateBuildTriggerRequest{
 				ProjectId: conf.GoogleProject,
 				Trigger: &cloudbuildpb.BuildTrigger{
-					BuildTemplate: &cloudbuildpb.BuildTrigger_Build{},
-					Name:          s.Repo,
+					BuildTemplate: &cloudbuildpb.BuildTrigger_Filename{
+						Filename: "Dockerfile",
+					},
+					Name: s.Deployment,
 					Github: &cloudbuildpb.GitHubEventsConfig{
 						Name: s.Repo,
 						Event: &cloudbuildpb.GitHubEventsConfig_Push{
