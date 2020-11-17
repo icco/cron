@@ -85,7 +85,7 @@ func (p *Pinboard) UpdatePins(ctx context.Context) error {
 		return err
 	}
 
-	p.Log.WithField("link_count", string(resp)).Infof("New Database Counts: %+v", string(resp))
+	p.Log.WithField("counts", resp).Info("Database Counts")
 
 	return nil
 }
