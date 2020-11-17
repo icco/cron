@@ -153,7 +153,8 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 			req := &cloudbuildpb.CreateBuildTriggerRequest{
 				ProjectId: conf.GoogleProject,
 				Trigger: &cloudbuildpb.BuildTrigger{
-					Name: s.Repo,
+					BuildTemplate: &cloudbuildpb.BuildTrigger_Build{},
+					Name:          s.Repo,
 					Github: &cloudbuildpb.GitHubEventsConfig{
 						Name: s.Repo,
 						Event: &cloudbuildpb.GitHubEventsConfig_Push{
