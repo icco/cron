@@ -32,7 +32,7 @@ var (
 	c *Config
 )
 
-func UpdateWorkspaces(ctx context.Context, conf *Config) {
+func UpdateWorkspaces(ctx context.Context, conf *Config) error {
 	repoFmt := "gcr.io/%s/%s:%s"
 	c = conf
 
@@ -51,9 +51,12 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 		repo := fmt.Sprintf(repoFmt, conf.GoogleProject, r.Repo, sha)
 		err = UpdateKube(ctx, r, repo)
 		if err != nil {
-			c.Log.WithError(err).WithContext(ctx).Fatal(err)
+			c.Log.WithError(err).WithContext(ctx).Error(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
@@ -131,9 +134,9 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 			return fmt.Errorf("failed while listing: %w", err)
 		}
 		conf.Log.WithContext(ctx).WithFields(logrus.Fields{
-			"triggers": resp.Triggers,
+			"triggers": resp,
 		}).Info("found triggers")
-		trigs = append(trigs, resp.Triggers...)
+		trigs = append(trigs, resp)
 	}
 
 	for _, s := range sites.All {
@@ -146,15 +149,19 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 			}
 		}
 
-		//if !exists {
-		//	req := &cloudbuildpb.CreateBuildTriggerRequest{
-		//		ProjectId: conf.GoogleProject,
-		//		Trigger:   &cloudbuildpb.BuildTrigger{},
-		//	}
-		//	if _, err := c.CreateBuildTrigger(ctx, req); err != nil {
-		//		return fmt.Errorf("could not create trigger %+v: %w", req, err)
-		//	}
-		//}
+		if !exists {
+			req := &cloudbuildpb.CreateBuildTriggerRequest{
+				ProjectId: conf.GoogleProject,
+				Trigger:   &cloudbuildpb.BuildTrigger{},
+			}
+			conf.Log.WithContext(ctx).WithFields(logrus.Fields{
+				"request": req,
+			}).Info("creating trigger")
+
+			//	if _, err := c.CreateBuildTrigger(ctx, req); err != nil {
+			//		return fmt.Errorf("could not create trigger %+v: %w", req, err)
+			//	}
+		}
 	}
 
 	return nil
