@@ -148,6 +148,12 @@ var All = []SiteMap{
 		Deployment: "sadnat",
 	},
 	{
+		Host:       "tabs.natwelch.com",
+		Owner:      "icco",
+		Repo:       "tab-archive",
+		Deployment: "tabs",
+	},
+	{
 		Host:       "traviscwelch.com",
 		Owner:      "trav3711",
 		Repo:       "traviscwelch.com",
