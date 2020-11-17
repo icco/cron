@@ -133,11 +133,12 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 		if err != nil {
 			return fmt.Errorf("failed while listing: %w", err)
 		}
-		conf.Log.WithContext(ctx).WithFields(logrus.Fields{
-			"triggers": resp,
-		}).Info("found triggers")
 		trigs = append(trigs, resp)
 	}
+
+	conf.Log.WithContext(ctx).WithFields(logrus.Fields{
+		"triggers": trigs,
+	}).Debug("found triggers")
 
 	for _, s := range sites.All {
 		exists := false
