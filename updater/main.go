@@ -7,19 +7,19 @@ import (
 	"fmt"
 	"net/http"
 
+	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
 	"github.com/google/go-github/v28/github"
 	"github.com/icco/cron/sites"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
+	"google.golang.org/api/iterator"
+	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/util/retry"
-  cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
-  	"google.golang.org/api/iterator"
-	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
 )
 
 type Config struct {
@@ -111,9 +111,9 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 }
 
 func UpdateTriggers(ctx context.Context, conf *Config) error {
-  c, err := cloudbuild.NewClient(ctx)
+	c, err := cloudbuild.NewClient(ctx)
 	if err != nil {
-    return fmt.Errorf("could not create client: %w", err)
+		return fmt.Errorf("could not create client: %w", err)
 	}
 
 	req := &cloudbuildpb.ListBuildTriggersRequest{
@@ -132,7 +132,7 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 		_ = resp
 	}
 
-  return fmt.Errorf("unimplemented")
+	return fmt.Errorf("unimplemented")
 }
 
 func (c *Config) GetSHA(ctx context.Context, owner string, repo string) (string, error) {
