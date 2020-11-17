@@ -63,9 +63,9 @@ func Act(octx context.Context, job string) error {
 			GithubToken:   githubToken,
 			GoogleProject: "icco-cloud",
 		}
-		//	if err := updater.UpdateWorkspaces(ctx, cfg); err != nil {
-		//		return fmt.Errorf("update workspaces: %w", err)
-		//	}
+		if err := updater.UpdateWorkspaces(ctx, cfg); err != nil {
+			return fmt.Errorf("update workspaces: %w", err)
+		}
 		if err := updater.UpdateTriggers(ctx, cfg); err != nil {
 			return fmt.Errorf("update triggers: %w", err)
 		}
