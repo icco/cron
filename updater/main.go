@@ -37,14 +37,18 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) error {
 	c = conf
 
 	for _, r := range sites.All {
-		sha, err := c.GetSHA(ctx, r.Owner, r.Repo)
+		sha, err := c.GetSHA(ctx, r.Owner, r.Repo, r.Branch)
 		if _, ok := err.(*github.RateLimitError); ok {
 			c.Log.WithContext(ctx).WithError(err).Warn("hit rate limit")
 			break
 		}
 
 		if sha == "" {
-			c.Log.WithContext(ctx).WithFields(logrus.Fields{"owner": r.Owner, "repo": r.Repo}).Error("SHA is empty")
+			c.Log.WithContext(ctx).WithFields(logrus.Fields{
+				"owner":  r.Owner,
+				"repo":   r.Repo,
+				"branch": r.Branch,
+			}).Error("SHA is empty")
 			break
 		}
 
@@ -184,14 +188,14 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 	return nil
 }
 
-func (c *Config) GetSHA(ctx context.Context, owner string, repo string) (string, error) {
+func (c *Config) GetSHA(ctx context.Context, owner, repo, mainBranch string) (string, error) {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: c.GithubToken},
 	)
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	branch, _, err := client.Repositories.GetBranch(ctx, owner, repo, "master")
+	branch, _, err := client.Repositories.GetBranch(ctx, owner, repo, mainBranch)
 	if err != nil {
 		return "", err
 	}
