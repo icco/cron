@@ -7,10 +7,13 @@ import (
 	"fmt"
 	"net/http"
 
+	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
 	"github.com/google/go-github/v28/github"
 	"github.com/icco/cron/sites"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
+	"google.golang.org/api/iterator"
+	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
@@ -20,16 +23,17 @@ import (
 )
 
 type Config struct {
-	Log         *logrus.Logger
-	GithubToken string
+	Log           *logrus.Logger
+	GithubToken   string
+	GoogleProject string
 }
 
 var (
 	c *Config
 )
 
-func UpdateWorkspaces(ctx context.Context, conf *Config) {
-	repoFmt := "gcr.io/icco-cloud/%s:%s"
+func UpdateWorkspaces(ctx context.Context, conf *Config) error {
+	repoFmt := "gcr.io/%s/%s:%s"
 	c = conf
 
 	for _, r := range sites.All {
@@ -44,12 +48,15 @@ func UpdateWorkspaces(ctx context.Context, conf *Config) {
 			break
 		}
 
-		repo := fmt.Sprintf(repoFmt, r.Repo, sha)
+		repo := fmt.Sprintf(repoFmt, conf.GoogleProject, r.Repo, sha)
 		err = UpdateKube(ctx, r, repo)
 		if err != nil {
-			c.Log.WithError(err).WithContext(ctx).Fatal(err)
+			c.Log.WithError(err).WithContext(ctx).Error(err)
+			return err
 		}
 	}
+
+	return nil
 }
 
 func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
@@ -103,6 +110,77 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 		"package":    pkg,
 		"deployment": r.Deployment,
 	}).Debug("updated deployment")
+
+	return nil
+}
+
+func UpdateTriggers(ctx context.Context, conf *Config) error {
+	c, err := cloudbuild.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("could not create client: %w", err)
+	}
+
+	var trigs []*cloudbuildpb.BuildTrigger
+	req := &cloudbuildpb.ListBuildTriggersRequest{
+		ProjectId: conf.GoogleProject,
+	}
+	it := c.ListBuildTriggers(ctx, req)
+	for {
+		resp, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("failed while listing: %w", err)
+		}
+		trigs = append(trigs, resp)
+	}
+
+	conf.Log.WithContext(ctx).WithFields(logrus.Fields{
+		"triggers": trigs,
+	}).Debug("found triggers")
+
+	for _, s := range sites.All {
+		exists := false
+		for _, t := range trigs {
+			if t.Name == s.Deployment {
+				exists = true
+				// TODO: If exists, update.
+				break
+			}
+		}
+
+		if !exists {
+			req := &cloudbuildpb.CreateBuildTriggerRequest{
+				ProjectId: conf.GoogleProject,
+				Trigger: &cloudbuildpb.BuildTrigger{
+					BuildTemplate: &cloudbuildpb.BuildTrigger_Filename{
+						Filename: "Dockerfile",
+					},
+					Name: s.Deployment,
+					Github: &cloudbuildpb.GitHubEventsConfig{
+						Name: s.Repo,
+						Event: &cloudbuildpb.GitHubEventsConfig_Push{
+							Push: &cloudbuildpb.PushFilter{
+								GitRef: &cloudbuildpb.PushFilter_Branch{
+									Branch: ".*",
+								},
+							},
+						},
+						Owner: s.Owner,
+					},
+				},
+			}
+
+			conf.Log.WithContext(ctx).WithFields(logrus.Fields{
+				"request": req,
+			}).Info("creating trigger")
+
+			if _, err := c.CreateBuildTrigger(ctx, req); err != nil {
+				return fmt.Errorf("could not create trigger %+v: %w", req, err)
+			}
+		}
+	}
 
 	return nil
 }

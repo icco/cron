@@ -155,7 +155,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 		pubsub.SubscriptionConfig{Topic: pubsubClient.Topic("cron")})
 	if err != nil {
 		// This is fine, don't do anything.
-		log.WithError(err).Info("Could not create subscription.")
+		log.WithError(err).Info("could not create subscription")
 		sub = pubsubClient.Subscription(subName)
 	}
 
@@ -167,12 +167,12 @@ func recieveMessages(ctx context.Context, subName string) error {
 		logFields := logrus.Fields{"parsed": data, "unparsed": string(msg.Data)}
 
 		if err != nil {
-			log.WithError(err).WithFields(logFields).Warn("Couldn't decode json.")
+			log.WithError(err).WithFields(logFields).Warn("could not decode json")
 		} else {
 			log.WithFields(logFields).Debug("Got message")
 			err = cron.Act(ctx, data["job"])
 			if err != nil {
-				log.WithError(err).Error("Problem running job.")
+				log.WithError(err).Error("problem running job")
 			}
 			msg.Ack()
 
