@@ -58,10 +58,16 @@ func Act(octx context.Context, job string) error {
 	case "minute":
 		log.Info("> heartbeat")
 	case "update-deployments":
-		updater.UpdateWorkspaces(ctx, &updater.Config{
+    cfg := &updater.Config{
 			Log:         log,
 			GithubToken: githubToken,
-		})
+		}
+    if err := updater.UpdateWorkspaces(ctx, cfg); err != nil {
+      return fmt.Errorf("update workspaces: %w", err)
+    }
+    if err := updater.UpdateTriggers(ctx, cfg); err != nil {
+      return fmt.Errorf("update triggers: %w", err)
+    }
 	case "spider":
 		spider.Crawl(ctx, &spider.Config{Log: log, URL: "https://writing.natwelch.com/"})
 	case "user-tweets":

@@ -107,6 +107,10 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 	return nil
 }
 
+func UpdateTriggers(ctx context.Context, conf *Config) error {
+  return fmt.Errorf("unimplemented")
+}
+
 func (c *Config) GetSHA(ctx context.Context, owner string, repo string) (string, error) {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: c.GithubToken},
