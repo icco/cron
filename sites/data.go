@@ -172,7 +172,7 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
-		Host:       "tabs.natwelch.com",
+		Host:       "tab-archive.app",
 		Owner:      "icco",
 		Repo:       "tab-archive",
 		Deployment: "tabs",
