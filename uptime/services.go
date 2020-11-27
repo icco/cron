@@ -125,7 +125,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 				RequestBased: &monitoringpb.RequestBasedSli{
 					Method: &monitoringpb.RequestBasedSli_GoodTotalRatio{
 						GoodTotalRatio: &monitoringpb.TimeSeriesRatio{
-							BadServiceFilter:   fmt.Sprintf("metric.type=%q resource.type=%q resource.labels.backend_target_name=%q metric.labels.response_code_class=\"500\"", metric, resource, backend),
+							GoodServiceFilter:  fmt.Sprintf("metric.type=%q resource.type=%q resource.labels.backend_target_name=%q metric.labels.response_code_class=\"200\"", metric, resource, backend),
 							TotalServiceFilter: fmt.Sprintf("metric.type=%q resource.type=%q resource.labels.backend_target_name=%q", metric, resource, backend),
 						},
 					},
