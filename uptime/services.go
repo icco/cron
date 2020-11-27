@@ -130,6 +130,7 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 		},
 		Conditions: []*monitoringpb.AlertPolicy_Condition{
 			{
+				DisplayName: "slo burn",
 				Condition: &monitoringpb.AlertPolicy_Condition_ConditionThreshold{
 					ConditionThreshold: &monitoringpb.AlertPolicy_Condition_MetricThreshold{
 						Filter:         fmt.Sprintf("select_slo_burn_rate(%q, %q)", sloID, "3600s"),
