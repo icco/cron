@@ -94,7 +94,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 }
 
 func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) error {
-	alertType := "SLO"
+	alertType := "slo"
 	alertNotification := "projects/icco-cloud/notificationChannels/2074431925909529711"
 
 	client, err := monitoring.NewAlertPolicyClient(ctx)
