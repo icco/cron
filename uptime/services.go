@@ -83,6 +83,35 @@ func UpdateServices(ctx context.Context, c *Config) error {
 		if err := c.addSLO(ctx, s, wanted); err != nil {
 			return fmt.Errorf("add slo: %w", err)
 		}
+
+		if err := c.addAlert(ctx, s, wanted); err != nil {
+			return fmt.Errorf("add alert: %w", err)
+		}
+	}
+
+	return nil
+}
+
+func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, svc *monitoringpb.Service) error {
+	client, err := monitoring.NewAlertPolicyClient(ctx)
+	if err != nil {
+		return fmt.Errorf("alert policy: %w", err)
+	}
+
+	req := &monitoringpb.GetAlertPolicyRequest{
+		Name: fmt.Sprintf("projects/%s", c.ProjectID),
+	}
+
+	it := c.ListAlertPolicies(ctx, req)
+	for {
+		resp, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("list policies: %w", err)
+		}
+		log.WithField("policy", resp).Debug("found alert policy")
 	}
 
 	return nil
