@@ -98,11 +98,11 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, svc *monitoringp
 		return fmt.Errorf("alert policy: %w", err)
 	}
 
-	req := &monitoringpb.GetAlertPolicyRequest{
+	req := &monitoringpb.ListAlertPoliciesRequest{
 		Name: fmt.Sprintf("projects/%s", c.ProjectID),
 	}
 
-	it := c.ListAlertPolicies(ctx, req)
+	it := client.ListAlertPolicies(ctx, req)
 	for {
 		resp, err := it.Next()
 		if err == iterator.Done {
@@ -111,7 +111,7 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, svc *monitoringp
 		if err != nil {
 			return fmt.Errorf("list policies: %w", err)
 		}
-		log.WithField("policy", resp).Debug("found alert policy")
+		c.Log.WithField("policy", resp).Debug("found alert policy")
 	}
 
 	return nil
