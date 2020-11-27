@@ -146,14 +146,6 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 	}
 
 	if existing != nil {
-		req := &monitoringpb.CreateAlertPolicyRequest{
-			Name:        fmt.Sprintf("projects/%s", c.ProjectID),
-			AlertPolicy: wanted,
-		}
-		if _, err := client.CreateAlertPolicy(ctx, req); err != nil {
-			return err
-		}
-	} else {
 		wanted.Name = existing.Name
 		if len(existing.Conditions) == len(wanted.Conditions) {
 			for i, c := range existing.Conditions {
@@ -162,6 +154,14 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 		}
 
 		if _, err := client.UpdateAlertPolicy(ctx, &monitoringpb.UpdateAlertPolicyRequest{AlertPolicy: wanted}); err != nil {
+			return err
+		}
+	} else {
+		req := &monitoringpb.CreateAlertPolicyRequest{
+			Name:        fmt.Sprintf("projects/%s", c.ProjectID),
+			AlertPolicy: wanted,
+		}
+		if _, err := client.CreateAlertPolicy(ctx, req); err != nil {
 			return err
 		}
 	}
