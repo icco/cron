@@ -80,11 +80,12 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			wanted = resp
 		}
 
-		if err := c.addSLO(ctx, s, wanted); err != nil {
+		slo, err := c.addSLO(ctx, s, wanted)
+		if err != nil {
 			return fmt.Errorf("add slo: %w", err)
 		}
 
-		if err := c.addAlert(ctx, s, wanted); err != nil {
+		if err := c.addAlert(ctx, s, slo.Name); err != nil {
 			return fmt.Errorf("add alert: %w", err)
 		}
 	}
@@ -92,35 +93,86 @@ func UpdateServices(ctx context.Context, c *Config) error {
 	return nil
 }
 
-func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, svc *monitoringpb.Service) error {
+func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) error {
+	alertType := "SLO"
+	alertNotification := "projects/icco-cloud/notificationChannels/2074431925909529711"
+
 	client, err := monitoring.NewAlertPolicyClient(ctx)
 	if err != nil {
 		return fmt.Errorf("alert policy: %w", err)
 	}
 
-	req := &monitoringpb.ListAlertPoliciesRequest{
+	var existing *monitoringpb.AlertPolicy
+	it := client.ListAlertPolicies(ctx, &monitoringpb.ListAlertPoliciesRequest{
 		Name: fmt.Sprintf("projects/%s", c.ProjectID),
-	}
-
-	it := client.ListAlertPolicies(ctx, req)
+	})
 	for {
-		resp, err := it.Next()
+		policy, err := it.Next()
 		if err == iterator.Done {
 			break
 		}
 		if err != nil {
 			return fmt.Errorf("list policies: %w", err)
 		}
-		c.Log.WithField("policy", resp).Debug("found alert policy")
+
+		if policy.UserLabels["type"] == alertType && policy.UserLabels["service"] == s.Deployment {
+			c.Log.WithField("policy", policy).Debug("found alert policy")
+			existing = policy
+		}
+	}
+
+	wanted := &monitoringpb.AlertPolicy{
+		DisplayName:          fmt.Sprintf("SLO Burn Alert %s", s.Host),
+		NotificationChannels: []string{alertNotification},
+		UserLabels: map[string]string{
+			"type":    alertType,
+			"service": s.Deployment,
+		},
+		Conditions: []*monitoringpb.AlertPolicy_Condition{
+			{
+				Condition: &monitoringpb.AlertPolicy_Condition_ConditionThreshold{
+					ConditionThreshold: &monitoringpb.AlertPolicy_Condition_MetricThreshold{
+						Filter:         fmt.Sprintf("select_slo_burn_rate(%q, %q)", sloID, "3600s"),
+						ThresholdValue: 10,
+						Trigger: &monitoringpb.AlertPolicy_Condition_Trigger{
+							Type: &monitoringpb.AlertPolicy_Condition_Trigger_Count{
+								Count: 1,
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if existing != nil {
+		req := &monitoringpb.CreateAlertPolicyRequest{
+			Name:        fmt.Sprintf("projects/%s", c.ProjectID),
+			AlertPolicy: wanted,
+		}
+		if _, err := client.CreateAlertPolicy(ctx, req); err != nil {
+			return err
+		}
+	} else {
+		wanted.Name = existing.Name
+		if len(existing.Conditions) == len(wanted.Conditions) {
+			for i, c := range existing.Conditions {
+				wanted.Conditions[i].Name = c.Name
+			}
+		}
+
+		if _, err := client.UpdateAlertPolicy(ctx, &monitoringpb.UpdateAlertPolicyRequest{AlertPolicy: wanted}); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.Service) error {
+func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.Service) (*monitoringpb.ServiceLevelObjective, error) {
 	client, err := monitoring.NewServiceMonitoringClient(ctx)
 	if err != nil {
-		return fmt.Errorf("service monitoring: %w", err)
+		return nil, fmt.Errorf("service monitoring: %w", err)
 	}
 
 	var slo *monitoringpb.ServiceLevelObjective
@@ -133,7 +185,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("list slos: %w", err)
+			return nil, fmt.Errorf("list slos: %w", err)
 		}
 		slo = resp
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("found slo")
@@ -143,7 +195,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 	resource := "https_lb_rule"
 	backend, err := c.getBackend(ctx, s.Deployment)
 	if err != nil {
-		return fmt.Errorf("get backend: %w", err)
+		return nil, fmt.Errorf("get backend: %w", err)
 	}
 	want := &monitoringpb.ServiceLevelObjective{
 		DisplayName: fmt.Sprintf("Generated SLO for %s", s.Host),
@@ -170,9 +222,10 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 		}
 		resp, err := client.UpdateServiceLevelObjective(ctx, req)
 		if err != nil {
-			return fmt.Errorf("update slo: %w", err)
+			return nil, fmt.Errorf("update slo: %w", err)
 		}
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("updated slo")
+		return resp, nil
 	} else {
 		req := &monitoringpb.CreateServiceLevelObjectiveRequest{
 			Parent:                svc.Name,
@@ -180,12 +233,13 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 		}
 		resp, err := client.CreateServiceLevelObjective(ctx, req)
 		if err != nil {
-			return fmt.Errorf("create slo: %w", err)
+			return nil, fmt.Errorf("create slo: %w", err)
 		}
 		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("created slo")
+		return resp, nil
 	}
 
-	return nil
+	return nil, fmt.Errorf("unknown logic error")
 }
 
 func (c *Config) getBackend(ctx context.Context, dep string) (string, error) {
