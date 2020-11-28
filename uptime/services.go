@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/icco/cron/sites"
@@ -140,6 +141,7 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 								Count: 1,
 							},
 						},
+						Duration: durationpb.New(time.Minute * 5),
 					},
 				},
 			},
