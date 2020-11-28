@@ -132,11 +132,11 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 		},
 		Conditions: []*monitoringpb.AlertPolicy_Condition{
 			{
-				DisplayName: "slo burn",
+				DisplayName: fmt.Sprintf("SLO Burn for %s", s.Host),
 				Condition: &monitoringpb.AlertPolicy_Condition_ConditionThreshold{
 					ConditionThreshold: &monitoringpb.AlertPolicy_Condition_MetricThreshold{
 						Filter:         fmt.Sprintf("select_slo_burn_rate(%q, %q)", sloID, "3600s"),
-						ThresholdValue: 10,
+						ThresholdValue: 60,
 						Trigger: &monitoringpb.AlertPolicy_Condition_Trigger{
 							Type: &monitoringpb.AlertPolicy_Condition_Trigger_Count{
 								Count: 1,
@@ -147,6 +147,10 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 					},
 				},
 			},
+		},
+		Documentation: &monitoringpb.AlertPolicy_Documentation{
+			MimeType: "text/markdown",
+			Content:  "An SLO alert fires when the number of non 200 http requests increases greatly.",
 		},
 	}
 
