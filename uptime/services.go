@@ -125,6 +125,7 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 	wanted := &monitoringpb.AlertPolicy{
 		DisplayName:          fmt.Sprintf("SLO Burn Alert %s", s.Host),
 		NotificationChannels: []string{alertNotification},
+		Combiner:             monitoringpb.AlertPolicy_AND,
 		UserLabels: map[string]string{
 			"type":    alertType,
 			"service": s.Deployment,
