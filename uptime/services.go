@@ -157,18 +157,21 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 				wanted.Conditions[i].Name = c.Name
 			}
 		}
-
-		if _, err := client.UpdateAlertPolicy(ctx, &monitoringpb.UpdateAlertPolicyRequest{AlertPolicy: wanted}); err != nil {
+		resp, err := client.UpdateAlertPolicy(ctx, &monitoringpb.UpdateAlertPolicyRequest{AlertPolicy: wanted})
+		if err != nil {
 			return err
 		}
+		c.Log.WithFields(logrus.Fields{"job": "uptime", "site": s, "response": resp}).Debug("updated alert policy")
 	} else {
 		req := &monitoringpb.CreateAlertPolicyRequest{
 			Name:        fmt.Sprintf("projects/%s", c.ProjectID),
 			AlertPolicy: wanted,
 		}
-		if _, err := client.CreateAlertPolicy(ctx, req); err != nil {
+		resp, err := client.CreateAlertPolicy(ctx, req)
+		if err != nil {
 			return err
 		}
+		c.Log.WithFields(logrus.Fields{"job": "uptime", "site": s, "response": resp}).Debug("created alert policy")
 	}
 
 	return nil
