@@ -95,6 +95,13 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
+		Host:       "kyoudai.industries",
+		Owner:      "trav3711",
+		Repo:       "kyoudai.industries",
+		Deployment: "kyoudai",
+		Branch:     "main",
+	},
+	{
 		Host:       "life.natwelch.com",
 		Owner:      "icco",
 		Repo:       "lifeline",
