@@ -8,6 +8,7 @@ import (
 	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
 	"github.com/icco/cron/spider"
+	"github.com/icco/cron/stats"
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
 	"github.com/icco/cron/uptime"
@@ -122,6 +123,15 @@ func Act(octx context.Context, job string) error {
 		}
 
 		if err := uptime.UpdateServices(ctx, c); err != nil {
+			return err
+		}
+	case "stats":
+		c := &stats.Config{
+			Log:          log,
+			GraphQLToken: gqlToken,
+		}
+
+		if err := c.Update(ctx); err != nil {
 			return err
 		}
 	default:
