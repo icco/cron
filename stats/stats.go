@@ -47,6 +47,19 @@ func (c *Config) Update(ctx context.Context) error {
 		})
 	}
 
+	g.Go(func() error {
+		stats, err := GetCounts(ctx, c)
+		if err != nil {
+			return err
+		}
+
+		for _, s := range stats {
+			if err := c.UploadStat(ctx, s.Key, s.Value); err != nil {
+				return err
+			}
+		}
+	})
+
 	return g.Wait()
 }
 
