@@ -60,7 +60,7 @@ func (c *Config) UploadStat(ctx context.Context, key string, value float64) erro
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
 	mut := `
   mutation ($s: NewStat!) {
-      upsertStat(input: $b) {
+      upsertStat(input: $s) {
         modified
       }
     }
