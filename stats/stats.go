@@ -10,17 +10,28 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+// Config stores config.
 type Config struct {
 	Log          *logrus.Logger
 	GraphQLToken string
 }
 
-type KeyFunc func(context.Context, *Config) (float64, error)
+type keyFunc func(context.Context, *Config) (float64, error)
 
-const funcMap = map[string]KeyFunc{
+// funcMap is a list of stats to get. Some ideas:
+// - Steps
+// - Planes above
+// - Devices on network
+// - Blog posts
+// - Books read this year
+// - Tweets today
+// - ETH price
+// - Time coding
+const funcMap = map[string]keyFunc{
 	"ETH": GetETHPrice,
 }
 
+// Update gets all stats.
 func (c *Config) Update(ctx context.Context) error {
 	g, ctx := errgroup.WithContext(ctx)
 	for k, f := range funcMap {
@@ -39,16 +50,6 @@ func (c *Config) Update(ctx context.Context) error {
 		return nil, err
 	}
 }
-
-// Stat ideas:
-// - Steps
-// - Planes above
-// - Devices on network
-// - Blog posts
-// - Books read this year
-// - Tweets today
-// - ETH price
-// - Time coding
 
 // UploadStat uploads a single stat.
 func (c *Config) UploadStat(ctx context.Context, key string, value float64) error {
