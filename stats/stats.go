@@ -58,6 +58,8 @@ func (c *Config) Update(ctx context.Context) error {
 				return err
 			}
 		}
+
+		return nil
 	})
 
 	return g.Wait()
