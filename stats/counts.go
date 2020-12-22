@@ -14,6 +14,7 @@ type countsResponse struct {
 			Value float64 `json:"value"`
 		} `json:"counts"`
 	} `json:"data"`
+	Error error `json:"error"`
 }
 
 func GetCounts(ctx context.Context, cfg *Config) ([]*gql.Stat, error) {
@@ -22,6 +23,10 @@ func GetCounts(ctx context.Context, cfg *Config) ([]*gql.Stat, error) {
 	var resp countsResponse
 	if err := gqlClient.Run(ctx, req, &resp); err != nil {
 		return nil, err
+	}
+	cfg.Log.WithField("response", resp).Debug("got count response")
+	if resp.Error != nil {
+		return nil, resp.Error
 	}
 
 	var stats []*gql.Stat
