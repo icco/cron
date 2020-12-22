@@ -27,7 +27,7 @@ type keyFunc func(context.Context, *Config) (float64, error)
 // - Tweets today
 // - ETH price
 // - Time coding
-const funcMap = map[string]keyFunc{
+var funcMap = map[string]keyFunc{
 	"ETH": GetETHPrice,
 }
 
@@ -38,17 +38,16 @@ func (c *Config) Update(ctx context.Context) error {
 		// https://golang.org/doc/faq#closures_and_goroutines
 		k, f := k, f
 		g.Go(func() error {
-			v, err := f(ctx)
+			v, err := f(ctx, c)
 			if err != nil {
-				return err
+				return fmt.Errorf("get %q: %w", k, err)
 			}
 
 			return c.UploadStat(ctx, k, v)
 		})
 	}
-	if err := g.Wait(); err != nil {
-		return nil, err
-	}
+
+	return g.Wait()
 }
 
 // UploadStat uploads a single stat.
@@ -69,7 +68,7 @@ func (c *Config) UploadStat(ctx context.Context, key string, value float64) erro
 
 	req := graphql.NewRequest(mut)
 	req.Var("s", s)
-	req.Header.Add("X-API-AUTH", g.GraphQLToken)
+	req.Header.Add("X-API-AUTH", c.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 
 	if err := gqlClient.Run(ctx, req, nil); err != nil {

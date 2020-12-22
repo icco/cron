@@ -29,7 +29,7 @@ func GetETHPrice(ctx context.Context, cfg *Config) (float64, error) {
 		return 0.0, fmt.Errorf("do eth request: %w", err)
 	}
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return 0.0, fmt.Errorf("eth body: %w", err)
 	}
@@ -39,5 +39,5 @@ func GetETHPrice(ctx context.Context, cfg *Config) (float64, error) {
 		return 0.0, fmt.Errorf("eth parse:", err)
 	}
 
-	return strconv.ParseFloat(s.Amount, 64)
+	return strconv.ParseFloat(s.Data.Amount, 64)
 }
