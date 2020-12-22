@@ -36,7 +36,7 @@ func GetETHPrice(ctx context.Context, cfg *Config) (float64, error) {
 
 	var s = new(ethResponse)
 	if err := json.Unmarshal(body, &s); err != nil {
-		return 0.0, fmt.Errorf("eth parse:", err)
+		return 0.0, fmt.Errorf("eth parse: %w", err)
 	}
 
 	return strconv.ParseFloat(s.Data.Amount, 64)

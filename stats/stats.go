@@ -28,7 +28,8 @@ type keyFunc func(context.Context, *Config) (float64, error)
 // - ETH price
 // - Time coding
 var funcMap = map[string]keyFunc{
-	"ETH": GetETHPrice,
+	"ETH":               GetETHPrice,
+	"Aircraft Overhead": GetAirplanes,
 }
 
 // Update gets all stats.
@@ -50,12 +51,12 @@ func (c *Config) Update(ctx context.Context) error {
 	g.Go(func() error {
 		stats, err := GetCounts(ctx, c)
 		if err != nil {
-			return err
+			return fmt.Errorf("get counts: %w", err)
 		}
 
 		for _, s := range stats {
 			if err := c.UploadStat(ctx, s.Key, s.Value); err != nil {
-				return err
+				return fmt.Errorf("upload stat: %w", err)
 			}
 		}
 
