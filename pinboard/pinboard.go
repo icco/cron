@@ -78,14 +78,5 @@ func (p *Pinboard) UpdatePins(ctx context.Context) error {
 		}
 	}
 
-	req := graphql.NewRequest(`query { counts { key, value } }`)
-	var resp json.RawMessage
-	if err = gqlClient.Run(ctx, req, &resp); err != nil {
-		p.Log.WithError(err).WithField("request", req).Error("graphql error on query counts")
-		return err
-	}
-
-	p.Log.WithField("counts", resp).Info("Database Counts")
-
 	return nil
 }
