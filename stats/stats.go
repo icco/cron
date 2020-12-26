@@ -14,6 +14,7 @@ import (
 type Config struct {
 	Log          *logrus.Logger
 	GraphQLToken string
+	OWMapKey     string
 }
 
 type keyFunc func(context.Context, *Config) (float64, error)
@@ -28,8 +29,9 @@ type keyFunc func(context.Context, *Config) (float64, error)
 // - ETH price
 // - Time coding
 var funcMap = map[string]keyFunc{
-	"ETH":               GetETHPrice,
-	"Aircraft Overhead": GetAirplanes,
+	"ETH":                GetETHPrice,
+	"Aircraft Overhead":  GetAirplanes,
+	"Beacon Temperature": GetCurrentWeather,
 }
 
 // UpdateOften updates stats that can be fetched quickly.
