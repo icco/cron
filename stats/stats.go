@@ -14,7 +14,7 @@ import (
 type Config struct {
 	Log          *logrus.Logger
 	GraphQLToken string
-	OWMapKey     string
+	OWMKey       string
 }
 
 type keyFunc func(context.Context, *Config) (float64, error)
