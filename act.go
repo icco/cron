@@ -129,6 +129,7 @@ func Act(octx context.Context, job string) error {
 		c := &stats.Config{
 			Log:          log,
 			GraphQLToken: gqlToken,
+			OWMKey:       os.Getenv("OPEN_WEATHER_MAP_KEY"),
 		}
 
 		if err := c.UpdateOften(ctx); err != nil {
