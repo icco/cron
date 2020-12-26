@@ -7,6 +7,7 @@ require (
 	cloud.google.com/go/pubsub v1.8.3
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.4
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
+	github.com/briandowns/openweathermap v0.16.0
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/dghubble/go-twitter v0.0.0-20201011215211-4b180d0cc78d
 	github.com/dghubble/oauth1 v0.6.0
