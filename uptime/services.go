@@ -212,7 +212,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 	want := &monitoringpb.ServiceLevelObjective{
 		DisplayName: fmt.Sprintf("Generated SLO for %s", s.Host),
 		Period:      &monitoringpb.ServiceLevelObjective_RollingPeriod{RollingPeriod: &durationpb.Duration{Seconds: 2419200}},
-		Goal:        0.99,
+		Goal:        0.9,
 		ServiceLevelIndicator: &monitoringpb.ServiceLevelIndicator{
 			Type: &monitoringpb.ServiceLevelIndicator_RequestBased{
 				RequestBased: &monitoringpb.RequestBasedSli{
