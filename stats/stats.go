@@ -48,21 +48,20 @@ func (c *Config) Update(ctx context.Context) error {
 		})
 	}
 
-	// TODO: Stop this from timing out
-	//g.Go(func() error {
-	//	stats, err := GetCounts(ctx, c)
-	//	if err != nil {
-	//		return fmt.Errorf("get counts: %w", err)
-	//	}
+	g.Go(func() error {
+		stats, err := GetCounts(ctx, c)
+		if err != nil {
+			return fmt.Errorf("get counts: %w", err)
+		}
 
-	//	for _, s := range stats {
-	//		if err := c.UploadStat(ctx, s.Key, s.Value); err != nil {
-	//			return fmt.Errorf("upload stat: %w", err)
-	//		}
-	//	}
+		for _, s := range stats {
+			if err := c.UploadStat(ctx, s.Key, s.Value); err != nil {
+				return fmt.Errorf("upload stat: %w", err)
+			}
+		}
 
-	//	return nil
-	//})
+		return nil
+	})
 
 	return g.Wait()
 }
