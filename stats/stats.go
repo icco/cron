@@ -78,7 +78,7 @@ func (c *Config) UploadStat(ctx context.Context, key string, value float64) erro
 	mut := `
   mutation ($s: NewStat!) {
       upsertStat(input: $s) {
-        modified
+        when
       }
     }
   `
