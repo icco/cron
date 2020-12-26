@@ -27,5 +27,5 @@ func GetCurrentWeather(ctx context.Context, cfg *Config) (float64, error) {
 		return 0.0, err
 	}
 
-	return w.Temp, nil
+	return w.Main.Temp, nil
 }
