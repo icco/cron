@@ -32,8 +32,8 @@ var funcMap = map[string]keyFunc{
 	"Aircraft Overhead": GetAirplanes,
 }
 
-// Update gets all stats.
-func (c *Config) Update(ctx context.Context) error {
+// UpdateOften updates stats that can be fetched quickly.
+func (c *Config) UpdateOften(ctx context.Context) error {
 	g, ctx := errgroup.WithContext(ctx)
 	for k, f := range funcMap {
 		// https://golang.org/doc/faq#closures_and_goroutines
@@ -48,6 +48,27 @@ func (c *Config) Update(ctx context.Context) error {
 		})
 	}
 
+	g.Go(func() error {
+		stats, err := GetCounts(ctx, c)
+		if err != nil {
+			return fmt.Errorf("get counts: %w", err)
+		}
+
+		for _, s := range stats {
+			if err := c.UploadStat(ctx, s.Key, s.Value); err != nil {
+				return fmt.Errorf("upload stat: %w", err)
+			}
+		}
+
+		return nil
+	})
+
+	return g.Wait()
+}
+
+// UpdateRarely updates stats that should be fetched less frequently.
+func (c *Config) UpdateRarely(ctx context.Context) error {
+	g, ctx := errgroup.WithContext(ctx)
 	g.Go(func() error {
 		stats, err := GetCounts(ctx, c)
 		if err != nil {

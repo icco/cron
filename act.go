@@ -131,7 +131,16 @@ func Act(octx context.Context, job string) error {
 			GraphQLToken: gqlToken,
 		}
 
-		if err := c.Update(ctx); err != nil {
+		if err := c.UpdateFrequently(ctx); err != nil {
+			return err
+		}
+	case "stats-hourly":
+		c := &stats.Config{
+			Log:          log,
+			GraphQLToken: gqlToken,
+		}
+
+		if err := c.UpdateRarely(ctx); err != nil {
 			return err
 		}
 	default:
