@@ -34,6 +34,9 @@ var funcMap = map[string]keyFunc{
 	"Aircraft Overhead":   GetAirplanes,
 	"Beacon Temperature":  GetCurrentWeather("Beacon, NY, US"),
 	"Chester Temperature": GetCurrentWeather("Chester, CA, US"),
+	"London Temperature": GetCurrentWeather("London, UK"),
+	"Santa Rosa Temperature": GetCurrentWeather("Santa Rosa, CA, US"),
+	"Seattle Temperature": GetCurrentWeather("Seattle, WA, US"),
 }
 
 // UpdateOften updates stats that can be fetched quickly.
