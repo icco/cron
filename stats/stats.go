@@ -29,14 +29,14 @@ type keyFunc func(context.Context, *Config) (float64, error)
 // - ETH price
 // - Time coding
 var funcMap = map[string]keyFunc{
-	"ETH":                 GetETHPrice,
-	"BTC":                 GetBTCPrice,
-	"Aircraft Overhead":   GetAirplanes,
-	"Beacon Temperature":  GetCurrentWeather("Beacon, NY, US"),
-	"Chester Temperature": GetCurrentWeather("Chester, CA, US"),
-	"London Temperature": GetCurrentWeather("London, UK"),
+	"ETH":                    GetETHPrice,
+	"BTC":                    GetBTCPrice,
+	"Aircraft Overhead":      GetAirplanes,
+	"Beacon Temperature":     GetCurrentWeather("Beacon, NY, US"),
+	"Chester Temperature":    GetCurrentWeather("Chester, CA, US"),
+	"London Temperature":     GetCurrentWeather("London, UK"),
 	"Santa Rosa Temperature": GetCurrentWeather("Santa Rosa, CA, US"),
-	"Seattle Temperature": GetCurrentWeather("Seattle, WA, US"),
+	"Seattle Temperature":    GetCurrentWeather("Seattle, WA, US"),
 }
 
 // UpdateOften updates stats that can be fetched quickly.
