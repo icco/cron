@@ -100,6 +100,8 @@ func (c *Config) UploadStat(ctx context.Context, key string, value float64) erro
 	req.Header.Add("X-API-AUTH", c.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 
+	gqlClient.Log = func(s string) { c.Log.Debug(s) }
+
 	c.Log.WithField("stat", s).Debug("uploading stat")
 	if err := gqlClient.Run(ctx, req, nil); err != nil {
 		return fmt.Errorf("graphql: %w", err)

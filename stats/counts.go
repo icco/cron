@@ -2,6 +2,7 @@ package stats
 
 import (
 	"context"
+	"fmt"
 
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
@@ -30,7 +31,7 @@ func GetCounts(ctx context.Context, cfg *Config) ([]*gql.Stat, error) {
 		return nil, resp.Error
 	}
 
-	if len(res.Data.Counts) == 0 {
+	if len(resp.Data.Counts) == 0 {
 		return nil, fmt.Errorf("count body was empty")
 	}
 
