@@ -24,9 +24,14 @@ func GetCounts(ctx context.Context, cfg *Config) ([]*gql.Stat, error) {
 	if err := gqlClient.Run(ctx, req, &resp); err != nil {
 		return nil, err
 	}
+
 	cfg.Log.WithField("response", resp).Debug("got count response")
 	if resp.Error != nil {
 		return nil, resp.Error
+	}
+
+	if len(res.Data.Counts) == 0 {
+		return nil, fmt.Errorf("count body was empty")
 	}
 
 	var stats []*gql.Stat
