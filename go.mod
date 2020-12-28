@@ -18,7 +18,7 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.3 // indirect
 	github.com/hellofresh/logging-go v0.4.0
-	github.com/icco/graphql v0.0.0-20201221154725-d03f750cbc9b
+	github.com/icco/graphql v0.0.0-20201224041651-350266234c5c
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.6 // indirect
@@ -31,7 +31,7 @@ require (
 	golang.org/x/crypto v0.0.0-20201124201722-c8d3bf9c5392 // indirect
 	golang.org/x/oauth2 v0.0.0-20201208152858-08078c50e5b5
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
-	golang.org/x/tools v0.0.0-20201221201019-196535612888 // indirect
+	golang.org/x/tools v0.0.0-20201228185149-0661ca7ea1ee // indirect
 	google.golang.org/api v0.36.0
 	google.golang.org/genproto v0.0.0-20201214200347-8c77b98c765d
 	google.golang.org/protobuf v1.25.0
