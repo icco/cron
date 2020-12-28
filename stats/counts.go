@@ -20,10 +20,10 @@ type countsResponse struct {
 
 func GetCounts(ctx context.Context, cfg *Config) ([]*gql.Stat, error) {
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
-	gqlClient.Log = func(s string) { c.Log.Debug(s) }
+	gqlClient.Log = func(s string) { cfg.Log.Debug(s) }
 
 	req := graphql.NewRequest(`query { counts { key, value } }`)
-	req.Header.Add("X-API-AUTH", c.GraphQLToken)
+	req.Header.Add("X-API-AUTH", cfg.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 	var resp countsResponse
 	if err := gqlClient.Run(ctx, req, &resp); err != nil {
