@@ -57,7 +57,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "etu",
 		Deployment: "etu",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "goals.natwelch.com",
