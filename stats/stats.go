@@ -21,12 +21,9 @@ type keyFunc func(context.Context, *Config) (float64, error)
 
 // funcMap is a list of stats to get. Some ideas:
 // - Steps
-// - Planes above
-// - Devices on network
 // - Blog posts
 // - Books read this year
 // - Tweets today
-// - ETH price
 // - Time coding
 var funcMap = map[string]keyFunc{
 	"ETH":                    GetETHPrice,
