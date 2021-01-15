@@ -165,6 +165,13 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
+		Host:       "realworldsre.com",
+		Owner:      "icco",
+		Repo:       "realworldsre.com",
+		Deployment: "realworldsre",
+		Branch:     "main",
+	},
+	{
 		Host:       "resume.natwelch.com",
 		Owner:      "icco",
 		Repo:       "resume",
