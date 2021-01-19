@@ -71,7 +71,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "gotak",
 		Deployment: "gotak",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "graphql.natwelch.com",
