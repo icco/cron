@@ -22,7 +22,11 @@ func GetAssetMix(ctx context.Context) (float64, error) {
 	}
 
 	for _, t := range as {
-		log.Printf("asset: %+v", t)
+		v, err := t.ParsedAmount()
+		if err != nil {
+			return 0.0, err
+		}
+		log.Printf("asset: %+v", v)
 	}
 
 	pas, err := client.GetPlaidAccounts(ctx)
@@ -31,7 +35,11 @@ func GetAssetMix(ctx context.Context) (float64, error) {
 	}
 
 	for _, t := range pas {
-		log.Printf("account: %+v", t)
+		v, err := t.ParsedAmount()
+		if err != nil {
+			return 0.0, err
+		}
+		log.Printf("account: %+v", v)
 	}
 
 	return 0.0, nil

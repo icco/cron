@@ -57,7 +57,8 @@ func Act(octx context.Context, job string) error {
 
 	switch job {
 	case "test":
-		stats.GetAssetMix(ctx)
+		v, err := stats.GetAssetMix(ctx)
+		log.Warn("%d, %+v", v, err)
 	case "minute":
 		log.Info("> heartbeat")
 	case "update-deployments":
