@@ -24,7 +24,7 @@ require (
 	github.com/hellofresh/logging-go v0.4.0
 	github.com/icco/graphql v0.0.0-20210112174851-a68f4e1bdf93
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
-	github.com/icco/lunchmoney v0.0.0-20210127014329-0634a94a3ae7
+	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.6 // indirect
 	github.com/machinebox/graphql v0.2.2

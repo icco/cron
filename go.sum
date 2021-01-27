@@ -75,6 +75,8 @@ github.com/NYTimes/gziphandler v0.0.0-20170623195520-56545f4a5d46/go.mod h1:3wb0
 github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
 github.com/PuerkitoBio/purell v1.1.1/go.mod h1:c11w/QuzBsJSee3cPx9rAFu61PvFxuPbtSwDGJws/X0=
 github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578/go.mod h1:uGdkoq3SwY9Y+13GIhn11/XLaGBb4BfwItxLd5jeuXE=
+github.com/Rhymond/go-money v1.0.2 h1:KklB66H3VlpNMkm8T5BH/MROK88o7q9CCn1hl853TzI=
+github.com/Rhymond/go-money v1.0.2/go.mod h1:iHvCuIvitxu2JIlAlhF0g9jHqjRSr+rpdOs7Omqlupg=
 github.com/TV4/logrus-stackdriver-formatter v0.1.0 h1:nFea8RiX7ecTnWPM+9FIqwZYJdcGo58CHMGIVdYzMXg=
 github.com/TV4/logrus-stackdriver-formatter v0.1.0/go.mod h1:wwS7hOiBvP6SBD0UXCa767+VhHkaXrfX0MzUojYcN0Q=
 github.com/agnivade/levenshtein v1.0.1 h1:3oJU7J3FGFmyhn8KHjmVaZCN5hxTr7GxgRue+sxIXdQ=
@@ -340,6 +342,8 @@ github.com/icco/logrus-stackdriver-formatter v0.3.0 h1:zHmQDEEDUla29/SXKorLD2enT
 github.com/icco/logrus-stackdriver-formatter v0.3.0/go.mod h1:yMdTvFwqQmahvdaaefL60hLkBAFIqCe4M5xZfz8gHXg=
 github.com/icco/lunchmoney v0.0.0-20210127014329-0634a94a3ae7 h1:rc1Y8NbNmvaquTwTUEo1C/gFiVGfmRSi4koEUjQQQM0=
 github.com/icco/lunchmoney v0.0.0-20210127014329-0634a94a3ae7/go.mod h1:xQ4wBCIppiE25sFDdmT14/46kpACkAtLsIWy8uTq3sg=
+github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535 h1:2H0OPKDIDDep8BYUOnYwCmgANG63RC9hoHvR2GMhxdQ=
+github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535/go.mod h1:TdpPQk49qE3l67DQCTv1cptfnjksGcL6FLypJcPjebY=
 github.com/imdario/mergo v0.3.5/go.mod h1:2EnlNZ0deacrJVfApfmtdGgDfMuh/nq6Ok1EcJh5FfA=
 github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba h1:FW3g6RfPxRHYFxOAVxad/eKiga8mVEh2YVtD/+FKEr4=
 github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba/go.mod h1:GFVNbU+5FcSghGENDCIOpeTGmhv1IgGDKnViO9DtCbI=
