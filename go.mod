@@ -24,6 +24,7 @@ require (
 	github.com/hellofresh/logging-go v0.4.0
 	github.com/icco/graphql v0.0.0-20210112174851-a68f4e1bdf93
 	github.com/icco/logrus-stackdriver-formatter v0.3.0
+	github.com/icco/lunchmoney v0.0.0-20210127011758-244e7ebad6f9
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.6 // indirect
 	github.com/machinebox/graphql v0.2.2
@@ -36,7 +37,6 @@ require (
 	golang.org/x/mod v0.4.1 // indirect
 	golang.org/x/oauth2 v0.0.0-20210113205817-d3ed898aa8a3
 	golang.org/x/sync v0.0.0-20201207232520-09787c993a3a
-	golang.org/x/sys v0.0.0-20210113181707-4bcb84eeeb78 // indirect
 	golang.org/x/term v0.0.0-20201210144234-2321bbc49cbf // indirect
 	golang.org/x/tools v0.0.0-20210114065538-d78b04bdf963 // indirect
 	google.golang.org/api v0.36.0
