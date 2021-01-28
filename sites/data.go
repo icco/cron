@@ -67,6 +67,13 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
+		Host:       "interview.natwelch.com",
+		Owner:      "icco",
+		Repo:       "interview",
+		Deployment: "interview",
+		Branch:     "main",
+	},
+	{
 		Host:       "gotak.app",
 		Owner:      "icco",
 		Repo:       "gotak",
