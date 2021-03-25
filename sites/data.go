@@ -134,7 +134,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "natwelch.com",
 		Deployment: "natwelch",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "photos.natwelch.com",
