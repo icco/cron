@@ -6,13 +6,13 @@ import (
 
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
 
 // Config stores config.
 type Config struct {
-	Log          *logrus.Logger
+	Log          *zap.SugaredLogger
 	GraphQLToken string
 	OWMKey       string
 }
@@ -97,7 +97,7 @@ func (c *Config) UploadStat(ctx context.Context, key string, value float64) erro
 	req.Header.Add("X-API-AUTH", c.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 
-	c.Log.WithField("stat", s).Debug("uploading stat")
+	c.Log.Debugw("uploading stat", "stat", s)
 	if err := gqlClient.Run(ctx, req, nil); err != nil {
 		return fmt.Errorf("graphql: %w", err)
 	}
