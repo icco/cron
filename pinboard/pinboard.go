@@ -15,7 +15,7 @@ import (
 // Pinboard contains the context needed to call pinboard.
 type Pinboard struct {
 	Token        string
-	Log          *zap.Logger
+	Log          *zap.SugaredLogger
 	GraphQLToken string
 }
 

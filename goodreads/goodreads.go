@@ -14,7 +14,7 @@ import (
 // Goodreads contains the scope for doing work against the goodreads API.
 type Goodreads struct {
 	Token        string
-	Log          *zap.Logger
+	Log          *zap.SugaredLogger
 	GraphQLToken string
 }
 
