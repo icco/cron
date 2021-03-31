@@ -16,16 +16,16 @@ import (
 	"github.com/go-chi/chi/middleware"
 	"github.com/icco/cron"
 	"github.com/icco/cron/sites"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"github.com/icco/gutil/logging"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/stats"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
+	"go.uber.org/zap"
 )
 
 var (
-	log = cron.InitLogging()
+	log = logging.NewLogger(cron.Service)
 
 	msgRecv     = stats.Int64("natwelch.com/stats/message/received", "received message from Pub/Sub", stats.UnitDimensionless)
 	msgRecvView = &view.View{
@@ -65,20 +65,20 @@ func main() {
 	if fromEnv := os.Getenv("PORT"); fromEnv != "" {
 		port = fromEnv
 	}
-	log.Printf("Starting up on http://localhost:%s", port)
+	log.Infow("Starting up", "host", fmt.Sprintf("http://localhost:%s", port))
 
 	if os.Getenv("ENABLE_STACKDRIVER") != "" {
 		labels := &stackdriver.Labels{}
-		labels.Set("app", "cron", "The name of the current app.")
+		labels.Set("app", cron.Service, "The name of the current app.")
 		sd, err := stackdriver.NewExporter(stackdriver.Options{
-			ProjectID:               "icco-cloud",
+			ProjectID:               cron.GCPProject,
 			MonitoredResource:       monitoredresource.Autodetect(),
 			DefaultMonitoringLabels: labels,
-			DefaultTraceAttributes:  map[string]interface{}{"app": "cron"},
+			DefaultTraceAttributes:  map[string]interface{}{"app": cron.Service},
 		})
 
 		if err != nil {
-			log.WithError(err).Fatalf("failed to create the stackdriver exporter")
+			log.Fatalw("failed to create the stackdriver exporter", zap.Error(err))
 		}
 		defer sd.Flush()
 
@@ -94,7 +94,7 @@ func main() {
 		for {
 			err := recieveMessages(ctx, "cron-client")
 			if err != nil {
-				log.WithError(err).Fatal("could not process message")
+				log.Fatalw("could not process message", zap.Error(err))
 			}
 		}
 	}()
@@ -103,24 +103,24 @@ func main() {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
-	r.Use(cron.LoggingMiddleware())
+	r.Use(logging.Middleware(log, cron.GCPProject))
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("ok."))
 		if err != nil {
-			log.WithError(err).Error("could not write response")
+			log.Errorw("could not write response", zap.Error(err))
 		}
 	})
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl, err := template.New("root").Parse(rootTmpl)
 		if err != nil {
-			log.WithError(err).Error("could not parse template")
+			log.Errorw("could not parse template", zap.Error(err))
 		}
 
 		data := []string{
 			fmt.Sprintf("%d sites", len(sites.All)),
 		}
 		if err := tmpl.Execute(w, data); err != nil {
-			log.WithError(err).Error("could not write response")
+			log.Errorw("could not write response", zap.Error(err))
 		}
 	})
 	h := &ochttp.Handler{
@@ -131,14 +131,14 @@ func main() {
 		ochttp.ServerRequestCountView,
 		ochttp.ServerResponseCountByStatusCode,
 	}...); err != nil {
-		log.WithError(err).Fatal("Failed to register ochttp views")
+		log.Fatalw("failed to register ochttp views", zap.Error(err))
 	}
 
 	if err := view.Register([]*view.View{
 		msgRecvView,
 		msgAckView,
 	}...); err != nil {
-		log.WithError(err).Fatal("Failed to register server metrics")
+		log.Fatalw("failed to register metrics", zap.Error(err))
 	}
 
 	log.Fatal(http.ListenAndServe(":"+port, h))
@@ -147,7 +147,7 @@ func main() {
 func recieveMessages(ctx context.Context, subName string) error {
 	pubsubClient, err := pubsub.NewClient(ctx, "icco-cloud")
 	if err != nil {
-		log.WithError(err).Fatal("Could not create client.")
+		log.Errorw("cloudn't create client", zap.Error(err))
 		return err
 	}
 
@@ -155,7 +155,6 @@ func recieveMessages(ctx context.Context, subName string) error {
 		pubsub.SubscriptionConfig{Topic: pubsubClient.Topic("cron")})
 	if err != nil {
 		// This is fine, don't do anything.
-		log.WithError(err).Info("could not create subscription")
 		sub = pubsubClient.Subscription(subName)
 	}
 
@@ -163,15 +162,11 @@ func recieveMessages(ctx context.Context, subName string) error {
 		stats.Record(ctx, msgRecv.M(1))
 
 		data := map[string]string{}
-		err := json.Unmarshal(msg.Data, &data)
-		logFields := logrus.Fields{"parsed": data, "unparsed": string(msg.Data)}
-
-		if err != nil {
-			log.WithError(err).WithFields(logFields).Warn("could not decode json")
+		if err := json.Unmarshal(msg.Data, &data); err != nil {
+			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
 		} else {
-			log.WithFields(logFields).Debug("Got message")
-			err = cron.Act(ctx, data["job"])
-			if err != nil {
+			log.Debugw("got message", "parsed", data, "unparsed", string(msg.Data))
+			if err := cron.Act(ctx, data["job"]); err != nil {
 				log.WithError(err).Error("problem running job")
 			}
 			msg.Ack()
@@ -181,7 +176,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 	})
 
 	if err != nil {
-		return errors.Wrap(err, "recieving messages")
+		return fmt.Errorf("recieving messages: %w", err)
 	}
 
 	return nil

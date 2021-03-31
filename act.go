@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	project = "icco-cloud"
-	service = "cron"
+	GCPProject = "icco-cloud"
+	Service    = "cron"
 )
 
 // Act takes a job and calls a sub project to do work.
@@ -77,7 +77,7 @@ func Act(octx context.Context, job string) error {
 		cfg := &updater.Config{
 			Log:           log,
 			GithubToken:   githubToken,
-			GoogleProject: project,
+			GoogleProject: GCPProject,
 		}
 		if err := updater.UpdateWorkspaces(ctx, cfg); err != nil {
 			return fmt.Errorf("update workspaces: %w", err)
@@ -130,7 +130,7 @@ func Act(octx context.Context, job string) error {
 	case "uptime":
 		c := &uptime.Config{
 			Log:       log,
-			ProjectID: project,
+			ProjectID: GCPProject,
 		}
 
 		if err := uptime.UpdateUptimeChecks(ctx, c); err != nil {
