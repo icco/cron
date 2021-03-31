@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/jackdanger/collectlinks"
-	"github.com/sirupsen/logrus"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/stats/view"
+	"go.uber.org/zap"
 )
 
 type Config struct {
-	Log *logrus.Logger
+	Log *zap.SugaredLogger
 	URL string
 }
 
@@ -37,7 +37,7 @@ func Crawl(octx context.Context, conf *Config) {
 		enqueue(ctx, uri, queue)
 
 		if ctx.Err() != nil {
-			c.Log.Warn(ctx.Err())
+			c.Log.Warnw("error crawling", zap.Error(ctx.Err()))
 			cncl()
 			return
 		}
@@ -48,14 +48,14 @@ func Crawl(octx context.Context, conf *Config) {
 
 func enqueue(ctx context.Context, uri string, queue chan string) {
 	atomic.AddUint64(&ops, 1)
-	c.Log.WithContext(ctx).Printf("ops: %d, %s", atomic.LoadUint64(&ops), uri)
+	c.Log.Infow("enqued", "ops", atomic.LoadUint64(&ops), "uri", uri)
 
 	if err := view.Register(
 		ochttp.ClientSentBytesDistribution,
 		ochttp.ClientReceivedBytesDistribution,
 		ochttp.ClientRoundtripLatencyDistribution,
 	); err != nil {
-		c.Log.Fatal(err)
+		c.Log.Errorw("registering views", zap.Error(err))
 	}
 
 	client := &http.Client{
@@ -65,7 +65,7 @@ func enqueue(ctx context.Context, uri string, queue chan string) {
 	resp, err := client.Get(uri)
 	visited[uri] = true
 	if err != nil {
-		c.Log.WithContext(ctx).WithError(err).Info("error scrapping")
+		c.Log.Infow("error scrapping", zap.Error(err))
 		return
 	}
 	defer resp.Body.Close()
