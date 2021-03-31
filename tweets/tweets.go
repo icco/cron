@@ -12,7 +12,7 @@ import (
 	"github.com/dghubble/oauth1"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 )
 
 // TwitterAuth holds the auth strings needed to talk to twitter.
@@ -26,12 +26,12 @@ type TwitterAuth struct {
 // Twitter contains the context needed for working with twitter.
 type Twitter struct {
 	TwitterAuth  *TwitterAuth
-	Log          *logrus.Logger
+	Log          *zap.SugaredLogger
 	GraphQLToken string
 }
 
 // Validate gets a twitter client and the current twitter user.
-func (t *TwitterAuth) Validate(ctx context.Context, log *logrus.Logger) (*twitter.Client, *twitter.User, error) {
+func (t *TwitterAuth) Validate(ctx context.Context, log *zap.SugaredLogger) (*twitter.Client, *twitter.User, error) {
 	if t.ConsumerKey == "" || t.ConsumerSecret == "" || t.AccessToken == "" || t.AccessSecret == "" {
 		return nil, nil, fmt.Errorf("Consumer key/secret and Access token/secret required")
 	}
@@ -48,7 +48,7 @@ func (t *TwitterAuth) Validate(ctx context.Context, log *logrus.Logger) (*twitte
 	}
 	user, resp, err := client.Accounts.VerifyCredentials(verifyParams)
 	if err != nil {
-		log.WithError(err).WithField("response", resp).Errorf("error verifying creds")
+		log.Errorw("error verifying creds", "response", resp, zap.Error(err))
 		return nil, nil, err
 	}
 
@@ -72,7 +72,7 @@ func (t *Twitter) SaveUserTweets(ctx context.Context) error {
 	if resp.Header.Get("X-Rate-Limit-Remaining") == "0" {
 		i, err := strconv.ParseInt(resp.Header.Get("X-Rate-Limit-Reset"), 10, 64)
 		if err != nil {
-			t.Log.WithError(err).Error("Error converting int")
+			t.Log.Errorw("converting int", zap.Error(err))
 			return err
 		}
 		tm := time.Unix(i, 0)
@@ -80,7 +80,7 @@ func (t *Twitter) SaveUserTweets(ctx context.Context) error {
 	}
 
 	if err != nil {
-		t.Log.WithError(err).Errorf("Error getting tweets: %+v", resp)
+		t.Log.Errorw("Error getting tweets", "resp", resp, zap.Error(err))
 		return err
 	}
 
@@ -119,7 +119,7 @@ func (t *Twitter) CacheRandomTweets(ctx context.Context) error {
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err := gqlClient.Run(ctx, req, &data)
 	if err != nil {
-		t.Log.WithError(err).Error("error talking to graphql")
+		t.Log.Errorw("error talking to graphql", zap.Error(err))
 		return err
 	}
 
@@ -166,7 +166,7 @@ func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error
 	if resp.Header.Get("X-Rate-Limit-Remaining") == "0" {
 		i, err := strconv.ParseInt(resp.Header.Get("X-Rate-Limit-Reset"), 10, 64)
 		if err != nil {
-			t.Log.WithError(err).Error("Error converting int")
+			t.Log.Errorw("converting int", zap.Error(err))
 			return nil, err
 		}
 		tm := time.Unix(i, 0)
@@ -174,7 +174,7 @@ func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error
 	}
 
 	if err != nil {
-		t.Log.WithError(err).Errorf("Error getting tweets: %+v", resp)
+		t.Log.Errorw("getting tweets", "resp", resp, zap.Error(err))
 		return nil, err
 	}
 
@@ -237,7 +237,7 @@ func (t *Twitter) UploadTweet(ctx context.Context, tw twitter.Tweet) error {
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err = gqlClient.Run(ctx, req, nil)
 	if err != nil {
-		t.Log.WithError(err).Error("error talking to graphql")
+		t.Log.Errorw("error talking to graphql", zap.Error(err))
 		return err
 	}
 
