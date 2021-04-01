@@ -14,6 +14,7 @@ require (
 	github.com/dghubble/oauth1 v0.7.0
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/gogo/protobuf v1.3.2 // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-github/v28 v28.1.1
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -27,12 +28,11 @@ require (
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/sirupsen/logrus v1.8.1
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
 	go.uber.org/zap v1.16.0
 	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
-	golang.org/x/net v0.0.0-20210331060903-cb1fcc7394e5 // indirect
+	golang.org/x/net v0.0.0-20210331212208-0fccb6fa2b5c // indirect
 	golang.org/x/oauth2 v0.0.0-20210323180902-22b0adad7558
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210331175145-43e1dd70ce54 // indirect
