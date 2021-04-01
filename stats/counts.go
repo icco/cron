@@ -30,7 +30,7 @@ func GetCounts(ctx context.Context, cfg *Config) ([]*gql.Stat, error) {
 		return nil, err
 	}
 
-	cfg.Log.WithField("response", resp).Debug("got count response")
+	cfg.Log.Debugw("got count response", "response", resp)
 	if resp.Error != nil {
 		return nil, resp.Error
 	}

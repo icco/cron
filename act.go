@@ -12,20 +12,32 @@ import (
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
 	"github.com/icco/cron/uptime"
+	"github.com/icco/gutil/logging"
 	"go.opencensus.io/tag"
+	"go.uber.org/zap"
+)
+
+const (
+	GCPProject = "icco-cloud"
+	Service    = "cron"
 )
 
 // Act takes a job and calls a sub project to do work.
 func Act(octx context.Context, job string) error {
+	log, err := logging.NewLogger(Service)
+	if err != nil {
+		return fmt.Errorf("could not create logger: %w", err)
+	}
+
 	jobKey, err := tag.NewKey("natwelch.com/keys/job")
 	if err != nil {
-		log.WithError(err).Warn("could not create oc tag")
+		log.Warnw("could not create oc tag", zap.Error(err))
 	}
 	ctx, err := tag.New(octx,
 		tag.Upsert(jobKey, job),
 	)
 	if err != nil {
-		log.WithError(err).Warn("could not add oc tag")
+		log.Warnw("could not add oc tag", zap.Error(err))
 	}
 
 	gqlToken := os.Getenv("GQL_TOKEN")
@@ -58,14 +70,14 @@ func Act(octx context.Context, job string) error {
 	switch job {
 	case "test":
 		v, err := stats.GetAssetMix(ctx)
-		log.Warn("%d, %+v", v, err)
+		log.Warnf("%d, %+v", v, err)
 	case "minute":
-		log.Info("> heartbeat")
+		log.Info("heartbeat")
 	case "update-deployments":
 		cfg := &updater.Config{
 			Log:           log,
 			GithubToken:   githubToken,
-			GoogleProject: "icco-cloud",
+			GoogleProject: GCPProject,
 		}
 		if err := updater.UpdateWorkspaces(ctx, cfg); err != nil {
 			return fmt.Errorf("update workspaces: %w", err)
@@ -118,7 +130,7 @@ func Act(octx context.Context, job string) error {
 	case "uptime":
 		c := &uptime.Config{
 			Log:       log,
-			ProjectID: "icco-cloud",
+			ProjectID: GCPProject,
 		}
 
 		if err := uptime.UpdateUptimeChecks(ctx, c); err != nil {

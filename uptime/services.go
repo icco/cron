@@ -8,7 +8,6 @@ import (
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
 	"github.com/icco/cron/sites"
-	"github.com/sirupsen/logrus"
 	compute "google.golang.org/api/compute/v1"
 	"google.golang.org/api/iterator"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
@@ -36,7 +35,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			return fmt.Errorf("list services: %w", err)
 		}
 
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc}).Debug("found service")
+		c.Log.Debugw("found service", "job", "uptime", "service", svc)
 		svcs = append(svcs, svc)
 	}
 
@@ -67,7 +66,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			if err != nil {
 				return fmt.Errorf("create service: %w", err)
 			}
-			c.Log.WithFields(logrus.Fields{"job": "uptime", "service": resp}).Debug("created service")
+			c.Log.Debugw("created service", "job", "uptime", "service", resp)
 			wanted = resp
 		} else {
 			req := &monitoringpb.UpdateServiceRequest{
@@ -77,7 +76,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			if err != nil {
 				return fmt.Errorf("update service: %w", err)
 			}
-			c.Log.WithFields(logrus.Fields{"job": "uptime", "service": resp}).Debug("updated service")
+			c.Log.Debugw("updated service", "job", "uptime", "service", resp)
 			wanted = resp
 		}
 
@@ -117,7 +116,7 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 		}
 
 		if policy.UserLabels["type"] == alertType && policy.UserLabels["service"] == s.Deployment {
-			c.Log.WithField("policy", policy).Debug("found alert policy")
+			c.Log.Debugw("found alert policy", "policy", policy)
 			existing = policy
 		}
 	}
@@ -165,7 +164,7 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 		if err != nil {
 			return err
 		}
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "site": s, "response": resp}).Debug("updated alert policy")
+		c.Log.Debugw("updated alert policy", "job", "uptime", "site", s, "response", resp)
 	} else {
 		req := &monitoringpb.CreateAlertPolicyRequest{
 			Name:        fmt.Sprintf("projects/%s", c.ProjectID),
@@ -175,7 +174,7 @@ func (c *Config) addAlert(ctx context.Context, s sites.SiteMap, sloID string) er
 		if err != nil {
 			return err
 		}
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "site": s, "response": resp}).Debug("created alert policy")
+		c.Log.Debugw("created alert policy", "job", "uptime", "site", s, "response", resp)
 	}
 
 	return nil
@@ -200,7 +199,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 			return nil, fmt.Errorf("list slos: %w", err)
 		}
 		slo = resp
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("found slo")
+		c.Log.Debugw("found slo", "job", "uptime", "service", svc, "site", s, "slo", resp)
 	}
 
 	metric := "loadbalancing.googleapis.com/https/backend_request_count"
@@ -236,7 +235,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 		if err != nil {
 			return nil, fmt.Errorf("update slo: %w", err)
 		}
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("updated slo")
+		c.Log.Debugw("updated slo", "job", "uptime", "service", svc, "site", s, "slo", resp)
 		return resp, nil
 	} else {
 		req := &monitoringpb.CreateServiceLevelObjectiveRequest{
@@ -247,7 +246,7 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 		if err != nil {
 			return nil, fmt.Errorf("create slo: %w", err)
 		}
-		c.Log.WithFields(logrus.Fields{"job": "uptime", "service": svc, "site": s, "slo": resp}).Debug("created slo")
+		c.Log.Debugw("created slo", "job", "uptime", "service", svc, "site", s, "slo", resp)
 		return resp, nil
 	}
 

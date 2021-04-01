@@ -10,54 +10,46 @@ import (
 	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
 	"github.com/google/go-github/v28/github"
 	"github.com/icco/cron/sites"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 	"golang.org/x/oauth2"
 	"google.golang.org/api/iterator"
 	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
 	apiv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/util/retry"
+
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
 type Config struct {
-	Log           *logrus.Logger
+	Log           *zap.SugaredLogger
 	GithubToken   string
 	GoogleProject string
 }
 
-var (
-	c *Config
-)
-
-func UpdateWorkspaces(ctx context.Context, conf *Config) error {
+func UpdateWorkspaces(ctx context.Context, c *Config) error {
 	repoFmt := "gcr.io/%s/%s:%s"
-	c = conf
 
 	for _, r := range sites.All {
 		sha, err := c.GetSHA(ctx, r.Owner, r.Repo, r.Branch)
 		if _, ok := err.(*github.RateLimitError); ok {
-			c.Log.WithContext(ctx).WithError(err).Warn("hit rate limit")
+			c.Log.Warnw("hit rate limit", zap.Error(err))
 			break
 		}
 
 		if sha == "" {
-			c.Log.WithContext(ctx).WithFields(logrus.Fields{
-				"owner":  r.Owner,
-				"repo":   r.Repo,
-				"branch": r.Branch,
-			}).Error("SHA is empty")
+			c.Log.Errorw("SHA is empty", "owner", r.Owner, "repo", r.Repo, "branch", r.Branch)
 			break
 		}
 
-		repo := fmt.Sprintf(repoFmt, conf.GoogleProject, r.Repo, sha)
-		err = UpdateKube(ctx, r, repo)
-		if err != nil {
-			c.Log.WithError(err).WithContext(ctx).Error(err)
+		repo := fmt.Sprintf(repoFmt, c.GoogleProject, r.Repo, sha)
+		if err := UpdateKube(ctx, r, repo); err != nil {
+			c.Log.Errorw("update kube", zap.Error(err))
 			return err
 		}
+		c.Log.Debugw("updated deployment", "package", repo, "deployment", r.Deployment)
 	}
 
 	return nil
@@ -110,11 +102,6 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 		return fmt.Errorf("Update failed: %w", retryErr)
 	}
 
-	c.Log.WithContext(ctx).WithFields(logrus.Fields{
-		"package":    pkg,
-		"deployment": r.Deployment,
-	}).Debug("updated deployment")
-
 	return nil
 }
 
@@ -140,9 +127,7 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 		trigs = append(trigs, resp)
 	}
 
-	conf.Log.WithContext(ctx).WithFields(logrus.Fields{
-		"triggers": trigs,
-	}).Debug("found triggers")
+	conf.Log.Debugw("found triggers", "triggers", trigs)
 
 	for _, s := range sites.All {
 		exists := false
@@ -175,10 +160,7 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 				},
 			}
 
-			conf.Log.WithContext(ctx).WithFields(logrus.Fields{
-				"request": req,
-			}).Info("creating trigger")
-
+			conf.Log.Infow("creating trigger", "request", req)
 			if _, err := c.CreateBuildTrigger(ctx, req); err != nil {
 				return fmt.Errorf("could not create trigger %+v: %w", req, err)
 			}

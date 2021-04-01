@@ -8,7 +8,7 @@ import (
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/icco/cron/sites"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 	"google.golang.org/api/iterator"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
@@ -16,7 +16,7 @@ import (
 )
 
 type Config struct {
-	Log       *logrus.Logger
+	Log       *zap.SugaredLogger
 	ProjectID string
 }
 
@@ -56,10 +56,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 		host := mr.Labels["host"]
 		checkHostMap[host] = check.Name
 	}
-	c.Log.WithFields(logrus.Fields{
-		"hosts":           hosts,
-		"existing-checks": checkHostMap,
-	}).Debug("hosts to check")
+	c.Log.Debugw("hosts to check", "hosts", hosts, "existing-checks", checkHostMap)
 
 	hostConfigMap := map[string]*monitoringpb.UptimeCheckConfig{}
 	for _, host := range hosts {
@@ -69,7 +66,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 				return errors.Wrapf(err, "update check %s", host)
 			}
 
-			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("updated uptime check")
+			c.Log.Debugw("updated uptime check", "job", "uptime", "host", host)
 			hostConfigMap[host] = cfg
 		} else {
 			cfg, err := c.createCheck(ctx, host)
@@ -77,12 +74,12 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 				return errors.Wrapf(err, "create check %s", host)
 			}
 
-			c.Log.WithFields(logrus.Fields{"job": "uptime", "host": host}).Debug("created uptime check")
+			c.Log.Debugw("created uptime check", "job", "uptime", "host", host)
 			hostConfigMap[host] = cfg
 		}
 	}
 
-	c.Log.WithFields(logrus.Fields{"hosts": hostConfigMap}).Debugf("uptime configs")
+	c.Log.Debugw("uptime configs", "hosts", hostConfigMap)
 
 	return nil
 }

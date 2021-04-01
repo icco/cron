@@ -2,19 +2,19 @@ package goodreads
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/KyleBanks/goodreads"
 	"github.com/KyleBanks/goodreads/responses"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
 )
 
 // Goodreads contains the scope for doing work against the goodreads API.
 type Goodreads struct {
 	Token        string
-	Log          *logrus.Logger
+	Log          *zap.SugaredLogger
 	GraphQLToken string
 }
 
@@ -28,17 +28,17 @@ func (g *Goodreads) GetBooks(ctx context.Context) ([]responses.Review, error) {
 func (g *Goodreads) UpsertBooks(ctx context.Context) error {
 	reviews, err := g.GetBooks(ctx)
 	if err != nil {
-		return errors.Wrap(err, "get books")
+		return fmt.Errorf("get books: %w", err)
 	}
 
 	for _, r := range reviews {
 		err := g.UploadBook(ctx, r.Book)
 		if err != nil {
-			return errors.Wrap(err, "upload book")
+			return fmt.Errorf("upload book: %w", err)
 		}
 	}
 
-	g.Log.Infof("uploaded books: %d", len(reviews))
+	g.Log.Infow("uploaded books", "reviews", len(reviews))
 
 	return nil
 }
@@ -65,7 +65,7 @@ func (g *Goodreads) UploadBook(ctx context.Context, b responses.AuthorBook) erro
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 	err := gqlClient.Run(ctx, req, nil)
 	if err != nil {
-		g.Log.WithError(err).Error("error talking to graphql")
+		g.Log.Errorw("error talking to graphql", zap.Error(err))
 		return err
 	}
 

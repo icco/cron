@@ -8,14 +8,14 @@ import (
 	"time"
 
 	"github.com/machinebox/graphql"
-	"github.com/sirupsen/logrus"
 	"github.com/zachlatta/pin"
+	"go.uber.org/zap"
 )
 
 // Pinboard contains the context needed to call pinboard.
 type Pinboard struct {
 	Token        string
-	Log          *logrus.Logger
+	Log          *zap.SugaredLogger
 	GraphQLToken string
 }
 
@@ -34,7 +34,7 @@ func (p *Pinboard) UpdatePins(ctx context.Context) error {
 	// Only get pins from the last 30m
 	thirtyMin, err := time.ParseDuration("-30m")
 	if err != nil {
-		p.Log.WithError(err).Error("time parsing")
+		p.Log.Errorw("time parsing", zap.Error(err))
 		return err
 	}
 	from := time.Now().Add(thirtyMin)
@@ -42,7 +42,7 @@ func (p *Pinboard) UpdatePins(ctx context.Context) error {
 
 	posts, _, err := pinClient.Posts.All(tags, start, results, &from, &to)
 	if err != nil {
-		p.Log.WithError(err).Error("failure talking to pinboard")
+		p.Log.Errorw("failure talking to pinboard", zap.Error(err))
 		return err
 	}
 
@@ -73,7 +73,7 @@ func (p *Pinboard) UpdatePins(ctx context.Context) error {
 
 		var resp json.RawMessage
 		if err := gqlClient.Run(ctx, req, &resp); err != nil {
-			p.Log.WithError(err).WithField("request", req).Error("graphql error on link upsert")
+			p.Log.Errorw("graphql error on link upsert", zap.Error(err), "request", req)
 			return err
 		}
 	}
