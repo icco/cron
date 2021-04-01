@@ -7,10 +7,12 @@ import (
 	"strings"
 
 	"github.com/icco/cron"
+	"github.com/icco/gutil/logging"
+	"go.uber.org/zap"
 )
 
 var (
-	log = cron.InitLogging()
+	log = logging.Must(logging.NewLogger(cron.Service))
 )
 
 func main() {
@@ -20,9 +22,8 @@ func main() {
 		return
 	}
 
-	err := cron.Act(context.Background(), strings.Join(cmd[1:], " "))
-	if err != nil {
-		log.WithError(err).Error(err.Error())
+	if err := cron.Act(context.Background(), strings.Join(cmd[1:], " ")); err != nil {
+		log.Errorw("could not act", zap.Error(err))
 		return
 	}
 }
