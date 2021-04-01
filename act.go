@@ -24,7 +24,7 @@ const (
 
 // Act takes a job and calls a sub project to do work.
 func Act(octx context.Context, job string) error {
-	log, err := logging.NewLogger(service)
+	log, err := logging.NewLogger(Service)
 	if err != nil {
 		return fmt.Errorf("could not create logger: %w", err)
 	}

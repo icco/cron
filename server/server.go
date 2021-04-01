@@ -25,7 +25,7 @@ import (
 )
 
 var (
-	log = logging.NewLogger(cron.Service)
+	log = logging.Must(logging.NewLogger(cron.Service))
 
 	msgRecv     = stats.Int64("natwelch.com/stats/message/received", "received message from Pub/Sub", stats.UnitDimensionless)
 	msgRecvView = &view.View{
@@ -103,7 +103,7 @@ func main() {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
-	r.Use(logging.Middleware(log, cron.GCPProject))
+	r.Use(logging.Middleware(log.Desugar(), cron.GCPProject))
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("ok."))
 		if err != nil {
@@ -167,7 +167,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 		} else {
 			log.Debugw("got message", "parsed", data, "unparsed", string(msg.Data))
 			if err := cron.Act(ctx, data["job"]); err != nil {
-				log.WithError(err).Error("problem running job")
+				log.Errorw("problem running job", zap.Error(err))
 			}
 			msg.Ack()
 
