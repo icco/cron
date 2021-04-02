@@ -167,7 +167,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 		} else {
 			log.Debugw("got message", "parsed", data, "unparsed", string(msg.Data))
 			if err := cron.Act(ctx, data["job"]); err != nil {
-				log.Errorw("problem running job", zap.Error(err))
+				log.Errorw("problem running job", "job", data, zap.Error(err))
 			}
 			msg.Ack()
 
