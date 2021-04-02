@@ -7,7 +7,7 @@ require (
 	cloud.google.com/go/pubsub v1.10.1
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.5
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
-	github.com/aws/aws-sdk-go v1.38.10 // indirect
+	github.com/aws/aws-sdk-go v1.38.11 // indirect
 	github.com/briandowns/openweathermap v0.16.0
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/dghubble/go-twitter v0.0.0-20201011215211-4b180d0cc78d
@@ -21,7 +21,7 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.4 // indirect
 	github.com/icco/graphql v0.0.0-20210330133935-9e24212a4095
-	github.com/icco/gutil v0.0.0-20210330123749-c2691754e306
+	github.com/icco/gutil v0.0.0-20210402020252-a70f58338acb
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.6 // indirect
@@ -37,8 +37,9 @@ require (
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/sys v0.0.0-20210331175145-43e1dd70ce54 // indirect
 	golang.org/x/term v0.0.0-20210317153231-de623e64d2a6 // indirect
+	golang.org/x/text v0.3.6 // indirect
 	google.golang.org/api v0.43.0
-	google.golang.org/genproto v0.0.0-20210331142528-b7513248f0ba
+	google.golang.org/genproto v0.0.0-20210401141331-865547bb08e2
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
