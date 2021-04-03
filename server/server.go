@@ -103,7 +103,7 @@ func main() {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
-	r.Use(logging.Middleware(log.Desugar(), cron.GCPProject))
+	// r.Use(logging.Middleware(log.Desugar(), cron.GCPProject))
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("ok."))
 		if err != nil {
