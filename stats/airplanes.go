@@ -16,8 +16,8 @@ type aircraftResponse struct {
 
 type Aircraft struct {
 	Hex            string        `json:"hex"`
-	AltBaro        string        `json:"alt_baro,omitempty"`
-	AltGeom        string        `json:"alt_geom,omitempty"`
+	AltBaro        int           `json:"alt_baro,omitempty"`
+	AltGeom        int           `json:"alt_geom,omitempty"`
 	Gs             float64       `json:"gs,omitempty"`
 	Track          float64       `json:"track,omitempty"`
 	BaroRate       int           `json:"baro_rate,omitempty"`
@@ -73,7 +73,7 @@ func GetAirplanes(ctx context.Context, cfg *Config) (float64, error) {
 	if err != nil {
 		return 0.0, fmt.Errorf("body: %w", err)
 	}
-	cfg.Log.Debugw("got aircraft response", "body", body)
+	cfg.Log.Debugw("got aircraft response", "body", string(body))
 
 	s, err := unmarshalAirplanes(body)
 	if err != nil {
