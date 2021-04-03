@@ -100,16 +100,16 @@ func main() {
 	}()
 
 	r := chi.NewRouter()
-	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	r.Use(middleware.Recoverer)
 	r.Use(logging.Middleware(log.Desugar(), cron.GCPProject))
+
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		_, err := w.Write([]byte("ok."))
 		if err != nil {
 			log.Errorw("could not write response", zap.Error(err))
 		}
 	})
+
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl, err := template.New("root").Parse(rootTmpl)
 		if err != nil {
