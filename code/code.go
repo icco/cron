@@ -1,14 +1,28 @@
 package code
 
-// class Commit <  ActiveRecord::Base
-//   validates :user, :presence => true
-//   validates :repo, :presence => true
-//   validates :sha, :presence => true, :uniqueness => {:scope => [:repo]}
-//
-//   def to_s
-//     "#{user}/#{repo}##{sha}"
-//   end
-//
+import (
+	"fmt"
+	"time"
+)
+
+// Commit is a history of a commit in a github repo.
+type Commit struct {
+	Repo     string    `json:"repo"`
+	User     string    `json:"user"`
+	SHA      string    `json:"sha"`
+	Datetime time.Time `json:"created_on"`
+}
+
+// String returns a string representation of a Commit.
+func (c *Commit) String() string {
+	return fmt.Sprintf("%s/%s#%s", c.User, c.Repo, c.SHA)
+}
+
+// FetchCommits gets all commits from githubarchive.org for a user at an hour.
+func FetchCommits(user string, year, month, day, hour int) ([]*Commit, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
 //   # Grabs the commit log from github archive for the specified hour, parses
 //   # that and then saves all commits pushed by the USER to the database.
 //   def self.fetchAllForTime day, month, year, hour, client = nil
@@ -55,7 +69,7 @@ package code
 //       logger.warn "The request for #{uri} returned an error. #{e.message}"
 //     end
 //   end
-//
+
 //   # This makes sure all commits from a repo's commit history are in the
 //   # database and have the correct data.
 //   #
@@ -80,7 +94,7 @@ package code
 //
 //     return commited_commits
 //   end
-//
+
 //   # This creates a Commit.
 //   #
 //   # NOTE: repo + sha are supposed to be unique, so if those two already exist,
@@ -162,7 +176,7 @@ package code
 //       logger.push("Error Saving Commit #{user}/#{repo}:#{sha}: 404", :warn)
 //     end
 //   end
-//
+
 //   # Lookup a user by email and return their username. Caches locally.
 //   def self.lookup_user email, client = nil
 //     if client.nil?
@@ -181,4 +195,3 @@ package code
 //
 //     return user
 //   end
-// end
