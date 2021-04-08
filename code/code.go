@@ -1,9 +1,21 @@
 package code
 
 import (
+	"compress/gzip"
+	"context"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"time"
+
+	"go.uber.org/zap"
 )
+
+// Config is a basic configuration struct.
+type Config struct {
+	User string
+	Log  *zap.SugaredLogger
+}
 
 // Commit is a history of a commit in a github repo.
 type Commit struct {
@@ -19,8 +31,42 @@ func (c *Commit) String() string {
 }
 
 // FetchCommits gets all commits from githubarchive.org for a user at an hour.
-func FetchCommits(user string, year, month, day, hour int) ([]*Commit, error) {
-	return nil, fmt.Errorf("unimplemented")
+func (cfg *Config) FetchCommits(ctx context.Context, year, month, day, hour int) ([]*Commit, error) {
+	t := time.Date(year, time.Month(month), day, hour, 0, 0, 0, time.UTC)
+	u := fmt.Sprintf("https://data.githubarchive.org/%s.json.gz", t.Format("2006-01-02-<15>"))
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("User-Agent", "icco-cron/1.0")
+
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	rdr, err := gzip.NewReader(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	defer rdr.Close()
+	defer resp.Body.Close()
+
+	jd := json.NewDecoder(rdr)
+	var ghData []*Github
+	for jd.More() {
+		var gh Github
+		if err := jd.Decode(&gh); err != nil {
+			return nil, err
+		}
+
+		ghData = append(ghData, &gh)
+		cfg.Log.Debug("got data", "github", gh)
+	}
+
+	return nil, nil
 }
 
 //   # Grabs the commit log from github archive for the specified hour, parses
