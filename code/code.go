@@ -42,7 +42,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 	for i := yesterday; i.Before(now); i.Add(time.Hour) {
 		cmts, err := cfg.FetchCommits(ctx, i.Year(), i.Month(), i.Day(), i.Hour())
 		if err != nil {
-			return err
+			return fmt.Errorf("get %q: %w", i, err)
 		}
 
 		tosave = append(tosave, cmts...)
@@ -65,12 +65,13 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get archive %q: %w", u, err)
 	}
+	cfg.Log.Debugw("got archive response", "url", u, "response", resp)
 
 	rdr, err := gzip.NewReader(resp.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("new gzip reader: %w", err)
 	}
 	defer rdr.Close()
 	defer resp.Body.Close()
@@ -80,7 +81,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 	for jd.More() {
 		var gh Github
 		if err := jd.Decode(&gh); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("decode json: %w", err)
 		}
 
 		cfg.Log.Debug("got data", "github", gh)
@@ -97,6 +98,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 					Repo: repo,
 					SHA:  c.Sha,
 					User: user,
+					// TODO: Get time
 				})
 			}
 		}
