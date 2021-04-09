@@ -19,8 +19,11 @@ import (
 )
 
 const (
+	// GCPProject is the project this runs in.
 	GCPProject = "icco-cloud"
-	Service    = "cron"
+
+	// Service is the name of this service.
+	Service = "cron"
 )
 
 // Act takes a job and calls a sub project to do work.

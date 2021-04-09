@@ -1,5 +1,6 @@
 package sites
 
+// SiteMap defines a site we deploy.
 type SiteMap struct {
 	Host       string
 	Owner      string

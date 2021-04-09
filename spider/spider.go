@@ -13,6 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
+// Config is our config.
 type Config struct {
 	Log *zap.SugaredLogger
 	URL string
@@ -24,6 +25,7 @@ var (
 	visited map[string]bool
 )
 
+// Crawl begins a crawl.
 func Crawl(octx context.Context, conf *Config) {
 	c = conf
 
@@ -73,7 +75,7 @@ func enqueue(ctx context.Context, uri string, queue chan string) {
 	links := collectlinks.All(resp.Body)
 
 	for _, link := range links {
-		absolute := fixUrl(link, uri)
+		absolute := fixURL(link, uri)
 		if uri != "" {
 			if !visited[absolute] {
 				go func() { queue <- absolute }()
@@ -82,15 +84,15 @@ func enqueue(ctx context.Context, uri string, queue chan string) {
 	}
 }
 
-func fixUrl(href, base string) string {
+func fixURL(href, base string) string {
 	uri, err := url.Parse(href)
 	if err != nil {
 		return ""
 	}
-	baseUrl, err := url.Parse(base)
+	baseURL, err := url.Parse(base)
 	if err != nil {
 		return ""
 	}
-	uri = baseUrl.ResolveReference(uri)
+	uri = baseURL.ResolveReference(uri)
 	return uri.String()
 }

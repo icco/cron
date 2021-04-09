@@ -9,6 +9,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// Github defines the data we can get from Github.
 type Github struct {
 	ID    string `json:"id"`
 	Type  string `json:"type"`
