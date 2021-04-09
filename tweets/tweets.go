@@ -174,7 +174,7 @@ func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error
 	}
 
 	if err != nil {
-		t.Log.Errorw("getting tweets", "resp", resp, zap.Error(err))
+		t.Log.Warnw("getting tweets", "resp", resp, zap.Error(err))
 		return nil, err
 	}
 

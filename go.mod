@@ -23,7 +23,7 @@ require (
 	github.com/icco/gutil v0.0.0-20210403025205-f4d44dcca9ed
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
-	github.com/jarcoal/httpmock v1.0.6 // indirect
+	github.com/jarcoal/httpmock v1.0.8 // indirect
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/pkg/errors v0.9.1
