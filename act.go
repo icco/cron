@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/icco/cron/code"
 	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
 	"github.com/icco/cron/spider"
@@ -157,6 +158,16 @@ func Act(octx context.Context, job string) error {
 		}
 
 		if err := c.UpdateRarely(ctx); err != nil {
+			return err
+		}
+	case "code":
+		c := &code.Config{
+			Log:         log,
+			User:        "icco",
+			GithubToken: githubToken,
+		}
+
+		if err := c.FetchAndSaveCommits(ctx); err != nil {
 			return err
 		}
 	default:
