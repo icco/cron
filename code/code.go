@@ -49,7 +49,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 
 	for _, c := range tosave {
 		if err := cfg.Save(ctx, c); err != nil {
-			log.Errorw("could not save commit", "commit", c, zap.Error(err))
+			cfg.Log.Errorw("could not save commit", "commit", c, zap.Error(err))
 		}
 	}
 
@@ -156,7 +156,7 @@ func (cfg *Config) Save(ctx context.Context, commit *Commit) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("get archive %q: got %s", u, resp.Status)
+		return fmt.Errorf("save commit %+v: got %s", commit, resp.Status)
 	}
 
 	return nil
