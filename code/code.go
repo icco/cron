@@ -66,13 +66,19 @@ func (cfg *Config) FetchCommits(ctx context.Context, year, month, day, hour int)
 		}
 
 		cfg.Log.Debug("got data", "github", gh)
-		if gh.Type == "PushEvent" && gh.Actor == cfg.User {
+		if gh.Type == "PushEvent" && gh.Actor.Login == cfg.User {
 			repo := gh.Repo.Name
-			for _, c := range gh.Commits {
+			for _, c := range gh.Payload.Commits {
+				user, err := cfg.GetUserByEmail(ctx, c.Author.Email)
+				if err != nil {
+					cfg.Log.Errorw("geting user", zap.Error(err))
+					continue
+				}
+
 				data = append(data, &Commit{
 					Repo: repo,
 					SHA:  c.Sha,
-					User: "",
+					User: user,
 				})
 			}
 		}
@@ -83,11 +89,11 @@ func (cfg *Config) FetchCommits(ctx context.Context, year, month, day, hour int)
 
 // GetUserByEmail returns a user based on their email.
 func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, error) {
-	client := cfg.GithubClient(ctx, cfg.GithubToken)
+	client := GithubClient(ctx, cfg.GithubToken)
 
 	result, _, err := client.Search.Users(ctx, email, nil)
 	if err != nil {
-		if !code.RateLimited(err, cfg.Log) {
+		if !RateLimited(err, cfg.Log) {
 			return "", fmt.Errorf("finding user: %w", err)
 		}
 	}
@@ -96,7 +102,7 @@ func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, er
 		return "", fmt.Errorf("no users found")
 	}
 
-	return result.Users[0].Login, nil
+	return *result.Users[0].Login, nil
 }
 
 // GithubClient creates a new GithubClient.
@@ -108,7 +114,7 @@ func GithubClient(ctx context.Context, token string) *github.Client {
 	return github.NewClient(tc)
 }
 
-func Ratelimited(err error, log *zap.SugaredLogger) bool {
+func RateLimited(err error, log *zap.SugaredLogger) bool {
 	_, ok := err.(*github.RateLimitError)
 	if ok {
 		log.Warnw("hit rate limit", zap.Error(err))

@@ -2,7 +2,7 @@ package code
 
 import "time"
 
-type Github []struct {
+type Github struct {
 	ID    string `json:"id"`
 	Type  string `json:"type"`
 	Actor struct {
