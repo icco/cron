@@ -98,7 +98,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 			for _, c := range gh.Payload.Commits {
 				user, err := cfg.GetUserByEmail(ctx, c.Author.Email)
 				if err != nil {
-					cfg.Log.Errorw("geting user", zap.Error(err))
+					user = cfg.User
 					continue
 				}
 
@@ -126,6 +126,7 @@ func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, er
 		}
 	}
 
+	cfg.Log.Debugw("got users", "users", result, "query", email)
 	if len(result.Users) == 0 {
 		return "", fmt.Errorf("no users found")
 	}
