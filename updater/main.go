@@ -19,15 +19,18 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/util/retry"
 
+	// Add GCP talking for k8s api.
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
+// Config is a config.
 type Config struct {
 	Log           *zap.SugaredLogger
 	GithubToken   string
 	GoogleProject string
 }
 
+// UpdateWorkspaces updates all of our services.
 func UpdateWorkspaces(ctx context.Context, c *Config) error {
 	repoFmt := "gcr.io/%s/%s:%s"
 
@@ -55,6 +58,7 @@ func UpdateWorkspaces(ctx context.Context, c *Config) error {
 	return nil
 }
 
+// UpdateKube calls the k8s update api.
 func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -105,6 +109,7 @@ func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
 	return nil
 }
 
+// UpdateTriggers updates our build triggers on gcp.
 func UpdateTriggers(ctx context.Context, conf *Config) error {
 	c, err := cloudbuild.NewClient(ctx)
 	if err != nil {
