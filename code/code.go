@@ -48,7 +48,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 	}
 
 	for _, c := range tosave {
-		if err := cfg.Save(c); err != nil {
+		if err := cfg.Save(ctx, c); err != nil {
 			log.Errorw("could not save commit", "commit", c, zap.Error(err))
 		}
 	}
