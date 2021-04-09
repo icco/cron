@@ -33,6 +33,24 @@ func (c *Commit) String() string {
 	return fmt.Sprintf("%s/%s#%s", c.User, c.Repo, c.SHA)
 }
 
+// FetchAndSaveCommits gets all commits for the last 24 hours and saves to DB.
+func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
+	now := time.Now()
+	yesterday := now.Sub(24 * time.Hour)
+
+	var tosave []*Commit
+	for i := yesterday; i.Before(now); i.Add(time.Hour) {
+		cmts, err := cfg.FetchCommits(ctx, i.Year(), i.Month(), i.Day(), i.Hour())
+		if err != nil {
+			return err
+		}
+
+		tosave = append(tosave, cmts...)
+	}
+
+	return nil
+}
+
 // FetchCommits gets all commits from githubarchive.org for a user at an hour.
 func (cfg *Config) FetchCommits(ctx context.Context, year, month, day, hour int) ([]*Commit, error) {
 	t := time.Date(year, time.Month(month), day, hour, 0, 0, 0, time.UTC)
