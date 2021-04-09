@@ -54,7 +54,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 // FetchCommits gets all commits from githubarchive.org for a user at an hour.
 func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month, day, hour int) ([]*Commit, error) {
 	t := time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
-	u := fmt.Sprintf("https://data.githubarchive.org/%s.json.gz", t.Format("2006-01-02-<15>"))
+	u := fmt.Sprintf("https://data.githubarchive.org/%s.json.gz", t.Format("2006-01-02-15"))
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
@@ -67,7 +67,10 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 	if err != nil {
 		return nil, fmt.Errorf("get archive %q: %w", u, err)
 	}
-	cfg.Log.Debugw("got archive response", "url", u, "response", resp)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("get archive %q: got %s", u, resp.Status)
+	}
 
 	rdr, err := gzip.NewReader(resp.Body)
 	if err != nil {
@@ -84,8 +87,8 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 			return nil, fmt.Errorf("decode json: %w", err)
 		}
 
-		cfg.Log.Debug("got data", "github", gh)
 		if gh.Type == "PushEvent" && gh.Actor.Login == cfg.User {
+			cfg.Log.Debugw("got filtered data", "github", gh)
 			repo := gh.Repo.Name
 			for _, c := range gh.Payload.Commits {
 				user, err := cfg.GetUserByEmail(ctx, c.Author.Email)
