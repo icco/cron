@@ -8,10 +8,9 @@ import (
 	"net/http"
 
 	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
-	"github.com/google/go-github/v28/github"
+	"github.com/icco/cron/code"
 	"github.com/icco/cron/sites"
 	"go.uber.org/zap"
-	"golang.org/x/oauth2"
 	"google.golang.org/api/iterator"
 	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
 	apiv1 "k8s.io/api/core/v1"
@@ -34,9 +33,10 @@ func UpdateWorkspaces(ctx context.Context, c *Config) error {
 
 	for _, r := range sites.All {
 		sha, err := c.GetSHA(ctx, r.Owner, r.Repo, r.Branch)
-		if _, ok := err.(*github.RateLimitError); ok {
-			c.Log.Warnw("hit rate limit", zap.Error(err))
-			break
+		if err != nil {
+			if !code.RateLimited(err, c.Log) {
+				return err
+			}
 		}
 
 		if sha == "" {
@@ -170,12 +170,9 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 	return nil
 }
 
+// GetSHA gets a sha.
 func (c *Config) GetSHA(ctx context.Context, owner, repo, mainBranch string) (string, error) {
-	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: c.GithubToken},
-	)
-	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
+	client := code.GithubClient(ctx, c.GithubToken)
 
 	branch, _, err := client.Repositories.GetBranch(ctx, owner, repo, mainBranch)
 	if err != nil {

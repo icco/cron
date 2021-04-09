@@ -8,13 +8,16 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/go-github/v34/github"
 	"go.uber.org/zap"
+	"golang.org/x/oauth2"
 )
 
 // Config is a basic configuration struct.
 type Config struct {
-	User string
-	Log  *zap.SugaredLogger
+	User        string
+	Log         *zap.SugaredLogger
+	GithubToken string
 }
 
 // Commit is a history of a commit in a github repo.
@@ -55,76 +58,70 @@ func (cfg *Config) FetchCommits(ctx context.Context, year, month, day, hour int)
 	defer resp.Body.Close()
 
 	jd := json.NewDecoder(rdr)
-	var ghData []*Github
+	var data []*Commit
 	for jd.More() {
 		var gh Github
 		if err := jd.Decode(&gh); err != nil {
 			return nil, err
 		}
 
-		ghData = append(ghData, &gh)
 		cfg.Log.Debug("got data", "github", gh)
+		if gh.Type == "PushEvent" && gh.Actor == cfg.User {
+			repo := gh.Repo.Name
+			for _, c := range gh.Commits {
+				data = append(data, &Commit{
+					Repo: repo,
+					SHA:  c.Sha,
+					User: "",
+				})
+			}
+		}
 	}
 
-	return nil, nil
+	return data, nil
 }
 
-//   # Grabs the commit log from github archive for the specified hour, parses
-//   # that and then saves all commits pushed by the USER to the database.
-//   def self.fetchAllForTime day, month, year, hour, client = nil
-//     require "open-uri"
-//     require "zlib"
-//
-//
-//     # Simple error checking.
-//     return nil if hour < 0 or hour > 23
-//     return nil if day < 1 or day > 31
-//     return nil if month < 1 or month > 12
-//
-//     date = "#{"%4d" % year}-#{"%02d" % month}-#{"%02d" % day}-#{hour}"
-//     uri = URI.parse "http://data.githubarchive.org/#{date}.json.gz"
-//     Oj.default_options = {symbolize_names: true}
-//
-//     logger.info "Grabbing #{date} for #{USER.inspect}"
-//
-//     begin
-//       uri.open do |gz|
-//         js = Zlib::GzipReader.new(gz).read
-//         Oj.load(js) do |event|
-//           if event[:actor] == USER
-//             logger.debug "Found Event: #{event.inspect}."
-//             if event[:type] == "PushEvent"
-//               repo = event[:repository][:name]
-//               event[:payload][:shas].each do |commit|
-//                 sha = commit[0]
-//                 user = self.lookup_user commit[1], client
-//                 if !user.nil?
-//                   ret = self.factory user, repo, sha, client
-//                   if !ret.nil?
-//                     logger.info "Inserted #{ret}."
-//                   end
-//                 end
-//               end
-//             end
-//           end
-//         end
-//       end
-//     rescue Timeout::Error
-//       logger.warn "The request for #{uri} timed out...skipping."
-//     rescue OpenURI::HTTPError => e
-//       logger.warn "The request for #{uri} returned an error. #{e.message}"
-//     end
-//   end
+// GetUserByEmail returns a user based on their email.
+func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, error) {
+	client := cfg.GithubClient(ctx, cfg.GithubToken)
+
+	result, _, err := client.Search.Users(ctx, email, nil)
+	if err != nil {
+		if !code.RateLimited(err, cfg.Log) {
+			return "", fmt.Errorf("finding user: %w", err)
+		}
+	}
+
+	if len(result.Users) == 0 {
+		return "", fmt.Errorf("no users found")
+	}
+
+	return result.Users[0].Login, nil
+}
+
+// GithubClient creates a new GithubClient.
+func GithubClient(ctx context.Context, token string) *github.Client {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	return github.NewClient(tc)
+}
+
+func Ratelimited(err error, log *zap.SugaredLogger) bool {
+	_, ok := err.(*github.RateLimitError)
+	if ok {
+		log.Warnw("hit rate limit", zap.Error(err))
+	}
+
+	return ok
+}
 
 //   # This makes sure all commits from a repo's commit history are in the
 //   # database and have the correct data.
 //   #
 //   # NOTE: This will probably blow out your github request quota.
 //   def self.update_repo user, repo, client = nil, check = true
-//     if client.nil?
-//       client = Octokit::Client.new({})
-//     end
-//
 //     commits = client.commits("#{user}/#{repo}").delete_if {|commit| commit.is_a? String }
 //     commited_commits = Commit.where(:repo => repo).group(:repo).count.values.first.to_i
 //     if check or commited_commits < commits.count
