@@ -17,7 +17,8 @@ type Config struct {
 	OWMKey       string
 }
 
-type keyFunc func(context.Context, *Config) (float64, error)
+// KeyFunc is a function for key exporters.
+type KeyFunc func(context.Context, *Config) (float64, error)
 
 // funcMap is a list of stats to get. Some ideas:
 // - Steps
@@ -25,7 +26,7 @@ type keyFunc func(context.Context, *Config) (float64, error)
 // - Books read this year
 // - Tweets today
 // - Time coding
-var funcMap = map[string]keyFunc{
+var funcMap = map[string]KeyFunc{
 	"ETH":                    GetETHPrice,
 	"BTC":                    GetBTCPrice,
 	"Aircraft Overhead":      GetAirplanes,

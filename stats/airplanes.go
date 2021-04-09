@@ -14,8 +14,11 @@ type aircraftResponse struct {
 	Aircraft []Aircraft `json:"aircraft"`
 }
 
+// FlexInt is an int that can be parsed for json, and if the json is a string,
+// is set to 0.
 type FlexInt int
 
+// Aircraft is a ADS-B aircraft data type.
 type Aircraft struct {
 	AltBaro        FlexInt       `json:"alt_baro,omitempty"`
 	AltGeom        int           `json:"alt_geom,omitempty"`
@@ -53,6 +56,7 @@ type Aircraft struct {
 	Version        int           `json:"version,omitempty"`
 }
 
+// GetAirplanes gets the number of airplanes we can see.
 func GetAirplanes(ctx context.Context, cfg *Config) (float64, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://newyork.welch.io/flights/data/aircraft.json", nil)
 	if err != nil {

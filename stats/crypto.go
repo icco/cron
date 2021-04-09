@@ -17,14 +17,17 @@ type coinbaseResponse struct {
 	} `json:"data"`
 }
 
+// GetETHPrice gets the price of eth in USD.
 func GetETHPrice(ctx context.Context, cfg *Config) (float64, error) {
 	return GetCryptoPrice(ctx, "ETH")
 }
 
+// GetBTCPrice gets the price of BTC in USD.
 func GetBTCPrice(ctx context.Context, cfg *Config) (float64, error) {
 	return GetCryptoPrice(ctx, "BTC")
 }
 
+// GetCryptoPrice gets a crypto in USD from coinbase.
 func GetCryptoPrice(ctx context.Context, crypto string) (float64, error) {
 	url := fmt.Sprintf("https://api.coinbase.com/v2/prices/%s-USD/buy", crypto)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)

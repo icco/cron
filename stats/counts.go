@@ -12,6 +12,7 @@ type countsResponse struct {
 	Counts []*gql.Stat
 }
 
+// GetCounts gets counts from graphql.
 func GetCounts(ctx context.Context, cfg *Config) ([]*gql.Stat, error) {
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
 	gqlClient.Log = func(s string) { cfg.Log.Debug(s) }

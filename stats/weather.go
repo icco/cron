@@ -6,7 +6,8 @@ import (
 	"github.com/briandowns/openweathermap"
 )
 
-func GetCurrentWeather(location string) keyFunc {
+// GetCurrentWeather gets the weather for a place from OWM.
+func GetCurrentWeather(location string) KeyFunc {
 	return func(ctx context.Context, cfg *Config) (float64, error) {
 		if err := openweathermap.ValidAPIKey(cfg.OWMKey); err != nil {
 			return 0.0, err

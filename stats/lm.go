@@ -9,6 +9,7 @@ import (
 	"github.com/icco/lunchmoney"
 )
 
+// GetAssetMix gets our asset mix from LunchMoney.
 // TODO: Add to config thing.
 func GetAssetMix(ctx context.Context) (float64, error) {
 	token := os.Getenv("LUNCHMONEY_TOKEN")
