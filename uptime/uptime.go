@@ -15,12 +15,14 @@ import (
 	"google.golang.org/genproto/protobuf/field_mask"
 )
 
+// Config is a config.
 type Config struct {
 	Log       *zap.SugaredLogger
 	ProjectID string
 }
 
 var (
+	// ExtraHosts is a list of hosts we also want to monitor.
 	ExtraHosts = []string{
 		"archive.natwelch.com",
 		"corybooker.com",

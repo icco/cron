@@ -14,6 +14,7 @@ import (
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
+// UpdateServices updates monitoring for all of our services.
 func UpdateServices(ctx context.Context, c *Config) error {
 	client, err := monitoring.NewServiceMonitoringClient(ctx)
 	if err != nil {
@@ -237,20 +238,19 @@ func (c *Config) addSLO(ctx context.Context, s sites.SiteMap, svc *monitoringpb.
 		}
 		c.Log.Debugw("updated slo", "job", "uptime", "service", svc, "site", s, "slo", resp)
 		return resp, nil
-	} else {
-		req := &monitoringpb.CreateServiceLevelObjectiveRequest{
-			Parent:                svc.Name,
-			ServiceLevelObjective: want,
-		}
-		resp, err := client.CreateServiceLevelObjective(ctx, req)
-		if err != nil {
-			return nil, fmt.Errorf("create slo: %w", err)
-		}
-		c.Log.Debugw("created slo", "job", "uptime", "service", svc, "site", s, "slo", resp)
-		return resp, nil
 	}
 
-	return nil, fmt.Errorf("unknown logic error")
+	req := &monitoringpb.CreateServiceLevelObjectiveRequest{
+		Parent:                svc.Name,
+		ServiceLevelObjective: want,
+	}
+	resp, err := client.CreateServiceLevelObjective(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("create slo: %w", err)
+	}
+
+	c.Log.Debugw("created slo", "job", "uptime", "service", svc, "site", s, "slo", resp)
+	return resp, nil
 }
 
 func (c *Config) getBackend(ctx context.Context, dep string) (string, error) {
