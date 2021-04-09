@@ -162,8 +162,9 @@ func Act(octx context.Context, job string) error {
 		}
 	case "code":
 		c := &code.Config{
-			Log:  log,
-			User: "icco",
+			Log:         log,
+			User:        "icco",
+			GithubToken: githubToken,
 		}
 
 		if err := c.FetchAndSaveCommits(ctx); err != nil {
