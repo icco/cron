@@ -105,7 +105,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 
 // GetUserByEmail returns a user based on their email.
 func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, error) {
-	client := GithubClient(ctx, cfg.GithubToken)
+	client := code.GithubClient(ctx, cfg.GithubToken)
 
 	result, _, err := client.Search.Users(ctx, email, nil)
 	if err != nil {
