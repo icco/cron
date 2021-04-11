@@ -16,7 +16,7 @@ require (
 	github.com/google/go-github/v34 v34.0.0
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.4 // indirect
-	github.com/icco/code.natwelch.com v0.0.0-20210411000621-de4d5e81fee1
+	github.com/icco/code.natwelch.com v0.0.0-20210411002806-5a63a6c0390e
 	github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3
 	github.com/icco/gutil v0.0.0-20210403025205-f4d44dcca9ed
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
