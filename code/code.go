@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/dgraph-io/ristretto"
 	"github.com/icco/code.natwelch.com/code"
 	"go.uber.org/zap"
 )
@@ -18,10 +19,23 @@ type Config struct {
 	User        string
 	Log         *zap.SugaredLogger
 	GithubToken string
+	Cache       *ristretto.Cache
 }
 
 // FetchAndSaveCommits gets all commits for the last 24 hours and saves to DB.
 func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
+	if cfg.Cache == nil {
+		cache, err := ristretto.NewCache(&ristretto.Config{
+			NumCounters: 1e7,     // Num keys to track frequency of (10M).
+			MaxCost:     1 << 30, // Maximum cost of cache (1GB).
+			BufferItems: 64,      // Number of keys per Get buffer.
+		})
+		if err != nil {
+			return err
+		}
+		cfg.Cache = cache
+	}
+
 	now := time.Now()
 	yesterday := now.Add(-24 * time.Hour)
 
@@ -84,11 +98,13 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 			cfg.Log.Debugw("got filtered data", "github", gh)
 			repo := gh.Repo.Name
 			for _, c := range gh.Payload.Commits {
-				user, err := cfg.GetUserByEmail(ctx, c.Author.Email)
+				user := cfg.User
+				getUser, err := cfg.GetUserByEmail(ctx, c.Author.Email)
 				if err != nil {
 					user = cfg.User
 					continue
 				}
+				user = getUser
 
 				data = append(data, &code.Commit{
 					Repo: repo,
@@ -105,6 +121,10 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 
 // GetUserByEmail returns a user based on their email.
 func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, error) {
+	user, ok := cfg.Cache.Get(email)
+	if ok {
+		return user.(string), nil
+	}
 	client := code.GithubClient(ctx, cfg.GithubToken)
 
 	result, _, err := client.Search.Users(ctx, email, nil)
@@ -118,8 +138,10 @@ func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, er
 	if len(result.Users) == 0 {
 		return "", fmt.Errorf("no users found")
 	}
+	user = *result.Users[0].Login
+	cfg.Cache.Set(email, user, 0)
 
-	return *result.Users[0].Login, nil
+	return user.(string), nil
 }
 
 // Save saves a commit.

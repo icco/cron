@@ -10,12 +10,13 @@ require (
 	github.com/briandowns/openweathermap v0.16.0
 	github.com/dghubble/go-twitter v0.0.0-20201011215211-4b180d0cc78d
 	github.com/dghubble/oauth1 v0.7.0
+	github.com/dgraph-io/ristretto v0.0.3
 	github.com/go-chi/chi/v5 v5.0.2
 	github.com/go-playground/validator/v10 v10.5.0 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.4 // indirect
-	github.com/icco/code.natwelch.com v0.0.0-20210411015107-093d1461d36a
+	github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b
 	github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3
 	github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535

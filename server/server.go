@@ -89,10 +89,20 @@ func main() {
 		})
 	}
 
+	cache, err := ristretto.NewCache(&ristretto.Config{
+		NumCounters: 1e7,     // Num keys to track frequency of (10M).
+		MaxCost:     1 << 30, // Maximum cost of cache (1GB).
+		BufferItems: 64,      // Number of keys per Get buffer.
+	})
+	if err != nil {
+		log.Fatalw("could not create cache", zap.Error(err))
+	}
+	cfg := &cron.Config{Log: log, Cache: cache}
+
 	go func() {
 		ctx := context.Background()
 		for {
-			err := recieveMessages(ctx, "cron-client")
+			err := recieveMessages(ctx, "cron-client", cfg)
 			if err != nil {
 				log.Fatalw("could not process message", zap.Error(err))
 			}
@@ -144,7 +154,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, h))
 }
 
-func recieveMessages(ctx context.Context, subName string) error {
+func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) error {
 	pubsubClient, err := pubsub.NewClient(ctx, "icco-cloud")
 	if err != nil {
 		log.Errorw("cloudn't create client", zap.Error(err))
@@ -166,7 +176,7 @@ func recieveMessages(ctx context.Context, subName string) error {
 			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
 		} else {
 			log.Debugw("got message", "parsed", data, "unparsed", string(msg.Data))
-			if err := cron.Act(ctx, data["job"]); err != nil {
+			if err := cfg.Act(ctx, data["job"]); err != nil {
 				log.Errorw("problem running job", "job", data, zap.Error(err))
 			}
 			msg.Ack()

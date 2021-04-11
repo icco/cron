@@ -26,13 +26,14 @@ const (
 	Service = "cron"
 )
 
-// Act takes a job and calls a sub project to do work.
-func Act(octx context.Context, job string) error {
-	log, err := logging.NewLogger(Service)
-	if err != nil {
-		return fmt.Errorf("could not create logger: %w", err)
-	}
+// Config is our base act config struct.
+type Config struct {
+	Log   *zap.SugaredLogger
+	Cache *ristretto.Cache
+}
 
+// Act takes a job and calls a sub project to do work.
+func (cfg *Config) Act(octx context.Context, job string) error {
 	jobKey, err := tag.NewKey("natwelch.com/keys/job")
 	if err != nil {
 		log.Warnw("could not create oc tag", zap.Error(err))
@@ -79,7 +80,7 @@ func Act(octx context.Context, job string) error {
 		log.Info("heartbeat")
 	case "update-deployments":
 		cfg := &updater.Config{
-			Log:           log,
+			Log:           cfg.Log,
 			GithubToken:   githubToken,
 			GoogleProject: GCPProject,
 		}
@@ -94,7 +95,7 @@ func Act(octx context.Context, job string) error {
 	case "user-tweets":
 		t := tweets.Twitter{
 			TwitterAuth:  twitterAuth,
-			Log:          log,
+			Log:          cfg.Log,
 			GraphQLToken: gqlToken,
 		}
 		err := t.SaveUserTweets(ctx)
@@ -104,7 +105,7 @@ func Act(octx context.Context, job string) error {
 	case "pinboard":
 		p := &pinboard.Pinboard{
 			Token:        pinboardToken,
-			Log:          log,
+			Log:          cfg.Log,
 			GraphQLToken: gqlToken,
 		}
 		err := p.UpdatePins(ctx)
@@ -114,7 +115,7 @@ func Act(octx context.Context, job string) error {
 	case "random-tweets":
 		t := &tweets.Twitter{
 			TwitterAuth:  twitterAuth,
-			Log:          log,
+			Log:          cfg.Log,
 			GraphQLToken: gqlToken,
 		}
 		err := t.CacheRandomTweets(ctx)
@@ -123,7 +124,7 @@ func Act(octx context.Context, job string) error {
 		}
 	case "goodreads":
 		g := &goodreads.Goodreads{
-			Log:          log,
+			Log:          cfg.Log,
 			Token:        goodreadsToken,
 			GraphQLToken: gqlToken,
 		}
@@ -133,7 +134,7 @@ func Act(octx context.Context, job string) error {
 		}
 	case "uptime":
 		c := &uptime.Config{
-			Log:       log,
+			Log:       cfg.Log,
 			ProjectID: GCPProject,
 		}
 
@@ -146,7 +147,7 @@ func Act(octx context.Context, job string) error {
 		}
 	case "stats":
 		c := &stats.Config{
-			Log:          log,
+			Log:          cfg.Log,
 			GraphQLToken: gqlToken,
 			OWMKey:       os.Getenv("OPEN_WEATHER_MAP_KEY"),
 		}
@@ -156,7 +157,7 @@ func Act(octx context.Context, job string) error {
 		}
 	case "stats-hourly":
 		c := &stats.Config{
-			Log:          log,
+			Log:          cfg.Log,
 			GraphQLToken: gqlToken,
 		}
 
@@ -165,9 +166,10 @@ func Act(octx context.Context, job string) error {
 		}
 	case "code":
 		c := &code.Config{
-			Log:         log,
+			Log:         cfg.Log,
 			User:        "icco",
 			GithubToken: githubToken,
+			Cache:       cfg.Cache,
 		}
 
 		if err := c.FetchAndSaveCommits(ctx); err != nil {
