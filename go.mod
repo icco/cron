@@ -15,9 +15,9 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.4 // indirect
-	github.com/icco/code.natwelch.com v0.0.0-20210411012348-f7d21dac597a
+	github.com/icco/code.natwelch.com v0.0.0-20210411015107-093d1461d36a
 	github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3
-	github.com/icco/gutil v0.0.0-20210411011308-d24e8e69d3e6
+	github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.8 // indirect

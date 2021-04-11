@@ -366,13 +366,13 @@ github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpO
 github.com/hudl/fargo v1.3.0/go.mod h1:y3CKSmjA+wD2gak7sUSXTAoopbhU08POFhmITJgmKTg=
 github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
-github.com/icco/code.natwelch.com v0.0.0-20210411012348-f7d21dac597a h1:dYm3aGeqbZHRrtYrQVm9OehDF0WXv5WR5LfphLQSZok=
-github.com/icco/code.natwelch.com v0.0.0-20210411012348-f7d21dac597a/go.mod h1:4amOzS7o4iz5LSBSYDhE3miJHkq9gIojm2yZpBwQrQI=
+github.com/icco/code.natwelch.com v0.0.0-20210411015107-093d1461d36a h1:G2dw0Nybc1JrT8ICtoxNqxDOsYDhY53YJGrLtyRtO98=
+github.com/icco/code.natwelch.com v0.0.0-20210411015107-093d1461d36a/go.mod h1:5I72Zb26u8qKZnA41vLqaUA/yYFihTO6Qbb3/X9cyUQ=
 github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3 h1:tDsfQX91dgQUZLdE82niWLMiDJwgxpvC0K7L8Bc4tIY=
 github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3/go.mod h1:UNF5VTT5m1ma3GjbL6B3rm8nSaWuzvVjpbK+7GLUtlg=
 github.com/icco/gutil v0.0.0-20210403025205-f4d44dcca9ed/go.mod h1:+7ztmm2CBM/lvYMteupj/wdL2Q8G0tTOGr1NaSUGqE0=
-github.com/icco/gutil v0.0.0-20210411011308-d24e8e69d3e6 h1:aiHwMZDNt2sy47EWXyyPiCP50qzzbhKNuCpmS1RusZk=
-github.com/icco/gutil v0.0.0-20210411011308-d24e8e69d3e6/go.mod h1:fy5nXvFzJakaQRoxMY92xJmp/LQjbOj5ssZQRStCm0U=
+github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470 h1:5QG14dIk0TheOoIiw5gceEVyc6DMmvDz9rQjFbszqcU=
+github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470/go.mod h1:fy5nXvFzJakaQRoxMY92xJmp/LQjbOj5ssZQRStCm0U=
 github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535 h1:2H0OPKDIDDep8BYUOnYwCmgANG63RC9hoHvR2GMhxdQ=
 github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535/go.mod h1:TdpPQk49qE3l67DQCTv1cptfnjksGcL6FLypJcPjebY=
 github.com/icco/zapdriver v1.4.0 h1:ACpofOtnSJT9eywNOoTuEhzo7YtFUGCc4xBXYFWYMkI=
