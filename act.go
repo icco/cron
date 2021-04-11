@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/dgraph-io/ristretto"
 	"github.com/icco/cron/code"
 	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
@@ -13,7 +14,6 @@ import (
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
 	"github.com/icco/cron/uptime"
-	"github.com/icco/gutil/logging"
 	"go.opencensus.io/tag"
 	"go.uber.org/zap"
 )
@@ -36,13 +36,13 @@ type Config struct {
 func (cfg *Config) Act(octx context.Context, job string) error {
 	jobKey, err := tag.NewKey("natwelch.com/keys/job")
 	if err != nil {
-		log.Warnw("could not create oc tag", zap.Error(err))
+		cfg.Log.Warnw("could not create oc tag", zap.Error(err))
 	}
 	ctx, err := tag.New(octx,
 		tag.Upsert(jobKey, job),
 	)
 	if err != nil {
-		log.Warnw("could not add oc tag", zap.Error(err))
+		cfg.Log.Warnw("could not add oc tag", zap.Error(err))
 	}
 
 	gqlToken := os.Getenv("GQL_TOKEN")
@@ -75,9 +75,9 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 	switch job {
 	case "test":
 		v, err := stats.GetAssetMix(ctx)
-		log.Warnf("%d, %+v", v, err)
+		cfg.Log.Warnf("%d, %+v", v, err)
 	case "minute":
-		log.Info("heartbeat")
+		cfg.Log.Info("heartbeat")
 	case "update-deployments":
 		cfg := &updater.Config{
 			Log:           cfg.Log,
@@ -91,7 +91,10 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 			return fmt.Errorf("update triggers: %w", err)
 		}
 	case "spider":
-		spider.Crawl(ctx, &spider.Config{Log: log, URL: "https://writing.natwelch.com/"})
+		spider.Crawl(ctx, &spider.Config{
+			Log: cfg.Log,
+			URL: "https://writing.natwelch.com/",
+		})
 	case "user-tweets":
 		t := tweets.Twitter{
 			TwitterAuth:  twitterAuth,
