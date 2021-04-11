@@ -201,6 +201,8 @@ github.com/go-chi/cors v1.2.0/go.mod h1:sSbTewc+6wYHBBCW7ytsFSn836hqM7JxpglAy2Vz
 github.com/go-gl/glfw v0.0.0-20190409004039-e6da0acd62b1/go.mod h1:vR7hzQXu2zJy9AVAgeJqvqgH9Q5CA+iKCZ2gyEVpxRU=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20191125211704-12ad95a8df72/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
 github.com/go-gl/glfw/v3.3/glfw v0.0.0-20200222043503-6f7a984d4dc4/go.mod h1:tQ2UAYgL5IevRw8kRxooKSPJfGvJ9fJQFa0TUsXzTg8=
+github.com/go-http-utils/fresh v0.0.0-20161124030543-7231e26a4b27/go.mod h1:AYvN8omj7nKLmbcXS2dyABYU6JB1Lz1bHmkkq1kf4I4=
+github.com/go-http-utils/headers v0.0.0-20181008091004-fed159eddc2a/go.mod h1:I79BieaU4fxrw4LMXby6q5OS9XnoR9UIKLOzDFjUmuw=
 github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-kit/kit v0.9.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2as=
 github.com/go-kit/kit v0.10.0/go.mod h1:xUsJbQ/Fp4kEt7AFgCuvyX4a71u8h9jB8tj/ORgOZ7o=
@@ -368,8 +370,9 @@ github.com/icco/code.natwelch.com v0.0.0-20210411002806-5a63a6c0390e h1:deY3AFpM
 github.com/icco/code.natwelch.com v0.0.0-20210411002806-5a63a6c0390e/go.mod h1:6AnjA9PjDctzcDn9iM5vChLBqIWVKJyCln/+JfbAHMM=
 github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3 h1:tDsfQX91dgQUZLdE82niWLMiDJwgxpvC0K7L8Bc4tIY=
 github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3/go.mod h1:UNF5VTT5m1ma3GjbL6B3rm8nSaWuzvVjpbK+7GLUtlg=
-github.com/icco/gutil v0.0.0-20210403025205-f4d44dcca9ed h1:+fHBtuUcUjYQ7037Z8skqiooAv4yYK45khfC/uBlCKQ=
 github.com/icco/gutil v0.0.0-20210403025205-f4d44dcca9ed/go.mod h1:+7ztmm2CBM/lvYMteupj/wdL2Q8G0tTOGr1NaSUGqE0=
+github.com/icco/gutil v0.0.0-20210411011308-d24e8e69d3e6 h1:aiHwMZDNt2sy47EWXyyPiCP50qzzbhKNuCpmS1RusZk=
+github.com/icco/gutil v0.0.0-20210411011308-d24e8e69d3e6/go.mod h1:fy5nXvFzJakaQRoxMY92xJmp/LQjbOj5ssZQRStCm0U=
 github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535 h1:2H0OPKDIDDep8BYUOnYwCmgANG63RC9hoHvR2GMhxdQ=
 github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535/go.mod h1:TdpPQk49qE3l67DQCTv1cptfnjksGcL6FLypJcPjebY=
 github.com/icco/zapdriver v1.4.0 h1:ACpofOtnSJT9eywNOoTuEhzo7YtFUGCc4xBXYFWYMkI=
