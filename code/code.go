@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/icco/code.natwelch.com/code"
 	"go.uber.org/zap"
 )
 
@@ -19,25 +20,12 @@ type Config struct {
 	GithubToken string
 }
 
-// Commit is a history of a commit in a github repo.
-type Commit struct {
-	Repo     string    `json:"repo"`
-	User     string    `json:"user"`
-	SHA      string    `json:"sha"`
-	Datetime time.Time `json:"created_on"`
-}
-
-// String returns a string representation of a Commit.
-func (c *Commit) String() string {
-	return fmt.Sprintf("%s/%s#%s", c.User, c.Repo, c.SHA)
-}
-
 // FetchAndSaveCommits gets all commits for the last 24 hours and saves to DB.
 func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 	now := time.Now()
 	yesterday := now.Add(-24 * time.Hour)
 
-	var tosave []*Commit
+	var tosave []*code.Commit
 	for i := yesterday; i.Before(now); i.Add(time.Hour) {
 		cmts, err := cfg.FetchCommits(ctx, i.Year(), i.Month(), i.Day(), i.Hour())
 		if err != nil {
@@ -57,7 +45,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 }
 
 // FetchCommits gets all commits from githubarchive.org for a user at an hour.
-func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month, day, hour int) ([]*Commit, error) {
+func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month, day, hour int) ([]*code.Commit, error) {
 	t := time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
 	u := fmt.Sprintf("https://data.githubarchive.org/%s.json.gz", t.Format("2006-01-02-15"))
 
@@ -85,7 +73,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 	defer resp.Body.Close()
 
 	jd := json.NewDecoder(rdr)
-	var data []*Commit
+	var data []*code.Commit
 	for jd.More() {
 		var gh Github
 		if err := jd.Decode(&gh); err != nil {
@@ -102,7 +90,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 					continue
 				}
 
-				data = append(data, &Commit{
+				data = append(data, &code.Commit{
 					Repo: repo,
 					SHA:  c.Sha,
 					User: user,
@@ -117,11 +105,11 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 
 // GetUserByEmail returns a user based on their email.
 func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, error) {
-	client := GithubClient(ctx, cfg.GithubToken)
+	client := code.GithubClient(ctx, cfg.GithubToken)
 
 	result, _, err := client.Search.Users(ctx, email, nil)
 	if err != nil {
-		if !RateLimited(err, cfg.Log) {
+		if !code.RateLimited(err, cfg.Log) {
 			return "", fmt.Errorf("finding user: %w", err)
 		}
 	}
@@ -135,7 +123,7 @@ func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, er
 }
 
 // Save saves a commit.
-func (cfg *Config) Save(ctx context.Context, commit *Commit) error {
+func (cfg *Config) Save(ctx context.Context, commit *code.Commit) error {
 	b, err := json.Marshal(commit)
 	if err != nil {
 		return err

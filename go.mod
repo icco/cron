@@ -7,20 +7,17 @@ require (
 	cloud.google.com/go/pubsub v1.10.1
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.5
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
-	github.com/aws/aws-sdk-go v1.38.16 // indirect
 	github.com/briandowns/openweathermap v0.16.0
-	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/dghubble/go-twitter v0.0.0-20201011215211-4b180d0cc78d
 	github.com/dghubble/oauth1 v0.7.0
 	github.com/go-chi/chi/v5 v5.0.2
 	github.com/go-playground/validator/v10 v10.5.0 // indirect
 	github.com/golang/protobuf v1.5.2
-	github.com/google/go-github/v34 v34.0.0
-	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.4 // indirect
-	github.com/icco/graphql v0.0.0-20210408161423-51c14af30c67
-	github.com/icco/gutil v0.0.0-20210403025205-f4d44dcca9ed
+	github.com/icco/code.natwelch.com v0.0.0-20210411002806-5a63a6c0390e
+	github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3
+	github.com/icco/gutil v0.0.0-20210411011308-d24e8e69d3e6
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.8 // indirect
@@ -30,8 +27,6 @@ require (
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
 	go.uber.org/zap v1.16.0
-	golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 // indirect
-	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	golang.org/x/term v0.0.0-20210406210042-72f3dc4e9b72 // indirect
 	google.golang.org/api v0.44.0
