@@ -109,7 +109,7 @@ func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, er
 
 	result, _, err := client.Search.Users(ctx, email, nil)
 	if err != nil {
-		if !RateLimited(err, cfg.Log) {
+		if !code.RateLimited(err, cfg.Log) {
 			return "", fmt.Errorf("finding user: %w", err)
 		}
 	}

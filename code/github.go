@@ -1,12 +1,7 @@
 package code
 
 import (
-	"context"
 	"time"
-
-	"github.com/google/go-github/v34/github"
-	"go.uber.org/zap"
-	"golang.org/x/oauth2"
 )
 
 // Github defines the data we can get from Github.
