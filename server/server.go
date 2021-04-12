@@ -171,7 +171,7 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 	}
 
 	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		stats.Record(ctx, msgRecv.M(1))
+		//stats.Record(ctx, msgRecv.M(1))
 
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
@@ -185,7 +185,7 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 		}
 		msg.Ack()
 
-		stats.Record(ctx, msgAck.M(1))
+		//stats.Record(ctx, msgAck.M(1))
 	}); err != nil && err != context.Canceled {
 		return fmt.Errorf("recieving messages: %w", err)
 	}
