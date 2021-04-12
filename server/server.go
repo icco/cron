@@ -76,6 +76,9 @@ func main() {
 			MonitoredResource:       monitoredresource.Autodetect(),
 			DefaultMonitoringLabels: labels,
 			DefaultTraceAttributes:  map[string]interface{}{"app": cron.Service},
+			OnError: func(err error) {
+				log.Errorw("stackdriver error", zap.Error(err))
+			},
 		})
 
 		if err != nil {
@@ -155,10 +158,9 @@ func main() {
 }
 
 func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) error {
-	pubsubClient, err := pubsub.NewClient(ctx, "icco-cloud")
+	pubsubClient, err := pubsub.NewClient(ctx, cron.gcpProject)
 	if err != nil {
-		log.Errorw("cloudn't create client", zap.Error(err))
-		return err
+		return fmt.Errorf("create pubsub client: %w", err)
 	}
 
 	sub, err := pubsubClient.CreateSubscription(ctx, subName,
@@ -168,24 +170,23 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 		sub = pubsubClient.Subscription(subName)
 	}
 
-	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		stats.Record(ctx, msgRecv.M(1))
 
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
 			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
-		} else {
-			log.Debugw("got message", "parsed", data, "unparsed", string(msg.Data))
-			if err := cfg.Act(ctx, data["job"]); err != nil {
-				log.Errorw("problem running job", "job", data, zap.Error(err))
-			}
-			msg.Ack()
-
-			stats.Record(ctx, msgAck.M(1))
+			return
 		}
-	})
 
-	if err != nil {
+		log.Debugw("got message", "parsed", data, "unparsed", string(msg.Data))
+		if err := cfg.Act(ctx, data["job"]); err != nil {
+			log.Errorw("problem running job", "job", data, zap.Error(err))
+		}
+		msg.Ack()
+
+		stats.Record(ctx, msgAck.M(1))
+	}); err != nil && err != context.Canceled {
 		return fmt.Errorf("recieving messages: %w", err)
 	}
 
