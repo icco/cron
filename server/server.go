@@ -158,7 +158,7 @@ func main() {
 }
 
 func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) error {
-	pubsubClient, err := pubsub.NewClient(ctx, cron.gcpProject)
+	pubsubClient, err := pubsub.NewClient(ctx, cron.GCPProject)
 	if err != nil {
 		return fmt.Errorf("create pubsub client: %w", err)
 	}
