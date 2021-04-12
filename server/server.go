@@ -103,9 +103,8 @@ func main() {
 	go func() {
 		ctx := context.Background()
 		for {
-			err := recieveMessages(ctx, "cron-client", cfg)
-			if err != nil {
-				log.Fatalw("could not process message", zap.Error(err))
+			if err := recieveMessages(ctx, "cron-client", cfg); err != nil {
+				log.Errorw("could not process message", zap.Error(err))
 			}
 		}
 	}()
