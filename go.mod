@@ -7,6 +7,7 @@ require (
 	cloud.google.com/go/pubsub v1.10.1
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.5
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
+	github.com/aws/aws-sdk-go v1.38.18 // indirect
 	github.com/briandowns/openweathermap v0.16.0
 	github.com/dghubble/go-twitter v0.0.0-20201011215211-4b180d0cc78d
 	github.com/dghubble/oauth1 v0.7.0
@@ -17,7 +18,7 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/googleapis/gnostic v0.5.4 // indirect
 	github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b
-	github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3
+	github.com/icco/graphql v0.0.0-20210412134826-53c96ce30a14
 	github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba

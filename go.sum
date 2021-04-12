@@ -98,9 +98,9 @@ github.com/auth0/go-jwt-middleware v1.0.0/go.mod h1:nX2S0GmCyl087kdNSSItfOvMYokq
 github.com/aws/aws-lambda-go v1.13.3/go.mod h1:4UKl9IzQMoD+QF79YdCuzCwp8VbmG4VAQwij/eHl5CU=
 github.com/aws/aws-sdk-go v1.23.20/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
 github.com/aws/aws-sdk-go v1.27.0/go.mod h1:KmX6BPdI08NWTb3/sm4ZGu5ShLoqVDhKgpiN924inxo=
-github.com/aws/aws-sdk-go v1.38.16/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
-github.com/aws/aws-sdk-go v1.38.17 h1:1OfcfEtNrphUZYa+J0U35/1hxePbb3ASSQWdFS7L0Hs=
 github.com/aws/aws-sdk-go v1.38.17/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
+github.com/aws/aws-sdk-go v1.38.18 h1:Y5W5siOHoiZbCHQcoEiih267L21sbw1FW+2Vdlq9dlU=
+github.com/aws/aws-sdk-go v1.38.18/go.mod h1:hcU610XS61/+aQV88ixoOzUoG7v3b31pl2zKMmprdro=
 github.com/aws/aws-sdk-go-v2 v0.18.0/go.mod h1:JWVYvqSMppoMJC0x5wdwiImzgXTI9FuZwxzkQq9wy+g=
 github.com/beorn7/perks v0.0.0-20180321164747-3a771d992973/go.mod h1:Dwedo/Wpr24TaqPxmxbtue+5NUziq4I4S80YR8gNf3Q=
 github.com/beorn7/perks v1.0.0/go.mod h1:KWe93zE9D1o94FZ5RNwFwVgaQK1VOXiVxmqh+CedLV8=
@@ -376,9 +376,8 @@ github.com/ianlancetaylor/demangle v0.0.0-20181102032728-5e5cf60278f6/go.mod h1:
 github.com/ianlancetaylor/demangle v0.0.0-20200824232613-28f6c0f3b639/go.mod h1:aSSvb/t6k1mPoxDqO4vJh6VOCGPwU4O0C2/Eqndh1Sc=
 github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b h1:YVDK+xReHqCiXXg9B5YFDloQaWt5k2wbdQKo2DCxQjQ=
 github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b/go.mod h1:5I72Zb26u8qKZnA41vLqaUA/yYFihTO6Qbb3/X9cyUQ=
-github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3 h1:tDsfQX91dgQUZLdE82niWLMiDJwgxpvC0K7L8Bc4tIY=
-github.com/icco/graphql v0.0.0-20210409172407-5bde259067f3/go.mod h1:UNF5VTT5m1ma3GjbL6B3rm8nSaWuzvVjpbK+7GLUtlg=
-github.com/icco/gutil v0.0.0-20210403025205-f4d44dcca9ed/go.mod h1:+7ztmm2CBM/lvYMteupj/wdL2Q8G0tTOGr1NaSUGqE0=
+github.com/icco/graphql v0.0.0-20210412134826-53c96ce30a14 h1:0XK7jBGlDzT0i3ODlh+m5D0QwL7LP/9d2Zi3KXXRIIQ=
+github.com/icco/graphql v0.0.0-20210412134826-53c96ce30a14/go.mod h1:FLMuKzdDF/m0RXvVO6XT4xeMExUW977eklRv8UUEloo=
 github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470 h1:5QG14dIk0TheOoIiw5gceEVyc6DMmvDz9rQjFbszqcU=
 github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470/go.mod h1:fy5nXvFzJakaQRoxMY92xJmp/LQjbOj5ssZQRStCm0U=
 github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535 h1:2H0OPKDIDDep8BYUOnYwCmgANG63RC9hoHvR2GMhxdQ=
@@ -788,7 +787,6 @@ golang.org/x/net v0.0.0-20210119194325-5f4716e94777/go.mod h1:m0MpNAwzfU5UDzcl9v
 golang.org/x/net v0.0.0-20210224082022-3d97a244fca7/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
 golang.org/x/net v0.0.0-20210226172049-e18ecbb05110/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
 golang.org/x/net v0.0.0-20210316092652-d523dce5a7f4/go.mod h1:RBQZq4jEuRlivfhVLdyRGr576XBO4/greRjx4P4O3yc=
-golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4/go.mod h1:p54w0d4576C0XHj96bSt6lcn1PtDYWL6XObtHCRCNQM=
 golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1 h1:4qWs8cYYH6PoEFy4dfhDFgoMGkwAcETd+MmPdCPMzUc=
 golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1/go.mod h1:9tjilg8BloeKEkVJvy7fQ90B1CfIiPueXVOjqfkSzI8=
 golang.org/x/oauth2 v0.0.0-20180821212333-d2e6202438be/go.mod h1:N/0e6XlmueqKjAGxoOufVs8QHGRruUQn6yWY3a++T0U=
