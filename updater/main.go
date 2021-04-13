@@ -28,7 +28,7 @@ func (cfg *Config) UpdateTriggers(ctx context.Context) error {
 		return fmt.Errorf("could not create client: %w", err)
 	}
 
-	var trigs []*cloudbuildpb.BuildTrigger
+	trigs := map[string]*cloudbuildpb.BuildTrigger{}
 	req := &cloudbuildpb.ListBuildTriggersRequest{
 		ProjectId: cfg.GoogleProject,
 	}
@@ -41,24 +41,29 @@ func (cfg *Config) UpdateTriggers(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("failed while listing: %w", err)
 		}
-		trigs = append(trigs, resp)
+		trigs[resp.Name] = resp
 	}
 
 	cfg.Log.Debugw("found triggers", "triggers", trigs)
 
 	for _, s := range sites.All {
-		for _, t := range trigs {
-			if t.Name == s.Deployment {
-				if err := cfg.upsertBuildTrigger(ctx, c, s, t.Id); err != nil {
-					return err
-				}
-			}
+		buildTrigger, buildExists := trigs[s.Deployment]
+		deployTrigger, deployExists := trigs[fmt.Sprintf(deployerFormat, s.Deployment)]
 
-			if fmt.Sprintf(deployerFormat, s.Deployment) == t.Name {
-				if err := cfg.upsertDeployTrigger(ctx, c, s, t.Id); err != nil {
-					return err
-				}
-			}
+		buildID := ""
+		if buildExists {
+			buildID = buildTrigger.Id
+		}
+		if err := cfg.upsertBuildTrigger(ctx, c, s, buildID); err != nil {
+			return err
+		}
+
+		deployID := ""
+		if deployExists {
+			deployID = deployTrigger.Id
+		}
+		if err := cfg.upsertDeployTrigger(ctx, c, s, deployID); err != nil {
+			return err
 		}
 	}
 
@@ -119,7 +124,7 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 	}
 
 	if existingTriggerID == "" {
-		cfg.Log.Infow("creating build trigger", "request", createReq)
+		cfg.Log.Infow("creating build trigger", "request", createReq, "site", s)
 		if _, err := c.CreateBuildTrigger(ctx, createReq); err != nil {
 			return fmt.Errorf("could not create trigger %+v: %w", createReq, err)
 		}
@@ -133,7 +138,7 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 		Trigger:   createReq.Trigger,
 	}
 
-	cfg.Log.Infow("updating build trigger", "request", updateReq)
+	cfg.Log.Infow("updating build trigger", "request", updateReq, "site", s)
 	if _, err := c.UpdateBuildTrigger(ctx, updateReq); err != nil {
 		return fmt.Errorf("could not update trigger %+v: %w", updateReq, err)
 	}
@@ -297,7 +302,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 	}
 
 	if existingTriggerID == "" {
-		cfg.Log.Infow("creating deploy trigger", "request", createReq)
+		cfg.Log.Infow("creating deploy trigger", "request", createReq, "site", s)
 		if _, err := c.CreateBuildTrigger(ctx, createReq); err != nil {
 			return fmt.Errorf("could not create trigger %+v: %w", createReq, err)
 		}
@@ -311,7 +316,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 		Trigger:   createReq.Trigger,
 	}
 
-	cfg.Log.Infow("updating deploy trigger", "request", updateReq)
+	cfg.Log.Infow("updating deploy trigger", "request", updateReq, "site", s)
 	if _, err := c.UpdateBuildTrigger(ctx, updateReq); err != nil {
 		return fmt.Errorf("could not update trigger %+v: %w", updateReq, err)
 	}
