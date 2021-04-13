@@ -19,7 +19,6 @@ import (
 	"github.com/icco/cron/sites"
 	"github.com/icco/gutil/logging"
 	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/stats"
 	"go.opencensus.io/stats/view"
 	"go.opencensus.io/trace"
 	"go.uber.org/zap"
@@ -27,22 +26,6 @@ import (
 
 var (
 	log = logging.Must(logging.NewLogger(cron.Service))
-
-	msgRecv     = stats.Int64("natwelch.com/stats/message/received", "received message from Pub/Sub", stats.UnitDimensionless)
-	msgRecvView = &view.View{
-		Name:        "natwelch.com/views/message/received",
-		Description: "received message from Pub/Sub",
-		Measure:     msgRecv,
-		Aggregation: view.Count(),
-	}
-
-	msgAck     = stats.Int64("natwelch.com/stats/message/acknowledged", "acknowledged message from Pub/Sub", stats.UnitDimensionless)
-	msgAckView = &view.View{
-		Name:        "natwelch.com/views/message/acknowledged",
-		Description: "acknowledged message from Pub/Sub",
-		Measure:     msgRecv,
-		Aggregation: view.Count(),
-	}
 
 	rootTmpl = `
 <html>
@@ -171,8 +154,6 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 	}
 
 	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		//stats.Record(ctx, msgRecv.M(1))
-
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
 			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
@@ -184,8 +165,6 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 			log.Errorw("problem running job", "job", data, zap.Error(err))
 		}
 		msg.Ack()
-
-		//stats.Record(ctx, msgAck.M(1))
 	}); err != nil && err != context.Canceled {
 		return fmt.Errorf("recieving messages: %w", err)
 	}
