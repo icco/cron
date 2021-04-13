@@ -46,7 +46,7 @@ func (t *TwitterAuth) Validate(ctx context.Context, log *zap.SugaredLogger) (*tw
 		SkipStatus:   twitter.Bool(true),
 		IncludeEmail: twitter.Bool(true),
 	}
-	user, resp, err := client.Accounts.VerifyCredentials(verifyParams)
+	user, _, err := client.Accounts.VerifyCredentials(verifyParams)
 	if err != nil {
 		log.Errorw("error verifying creds", zap.Error(err))
 		return nil, nil, err
