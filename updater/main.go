@@ -25,23 +25,23 @@ var (
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ s.Deployment }}
+  name: {{ .Deployment }}
   labels:
-    app: {{ s.Deployment }}
+    app: {{ .Deployment }}
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: {{ s.Deployment }}
+      app: {{ .Deployment }}
   template:
     metadata:
       labels:
-        app: {{ s.Deployment }}
+        app: {{ .Deployment }}
         tier: web
     spec:
       containers:
       - name: {{ s.Deployment }}
-        image: gcr.io/icco-cloud/{{ s.Repo }}:latest
+        image: gcr.io/icco-cloud/{{ .Repo }}:latest
         ports:
         - name: appport
           containerPort: 8080
@@ -55,21 +55,21 @@ spec:
             port: appport
         envFrom:
         - configMapRef:
-            name: {{ s.Deployment }}-env
+            name: {{ .Deployment }}-env
 `))
 	serviceTmpl = template.Must(template.New("service.yaml").Parse(`
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ s.Deployment }}-service
+  name: {{ .Deployment }}-service
   labels:
-    app: {{ s.Deployment }}
+    app: {{ .Deployment }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: NodePort
   selector:
-    app: {{ s.Deployment }}
+    app: {{ .Deployment }}
     tier: web
   ports:
   - port: 8080
