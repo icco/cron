@@ -81,13 +81,9 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 	case "update-deployments":
 		cfg := &updater.Config{
 			Log:           cfg.Log,
-			GithubToken:   githubToken,
 			GoogleProject: GCPProject,
 		}
-		if err := updater.UpdateWorkspaces(ctx, cfg); err != nil {
-			return fmt.Errorf("update workspaces: %w", err)
-		}
-		if err := updater.UpdateTriggers(ctx, cfg); err != nil {
+		if err := cfg.UpdateTriggers(ctx); err != nil {
 			return fmt.Errorf("update triggers: %w", err)
 		}
 	case "spider":
