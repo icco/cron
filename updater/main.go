@@ -1,8 +1,10 @@
 package updater
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"text/template"
 
 	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
 	"github.com/icco/cron/sites"
@@ -17,8 +19,62 @@ type Config struct {
 	GoogleProject string
 }
 
-const (
+var (
 	deployerFormat = "%s-deploy"
+	deployTmpl     = template.Must(template.New("deployment.yaml").Parse(`
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ s.Deployment }}
+  labels:
+    app: {{ s.Deployment }}
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: {{ s.Deployment }}
+  template:
+    metadata:
+      labels:
+        app: {{ s.Deployment }}
+        tier: web
+    spec:
+      containers:
+      - name: {{ s.Deployment }}
+        image: gcr.io/icco-cloud/{{ s.Repo }}:latest
+        ports:
+        - name: appport
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: appport
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: appport
+        envFrom:
+        - configMapRef:
+            name: {{ s.Deployment }}-env
+`))
+	serviceTmpl = template.Must(template.New("service.yaml").Parse(`
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ s.Deployment }}-service
+  labels:
+    app: {{ s.Deployment }}
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: NodePort
+  selector:
+    app: {{ s.Deployment }}
+    tier: web
+  ports:
+  - port: 8080
+    targetPort: 8080
+`))
 )
 
 // UpdateTriggers updates our build triggers on gcp.
@@ -146,51 +202,24 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 	return nil
 }
 
-func deploymentYAML(s sites.SiteMap) string {
-	return fmt.Sprintf(`
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: %s
-  labels:
-    app: %s
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: %s
-  template:
-    metadata:
-      labels:
-        app: %s
-        tier: web
-    spec:
-      containers:
-      - name: %s
-        image: gcr.io/icco-cloud/%s:latest
-        ports:
-        - name: appport
-          containerPort: 8080
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: appport
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: appport
-        envFrom:
-        - configMapRef:
-            name: %s-env
-  `,
-		s.Deployment,
-		s.Deployment,
-		s.Deployment,
-		s.Deployment,
-		s.Deployment,
-		s.Repo,
-		s.Deployment,
-	)
+func (cfg *Config) deployYAML(s sites.SiteMap) string {
+	var tpl bytes.Buffer
+	if err := deployTmpl.Execute(&tpl, s); err != nil {
+		cfg.Log.Errorw("couldn't render deployment.yaml", zap.Error(err))
+		return ""
+	}
+
+	return tpl.String()
+}
+
+func (cfg *Config) serviceYAML(s sites.SiteMap) string {
+	var tpl bytes.Buffer
+	if err := serviceTmpl.Execute(&tpl, s); err != nil {
+		cfg.Log.Errorw("couldn't render service.yaml", zap.Error(err))
+		return ""
+	}
+
+	return tpl.String()
 }
 
 func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client, s sites.SiteMap, existingTriggerID string) error {
@@ -219,7 +248,18 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 							Name: "gcr.io/cloud-builders/curl",
 							Args: []string{
 								"-c",
-								fmt.Sprintf(`set -ex; mkdir -p $_K8S_YAML_PATH; echo %q > $_K8S_YAML_PATH/deployment.yaml; ls -al /workspace; cat $_K8S_YAML_PATH/deployment.yaml`, deploymentYAML(s)),
+								fmt.Sprintf(
+									`
+                  set -ex;
+                  mkdir -p $_K8S_YAML_PATH;
+                  echo %q > $_K8S_YAML_PATH/deployment.yaml;
+                  echo %q > $_K8S_YAML_PATH/service.yaml;
+                  ls -al $_K8S_YAML_PATH
+                  cat $_K8S_YAML_PATH/deployment.yaml
+                  cat $_K8S_YAML_PATH/service.yaml
+                  `,
+									cfg.deployYAML(s),
+									cfg.serviceYAML(s)),
 							},
 							Entrypoint: "sh",
 						},
