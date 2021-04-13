@@ -18,7 +18,7 @@ type Config struct {
 }
 
 const (
-	deployerFormat = "%s-deployer"
+	deployerFormat = "%s-deploy"
 )
 
 // UpdateTriggers updates our build triggers on gcp.
@@ -119,7 +119,7 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 	}
 
 	if existingTriggerID == "" {
-		cfg.Log.Infow("creating trigger", "request", createReq)
+		cfg.Log.Infow("creating build trigger", "request", createReq)
 		if _, err := c.CreateBuildTrigger(ctx, createReq); err != nil {
 			return fmt.Errorf("could not create trigger %+v: %w", createReq, err)
 		}
@@ -133,7 +133,7 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 		Trigger:   createReq.Trigger,
 	}
 
-	cfg.Log.Infow("updating trigger", "request", updateReq)
+	cfg.Log.Infow("updating build trigger", "request", updateReq)
 	if _, err := c.UpdateBuildTrigger(ctx, updateReq); err != nil {
 		return fmt.Errorf("could not update trigger %+v: %w", updateReq, err)
 	}
@@ -297,7 +297,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 	}
 
 	if existingTriggerID == "" {
-		cfg.Log.Infow("creating trigger", "request", createReq)
+		cfg.Log.Infow("creating deploy trigger", "request", createReq)
 		if _, err := c.CreateBuildTrigger(ctx, createReq); err != nil {
 			return fmt.Errorf("could not create trigger %+v: %w", createReq, err)
 		}
@@ -311,7 +311,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 		Trigger:   createReq.Trigger,
 	}
 
-	cfg.Log.Infow("updating trigger", "request", updateReq)
+	cfg.Log.Infow("updating deploy trigger", "request", updateReq)
 	if _, err := c.UpdateBuildTrigger(ctx, updateReq); err != nil {
 		return fmt.Errorf("could not update trigger %+v: %w", updateReq, err)
 	}
