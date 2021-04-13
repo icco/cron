@@ -187,6 +187,7 @@ spec:
 		s.Deployment,
 		s.Deployment,
 		s.Deployment,
+		s.Deployment,
 		s.Repo,
 		s.Deployment,
 	)
