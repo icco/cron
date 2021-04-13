@@ -130,13 +130,6 @@ func main() {
 		log.Fatalw("failed to register ochttp views", zap.Error(err))
 	}
 
-	if err := view.Register([]*view.View{
-		msgRecvView,
-		msgAckView,
-	}...); err != nil {
-		log.Fatalw("failed to register metrics", zap.Error(err))
-	}
-
 	log.Fatal(http.ListenAndServe(":"+port, h))
 }
 
