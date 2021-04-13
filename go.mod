@@ -26,6 +26,7 @@ require (
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/vektah/gqlparser/v2 v2.2.0 // indirect
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
 	go.uber.org/zap v1.16.0
