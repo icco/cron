@@ -4,7 +4,7 @@ go 1.15
 
 require (
 	cloud.google.com/go v0.81.0
-	cloud.google.com/go/pubsub v1.10.0
+	cloud.google.com/go/pubsub v1.10.2
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.5
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
 	github.com/aws/aws-sdk-go v1.38.18 // indirect
