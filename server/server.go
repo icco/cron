@@ -9,40 +9,17 @@ import (
 	"os"
 
 	"cloud.google.com/go/pubsub"
-	"contrib.go.opencensus.io/exporter/stackdriver"
-	"contrib.go.opencensus.io/exporter/stackdriver/monitoredresource"
-	"contrib.go.opencensus.io/exporter/stackdriver/propagation"
 	"github.com/dgraph-io/ristretto"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/icco/cron"
 	"github.com/icco/cron/sites"
 	"github.com/icco/gutil/logging"
-	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/stats"
-	"go.opencensus.io/stats/view"
-	"go.opencensus.io/trace"
 	"go.uber.org/zap"
 )
 
 var (
 	log = logging.Must(logging.NewLogger(cron.Service))
-
-	msgRecv     = stats.Int64("natwelch.com/stats/message/received", "received message from Pub/Sub", stats.UnitDimensionless)
-	msgRecvView = &view.View{
-		Name:        "natwelch.com/views/message/received",
-		Description: "received message from Pub/Sub",
-		Measure:     msgRecv,
-		Aggregation: view.Count(),
-	}
-
-	msgAck     = stats.Int64("natwelch.com/stats/message/acknowledged", "acknowledged message from Pub/Sub", stats.UnitDimensionless)
-	msgAckView = &view.View{
-		Name:        "natwelch.com/views/message/acknowledged",
-		Description: "acknowledged message from Pub/Sub",
-		Measure:     msgRecv,
-		Aggregation: view.Count(),
-	}
 
 	rootTmpl = `
 <html>
@@ -67,31 +44,6 @@ func main() {
 		port = fromEnv
 	}
 	log.Infow("Starting up", "host", fmt.Sprintf("http://localhost:%s", port))
-
-	if os.Getenv("ENABLE_STACKDRIVER") != "" {
-		labels := &stackdriver.Labels{}
-		labels.Set("app", cron.Service, "The name of the current app.")
-		sd, err := stackdriver.NewExporter(stackdriver.Options{
-			ProjectID:               cron.GCPProject,
-			MonitoredResource:       monitoredresource.Autodetect(),
-			DefaultMonitoringLabels: labels,
-			DefaultTraceAttributes:  map[string]interface{}{"app": cron.Service},
-			OnError: func(err error) {
-				log.Errorw("stackdriver error", zap.Error(err))
-			},
-		})
-
-		if err != nil {
-			log.Fatalw("failed to create the stackdriver exporter", zap.Error(err))
-		}
-		defer sd.Flush()
-
-		view.RegisterExporter(sd)
-		trace.RegisterExporter(sd)
-		trace.ApplyConfig(trace.Config{
-			DefaultSampler: trace.AlwaysSample(),
-		})
-	}
 
 	cache, err := ristretto.NewCache(&ristretto.Config{
 		NumCounters: 1e7,     // Num keys to track frequency of (10M).
@@ -136,25 +88,8 @@ func main() {
 			log.Errorw("could not write response", zap.Error(err))
 		}
 	})
-	h := &ochttp.Handler{
-		Handler:     r,
-		Propagation: &propagation.HTTPFormat{},
-	}
-	if err := view.Register([]*view.View{
-		ochttp.ServerRequestCountView,
-		ochttp.ServerResponseCountByStatusCode,
-	}...); err != nil {
-		log.Fatalw("failed to register ochttp views", zap.Error(err))
-	}
 
-	if err := view.Register([]*view.View{
-		msgRecvView,
-		msgAckView,
-	}...); err != nil {
-		log.Fatalw("failed to register metrics", zap.Error(err))
-	}
-
-	log.Fatal(http.ListenAndServe(":"+port, h))
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
 
 func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) error {
@@ -163,16 +98,26 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 		return fmt.Errorf("create pubsub client: %w", err)
 	}
 
-	sub, err := pubsubClient.CreateSubscription(ctx, subName,
-		pubsub.SubscriptionConfig{Topic: pubsubClient.Topic("cron")})
+	sub := pubsubClient.Subscription(subName)
+	ok, err := sub.Exists(ctx)
 	if err != nil {
-		// This is fine, don't do anything.
-		sub = pubsubClient.Subscription(subName)
+		return fmt.Errorf("could not check exist of sub: %w", err)
+	}
+	if !ok {
+		if _, err := pubsubClient.CreateSubscription(ctx, subName, pubsub.SubscriptionConfig{
+			Topic: pubsubClient.Topic("cron"),
+		}); err != nil {
+			return fmt.Errorf("could not create sub: %w", err)
+		}
 	}
 
-	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		//stats.Record(ctx, msgRecv.M(1))
+	scfg, err := sub.Config(ctx)
+	if err != nil {
+		return fmt.Errorf("could not get sub.Config: %w", err)
+	}
+	log.Debugw("got subscription config", "config", scfg, "subscription", subName)
 
+	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
 			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
@@ -184,8 +129,6 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 			log.Errorw("problem running job", "job", data, zap.Error(err))
 		}
 		msg.Ack()
-
-		//stats.Record(ctx, msgAck.M(1))
 	}); err != nil && err != context.Canceled {
 		return fmt.Errorf("recieving messages: %w", err)
 	}

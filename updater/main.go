@@ -1,116 +1,28 @@
 package updater
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
 
 	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
-	"github.com/icco/code.natwelch.com/code"
 	"github.com/icco/cron/sites"
 	"go.uber.org/zap"
 	"google.golang.org/api/iterator"
 	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
-	apiv1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
-	"k8s.io/client-go/util/retry"
-
-	// Add GCP talking for k8s api.
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
 // Config is a config.
 type Config struct {
 	Log           *zap.SugaredLogger
-	GithubToken   string
 	GoogleProject string
 }
 
-// UpdateWorkspaces updates all of our services.
-func UpdateWorkspaces(ctx context.Context, c *Config) error {
-	repoFmt := "gcr.io/%s/%s:%s"
-
-	for _, r := range sites.All {
-		sha, err := c.GetSHA(ctx, r.Owner, r.Repo, r.Branch)
-		if err != nil {
-			if !code.RateLimited(err, c.Log) {
-				return err
-			}
-		}
-
-		if sha == "" {
-			c.Log.Errorw("SHA is empty", "owner", r.Owner, "repo", r.Repo, "branch", r.Branch)
-			break
-		}
-
-		repo := fmt.Sprintf(repoFmt, c.GoogleProject, r.Repo, sha)
-		if err := UpdateKube(ctx, r, repo); err != nil {
-			c.Log.Errorw("update kube", zap.Error(err))
-			return err
-		}
-		c.Log.Debugw("updated deployment", "package", repo, "deployment", r.Deployment)
-	}
-
-	return nil
-}
-
-// UpdateKube calls the k8s update api.
-func UpdateKube(ctx context.Context, r sites.SiteMap, pkg string) error {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return err
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return err
-	}
-
-	deploymentsClient := clientset.AppsV1().Deployments(apiv1.NamespaceDefault)
-
-	retryErr := retry.RetryOnConflict(retry.DefaultRetry, func() error {
-		dep, getErr := deploymentsClient.Get(ctx, r.Deployment, metav1.GetOptions{})
-		if getErr != nil {
-			return (fmt.Errorf("Failed to get latest version of Deployment: %v", getErr))
-		}
-
-		oldPkg := dep.Spec.Template.Spec.Containers[0].Image
-		dep.Spec.Template.Spec.Containers[0].Image = pkg
-		_, updateErr := deploymentsClient.Update(ctx, dep, metav1.UpdateOptions{})
-		if updateErr != nil {
-			return updateErr
-		}
-
-		if oldPkg != pkg {
-			d, err := json.Marshal(map[string]string{
-				"cloud deployment": r.Deployment,
-				"old pkg":          oldPkg,
-				"new pkg":          pkg,
-			})
-			if err != nil {
-				return err
-			}
-			_, err = http.Post("https://relay.natwelch.com/hook", "application/json", bytes.NewBuffer(d))
-			if err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-	if retryErr != nil {
-		return fmt.Errorf("Update failed: %w", retryErr)
-	}
-
-	return nil
-}
+const (
+	deployerFormat = "%s-deployer"
+)
 
 // UpdateTriggers updates our build triggers on gcp.
-func UpdateTriggers(ctx context.Context, conf *Config) error {
+func (cfg *Config) UpdateTriggers(ctx context.Context) error {
 	c, err := cloudbuild.NewClient(ctx)
 	if err != nil {
 		return fmt.Errorf("could not create client: %w", err)
@@ -118,7 +30,7 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 
 	var trigs []*cloudbuildpb.BuildTrigger
 	req := &cloudbuildpb.ListBuildTriggersRequest{
-		ProjectId: conf.GoogleProject,
+		ProjectId: cfg.GoogleProject,
 	}
 	it := c.ListBuildTriggers(ctx, req)
 	for {
@@ -132,42 +44,20 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 		trigs = append(trigs, resp)
 	}
 
-	conf.Log.Debugw("found triggers", "triggers", trigs)
+	cfg.Log.Debugw("found triggers", "triggers", trigs)
 
 	for _, s := range sites.All {
-		exists := false
 		for _, t := range trigs {
 			if t.Name == s.Deployment {
-				exists = true
-				// TODO: If exists, update.
-				break
-			}
-		}
-
-		if !exists {
-			req := &cloudbuildpb.CreateBuildTriggerRequest{
-				ProjectId: conf.GoogleProject,
-				// https://issuetracker.google.com/issues/173534838
-				Trigger: &cloudbuildpb.BuildTrigger{
-					BuildTemplate: &cloudbuildpb.BuildTrigger_Filename{},
-					Name:          s.Deployment,
-					Github: &cloudbuildpb.GitHubEventsConfig{
-						Name: s.Repo,
-						Event: &cloudbuildpb.GitHubEventsConfig_Push{
-							Push: &cloudbuildpb.PushFilter{
-								GitRef: &cloudbuildpb.PushFilter_Branch{
-									Branch: ".*",
-								},
-							},
-						},
-						Owner: s.Owner,
-					},
-				},
+				if err := cfg.upsertBuildTrigger(ctx, c, s, t.Id); err != nil {
+					return err
+				}
 			}
 
-			conf.Log.Infow("creating trigger", "request", req)
-			if _, err := c.CreateBuildTrigger(ctx, req); err != nil {
-				return fmt.Errorf("could not create trigger %+v: %w", req, err)
+			if fmt.Sprintf(deployerFormat, s.Deployment) == t.Name {
+				if err := cfg.upsertDeployTrigger(ctx, c, s, t.Id); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -175,22 +65,256 @@ func UpdateTriggers(ctx context.Context, conf *Config) error {
 	return nil
 }
 
-// GetSHA gets a sha.
-func (c *Config) GetSHA(ctx context.Context, owner, repo, mainBranch string) (string, error) {
-	client := code.GithubClient(ctx, c.GithubToken)
-
-	branch, _, err := client.Repositories.GetBranch(ctx, owner, repo, mainBranch)
-	if err != nil {
-		return "", err
+func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client, s sites.SiteMap, existingTriggerID string) error {
+	createReq := &cloudbuildpb.CreateBuildTriggerRequest{
+		ProjectId: cfg.GoogleProject,
+		Trigger: &cloudbuildpb.BuildTrigger{
+			BuildTemplate: &cloudbuildpb.BuildTrigger_Build{
+				Build: &cloudbuildpb.Build{
+					Substitutions: map[string]string{
+						"_IMAGE_NAME":         fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
+						"_DOCKERFILE_DIR":     "",
+						"_DOCKERFILE_NAME":    "Dockerfile",
+						"_OUTPUT_BUCKET_PATH": fmt.Sprintf("%s_cloudbuild/deploy", cfg.GoogleProject),
+					},
+					Tags: []string{s.Deployment, "build"},
+					Steps: []*cloudbuildpb.BuildStep{
+						{
+							Name: "gcr.io/cloud-builders/docker",
+							Args: []string{
+								"build",
+								"-t",
+								"$_IMAGE_NAME:$COMMIT_SHA",
+								".",
+								"-f",
+								"$_DOCKERFILE_NAME",
+							},
+							Dir: "$_DOCKERFILE_DIR",
+							Id:  "Build",
+						},
+						{
+							Name: "gcr.io/cloud-builders/docker",
+							Args: []string{
+								"push",
+								"$_IMAGE_NAME:$COMMIT_SHA",
+							},
+							Id: "Push",
+						},
+					},
+				},
+			},
+			Name: s.Deployment,
+			Github: &cloudbuildpb.GitHubEventsConfig{
+				Name: s.Repo,
+				Event: &cloudbuildpb.GitHubEventsConfig_Push{
+					Push: &cloudbuildpb.PushFilter{
+						GitRef: &cloudbuildpb.PushFilter_Branch{
+							Branch: ".*",
+						},
+					},
+				},
+				Owner: s.Owner,
+			},
+		},
 	}
 
-	if branch != nil {
-		if branch.Commit != nil {
-			if branch.Commit.SHA != nil {
-				return *branch.Commit.SHA, nil
-			}
+	if existingTriggerID == "" {
+		cfg.Log.Infow("creating trigger", "request", createReq)
+		if _, err := c.CreateBuildTrigger(ctx, createReq); err != nil {
+			return fmt.Errorf("could not create trigger %+v: %w", createReq, err)
 		}
+
+		return nil
 	}
 
-	return "", fmt.Errorf("could not get %s/%s", owner, repo)
+	updateReq := &cloudbuildpb.UpdateBuildTriggerRequest{
+		ProjectId: cfg.GoogleProject,
+		TriggerId: existingTriggerID,
+		Trigger:   createReq.Trigger,
+	}
+
+	cfg.Log.Infow("updating trigger", "request", updateReq)
+	if _, err := c.UpdateBuildTrigger(ctx, updateReq); err != nil {
+		return fmt.Errorf("could not update trigger %+v: %w", updateReq, err)
+	}
+
+	return nil
+}
+
+func deploymentYAML(s sites.SiteMap) string {
+	return fmt.Sprintf(`
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: %s
+  labels:
+    app: %s
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: %s
+  template:
+    metadata:
+      labels:
+        app: %s
+        tier: web
+    spec:
+      containers:
+      - name: %s
+        image: gcr.io/icco-cloud/%s:latest
+        ports:
+        - name: appport
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: appport
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: appport
+        envFrom:
+        - configMapRef:
+            name: %s-env
+  `,
+		s.Deployment,
+		s.Deployment,
+		s.Deployment,
+		s.Deployment,
+		s.Repo,
+		s.Deployment,
+	)
+}
+
+func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client, s sites.SiteMap, existingTriggerID string) error {
+	createReq := &cloudbuildpb.CreateBuildTriggerRequest{
+		ProjectId: cfg.GoogleProject,
+		Trigger: &cloudbuildpb.BuildTrigger{
+			BuildTemplate: &cloudbuildpb.BuildTrigger_Build{
+				Build: &cloudbuildpb.Build{
+					Substitutions: map[string]string{
+						"_K8S_LABELS":         "",
+						"_K8S_ANNOTATIONS":    fmt.Sprintf("gcb-trigger-id=%s", existingTriggerID),
+						"_K8S_YAML_PATH":      "kubernetes/",
+						"_IMAGE_NAME":         fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
+						"_GKE_LOCATION":       "us-central1",
+						"_K8S_APP_NAME":       s.Deployment,
+						"_GKE_CLUSTER":        "autopilot-cluster-1",
+						"_DOCKERFILE_DIR":     "",
+						"_K8S_NAMESPACE":      "default",
+						"_DOCKERFILE_NAME":    "Dockerfile",
+						"_OUTPUT_BUCKET_PATH": fmt.Sprintf("%s_cloudbuild/deploy", cfg.GoogleProject),
+					},
+					Tags: []string{"$_K8S_APP_NAME", "deploy"},
+					Steps: []*cloudbuildpb.BuildStep{
+						{
+							Id:   "Write k8s",
+							Name: "gcr.io/cloud-builders/gsutil",
+							Args: []string{
+								"-c",
+								fmt.Sprintf(`set -e;mkdir -p $_K8s_YAML_PATH; cd $_K8S_YAML_PATH; echo %q > deployment.yaml`, deploymentYAML(s)),
+							},
+							Entrypoint: "sh",
+						},
+						{
+							Name: "gcr.io/cloud-builders/docker",
+							Args: []string{
+								"build",
+								"-t",
+								"$_IMAGE_NAME:$COMMIT_SHA",
+								".",
+								"-f",
+								"$_DOCKERFILE_NAME",
+							},
+							Dir: "$_DOCKERFILE_DIR",
+							Id:  "Build",
+						},
+						{
+							Name: "gcr.io/cloud-builders/docker",
+							Args: []string{
+								"push",
+								"$_IMAGE_NAME:$COMMIT_SHA",
+							},
+							Id: "Push",
+						},
+						{
+							Name: "gcr.io/cloud-builders/gke-deploy",
+							Args: []string{
+								"prepare",
+								"--filename=$_K8S_YAML_PATH",
+								"--image=$_IMAGE_NAME:$COMMIT_SHA",
+								"--app=$_K8S_APP_NAME",
+								"--version=$COMMIT_SHA",
+								"--namespace=$_K8S_NAMESPACE",
+								"--label=$_K8S_LABELS",
+								"--annotation=$_K8S_ANNOTATIONS,gcb-build-id=$BUILD_ID",
+								"--create-application-cr",
+								`--links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"`,
+								"--output=output",
+							},
+							Id: "Prepare deploy",
+						},
+						{
+							Name: "gcr.io/cloud-builders/gsutil",
+							Args: []string{
+								"-c",
+								`if [ "$_OUTPUT_BUCKET_PATH" != "" ]; then
+                  gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$_K8S_APP_NAME/$BUILD_ID/suggested
+                  gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$_K8S_APP_NAME/$BUILD_ID/expanded
+                fi`,
+							},
+							Id:         "Save configs",
+							Entrypoint: "sh",
+						},
+						{
+							Name: "gcr.io/cloud-builders/gke-deploy",
+							Args: []string{
+								"apply",
+								"--filename=output/expanded",
+								"--cluster=$_GKE_CLUSTER",
+								"--location=$_GKE_LOCATION",
+								"--namespace=$_K8S_NAMESPACE",
+							},
+							Id: "Apply deploy",
+						},
+					},
+				},
+			},
+			Name: fmt.Sprintf(deployerFormat, s.Deployment),
+			Github: &cloudbuildpb.GitHubEventsConfig{
+				Name: s.Repo,
+				Event: &cloudbuildpb.GitHubEventsConfig_Push{
+					Push: &cloudbuildpb.PushFilter{
+						GitRef: &cloudbuildpb.PushFilter_Branch{
+							Branch: fmt.Sprintf("^%s$", s.Branch),
+						},
+					},
+				},
+				Owner: s.Owner,
+			},
+		},
+	}
+
+	if existingTriggerID == "" {
+		cfg.Log.Infow("creating trigger", "request", createReq)
+		if _, err := c.CreateBuildTrigger(ctx, createReq); err != nil {
+			return fmt.Errorf("could not create trigger %+v: %w", createReq, err)
+		}
+
+		return nil
+	}
+
+	updateReq := &cloudbuildpb.UpdateBuildTriggerRequest{
+		ProjectId: cfg.GoogleProject,
+		TriggerId: existingTriggerID,
+		Trigger:   createReq.Trigger,
+	}
+
+	cfg.Log.Infow("updating trigger", "request", updateReq)
+	if _, err := c.UpdateBuildTrigger(ctx, updateReq); err != nil {
+		return fmt.Errorf("could not update trigger %+v: %w", updateReq, err)
+	}
+
+	return nil
 }
