@@ -108,6 +108,52 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 	return nil
 }
 
+func deploymentYAML(s sites.SiteMap) string {
+	return fmt.Sprintf(`
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: %s
+  labels:
+    app: %s
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: %s
+  template:
+    metadata:
+      labels:
+        app: %s
+        tier: web
+    spec:
+      containers:
+      - name: %s
+        image: gcr.io/icco-cloud/%s:latest
+        ports:
+        - name: appport
+          containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: appport
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: appport
+        envFrom:
+        - configMapRef:
+            name: %s-env
+  `,
+		s.Deployment,
+		s.Deployment,
+		s.Deployment,
+		s.Deployment,
+		s.Repo,
+		s.Deployment,
+	)
+}
+
 func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client, s sites.SiteMap, existingTriggerID string) error {
 	createReq := &cloudbuildpb.CreateBuildTriggerRequest{
 		ProjectId: cfg.GoogleProject,
@@ -127,7 +173,17 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 						"_DOCKERFILE_NAME":    "Dockerfile",
 						"_OUTPUT_BUCKET_PATH": fmt.Sprintf("%s_cloudbuild/deploy", cfg.GoogleProject),
 					},
+					Tags: []string{"$_K8S_APP_NAME", "deploy"},
 					Steps: []*cloudbuildpb.BuildStep{
+						{
+							Id:   "Write k8s",
+							Name: "gcr.io/cloud-builders/gsutil",
+							Args: []string{
+								"-c",
+								fmt.Sprintf(`set -e;mkdir -p $_K8s_YAML_PATH; cd $_K8S_YAML_PATH; echo %q > deployment.yaml`, deploymentYAML(s)),
+							},
+							Entrypoint: "sh",
+						},
 						{
 							Name: "gcr.io/cloud-builders/docker",
 							Args: []string{
