@@ -219,7 +219,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 							Name: "gcr.io/cloud-builders/curl",
 							Args: []string{
 								"-c",
-								fmt.Sprintf(`set -e; mkdir -p $_K8S_YAML_PATH; echo %q > $_K8S_YAML_PATH/deployment.yaml; ls -al /workspace;`, deploymentYAML(s)),
+								fmt.Sprintf(`set -ex; mkdir -p $_K8S_YAML_PATH; echo %q > $_K8S_YAML_PATH/deployment.yaml; ls -al /workspace; cat $_K8S_YAML_PATH/deployment.yaml`, deploymentYAML(s)),
 							},
 							Entrypoint: "sh",
 						},
