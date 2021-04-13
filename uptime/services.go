@@ -45,7 +45,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			DisplayName: s.Deployment,
 			Identifier:  &monitoringpb.Service_Custom_{},
 			Telemetry: &monitoringpb.Service_Telemetry{
-				ResourceName: fmt.Sprintf("//container.googleapis.com/projects/%s/locations/us-central1/clusters/nat-cluster-2/k8s/namespaces/default/services/%s-service", c.ProjectID, s.Deployment),
+				ResourceName: fmt.Sprintf("//container.googleapis.com/projects/%s/locations/us-central1/clusters/autopilot-cluster-1/k8s/namespaces/default/services/%s-service", c.ProjectID, s.Deployment),
 			},
 		}
 
