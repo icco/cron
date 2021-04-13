@@ -146,12 +146,6 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 		sub = pubsubClient.Subscription(subName)
 	}
 
-	scfg, err := sub.Config(ctx)
-	if err != nil {
-		return fmt.Errorf("could not get sub.Config: %w", err)
-	}
-	log.Debugw("got subscription config", "config", scfg, "subscription", subName)
-
 	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
