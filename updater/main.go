@@ -69,8 +69,41 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 	createReq := &cloudbuildpb.CreateBuildTriggerRequest{
 		ProjectId: cfg.GoogleProject,
 		Trigger: &cloudbuildpb.BuildTrigger{
-			BuildTemplate: &cloudbuildpb.BuildTrigger_Filename{},
-			Name:          s.Deployment,
+			BuildTemplate: &cloudbuildpb.BuildTrigger_Build{
+				Build: &cloudbuildpb.Build{
+					Substitutions: map[string]string{
+						"_IMAGE_NAME":         fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
+						"_DOCKERFILE_DIR":     "",
+						"_DOCKERFILE_NAME":    "Dockerfile",
+						"_OUTPUT_BUCKET_PATH": fmt.Sprintf("%s_cloudbuild/deploy", cfg.GoogleProject),
+					},
+					Tags: []string{s.Deployment, "build"},
+					Steps: []*cloudbuildpb.BuildStep{
+						{
+							Name: "gcr.io/cloud-builders/docker",
+							Args: []string{
+								"build",
+								"-t",
+								"$_IMAGE_NAME:$COMMIT_SHA",
+								".",
+								"-f",
+								"$_DOCKERFILE_NAME",
+							},
+							Dir: "$_DOCKERFILE_DIR",
+							Id:  "Build",
+						},
+						{
+							Name: "gcr.io/cloud-builders/docker",
+							Args: []string{
+								"push",
+								"$_IMAGE_NAME:$COMMIT_SHA",
+							},
+							Id: "Push",
+						},
+					},
+				},
+			},
+			Name: s.Deployment,
 			Github: &cloudbuildpb.GitHubEventsConfig{
 				Name: s.Repo,
 				Event: &cloudbuildpb.GitHubEventsConfig_Push{
