@@ -139,11 +139,17 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 		return fmt.Errorf("create pubsub client: %w", err)
 	}
 
-	sub, err := pubsubClient.CreateSubscription(ctx, subName,
-		pubsub.SubscriptionConfig{Topic: pubsubClient.Topic("cron")})
+	sub := pubsubClient.Subscription(subName)
+	ok, err := sub.Exists(ctx)
 	if err != nil {
-		// This is fine, don't do anything.
-		sub = pubsubClient.Subscription(subName)
+		return fmt.Errorf("could not check exist of sub: %w", err)
+	}
+	if !ok {
+		if _, err := pubsubClient.CreateSubscription(ctx, subName, pubsub.SubscriptionConfig{
+			Topic: pubsubClient.Topic("cron"),
+		}); err != nil {
+			return fmt.Errorf("could not create sub: %w", err)
+		}
 	}
 
 	scfg, err := sub.Config(ctx)
