@@ -201,7 +201,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 					Substitutions: map[string]string{
 						"_K8S_LABELS":         "",
 						"_K8S_ANNOTATIONS":    fmt.Sprintf("gcb-trigger-id=%s", existingTriggerID),
-						"_K8S_YAML_PATH":      "kubernetes/",
+						"_K8S_YAML_PATH":      "/workspace/kubernetes",
 						"_IMAGE_NAME":         fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
 						"_GKE_LOCATION":       "us-central1",
 						"_K8S_APP_NAME":       s.Deployment,
@@ -215,10 +215,10 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 					Steps: []*cloudbuildpb.BuildStep{
 						{
 							Id:   "Write k8s",
-							Name: "gcr.io/cloud-builders/gsutil",
+							Name: "gcr.io/cloud-builders/curl",
 							Args: []string{
 								"-c",
-								fmt.Sprintf(`set -e;mkdir -p $_K8s_YAML_PATH; cd $_K8S_YAML_PATH; echo %q > deployment.yaml`, deploymentYAML(s)),
+								fmt.Sprintf(`set -e; mkdir -p $_K8S_YAML_PATH; echo %q > $_K8S_YAML_PATH/deployment.yaml; ls -al /workspace;`, deploymentYAML(s)),
 							},
 							Entrypoint: "sh",
 						},
