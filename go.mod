@@ -15,7 +15,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b
 	github.com/icco/graphql v0.0.0-20210412134826-53c96ce30a14
-	github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470
+	github.com/icco/gutil v0.0.0-20210413234538-3617c9b534ad
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.8 // indirect
@@ -30,9 +30,9 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/oauth2 v0.0.0-20210413134643-5e61552d6c78 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210412220455-f1c623a9e750 // indirect
+	golang.org/x/sys v0.0.0-20210414055047-fe65e336abe0 // indirect
 	google.golang.org/api v0.44.0
-	google.golang.org/genproto v0.0.0-20210406143921-e86de6bf7a46
+	google.golang.org/genproto v0.0.0-20210414175830-92282443c685
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
