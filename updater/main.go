@@ -286,6 +286,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
                   set -ex;
                   mkdir -p $_K8S_YAML_PATH;
                   echo %q > $_K8S_YAML_PATH/deployment.yaml;
+                  echo %q > $_K8S_YAML_PATH/hpa.yaml;
                   echo %q > $_K8S_YAML_PATH/service.yaml;
                   ls -al $_K8S_YAML_PATH
                   cat $_K8S_YAML_PATH/deployment.yaml
