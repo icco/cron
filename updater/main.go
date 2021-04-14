@@ -40,7 +40,7 @@ spec:
         tier: web
     spec:
       containers:
-      - name: {{ s.Deployment }}
+      - name: {{ .Deployment }}
         image: gcr.io/icco-cloud/{{ .Repo }}:latest
         ports:
         - name: appport
