@@ -5,12 +5,14 @@ import (
 	"context"
 	"fmt"
 	"text/template"
+	"time"
 
 	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
 	"github.com/icco/cron/sites"
 	"go.uber.org/zap"
 	"google.golang.org/api/iterator"
 	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 var (
@@ -149,6 +151,7 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 		Trigger: &cloudbuildpb.BuildTrigger{
 			BuildTemplate: &cloudbuildpb.BuildTrigger_Build{
 				Build: &cloudbuildpb.Build{
+					Timeout: durationpb.New(time.Minute * 20),
 					Substitutions: map[string]string{
 						"_IMAGE_NAME":         fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
 						"_DOCKERFILE_DIR":     "",
@@ -256,6 +259,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 		Trigger: &cloudbuildpb.BuildTrigger{
 			BuildTemplate: &cloudbuildpb.BuildTrigger_Build{
 				Build: &cloudbuildpb.Build{
+					Timeout: durationpb.New(time.Minute * 20),
 					Substitutions: map[string]string{
 						"_K8S_LABELS":         "",
 						"_K8S_ANNOTATIONS":    fmt.Sprintf("gcb-trigger-id=%s", existingTriggerID),

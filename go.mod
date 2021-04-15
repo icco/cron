@@ -14,7 +14,7 @@ require (
 	github.com/go-playground/validator/v10 v10.5.0 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b
-	github.com/icco/graphql v0.0.0-20210412134826-53c96ce30a14
+	github.com/icco/graphql v0.0.0-20210415134734-48f8c62c4462
 	github.com/icco/gutil v0.0.0-20210413234538-3617c9b534ad
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
@@ -24,16 +24,13 @@ require (
 	github.com/matryer/is v1.4.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1
-	github.com/vektah/gqlparser/v2 v2.2.0 // indirect
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
 	go.uber.org/zap v1.16.0
-	golang.org/x/net v0.0.0-20210414194228-064579744ee0 // indirect
-	golang.org/x/oauth2 v0.0.0-20210413134643-5e61552d6c78 // indirect
+	golang.org/x/crypto v0.0.0-20210415154028-4f45737414dc // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210415045647-66c3f260301c // indirect
 	google.golang.org/api v0.44.0
-	google.golang.org/genproto v0.0.0-20210414175830-92282443c685
+	google.golang.org/genproto v0.0.0-20210415145412-64678f1ae2d5
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
