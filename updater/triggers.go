@@ -187,8 +187,9 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 				Event: &cloudbuildpb.GitHubEventsConfig_Push{
 					Push: &cloudbuildpb.PushFilter{
 						GitRef: &cloudbuildpb.PushFilter_Branch{
-							Branch: ".*",
+							Branch: fmt.Sprintf("^%s$", s.Branch),
 						},
+						InvertRegex: true,
 					},
 				},
 				Owner: s.Owner,
