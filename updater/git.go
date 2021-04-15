@@ -30,9 +30,16 @@ func (cfg *Config) Update(ctx context.Context, site sites.SiteMap) error {
 	op, err := c.RunBuildTrigger(ctx, &cloudbuildpb.RunBuildTriggerRequest{
 		ProjectId: cfg.GoogleProject,
 		TriggerId: trig.Id,
+		Source: &cloudbuildpb.RepoSource{
+			ProjectId: cfg.GoogleProject,
+			RepoName:  site.Repo,
+			Revision: &cloudbuildpb.RepoSource_BranchName{
+				BranchName: site.Branch,
+			},
+		},
 	})
 	if err != nil {
-		return fmt.Errorf("run build trigger: %w", err)
+		return fmt.Errorf("run build trigger %q: %w", name, err)
 	}
 
 	if _, err := op.Wait(ctx); err != nil {
