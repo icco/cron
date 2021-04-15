@@ -27,6 +27,7 @@ func (cfg *Config) Update(ctx context.Context, site sites.SiteMap) error {
 		return fmt.Errorf("get build trigger %q: %w", name, err)
 	}
 
+	cfg.Log.Debugw("running build trigger", "tigger", trig, "site", site)
 	op, err := c.RunBuildTrigger(ctx, &cloudbuildpb.RunBuildTriggerRequest{
 		ProjectId: cfg.GoogleProject,
 		TriggerId: trig.Id,

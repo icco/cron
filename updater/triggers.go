@@ -212,7 +212,7 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 		Trigger:   createReq.Trigger,
 	}
 
-	cfg.Log.Infow("updating build trigger", "request", updateReq, "site", s)
+	cfg.Log.Debugw("updating build trigger", "request", updateReq, "site", s)
 	if _, err := c.UpdateBuildTrigger(ctx, updateReq); err != nil {
 		return fmt.Errorf("could not update trigger %+v: %w", updateReq, err)
 	}
