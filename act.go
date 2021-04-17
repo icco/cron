@@ -87,9 +87,9 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 			return fmt.Errorf("update triggers: %w", err)
 		}
 
-		if err := cfg.UpdateRandomSite(ctx); err != nil {
-			return fmt.Errorf("update random site: %w", err)
-		}
+		//if err := cfg.UpdateRandomSite(ctx); err != nil {
+		//	return fmt.Errorf("update random site: %w", err)
+		//}
 	case "spider":
 		spider.Crawl(ctx, &spider.Config{
 			Log: cfg.Log,
