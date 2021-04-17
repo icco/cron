@@ -205,7 +205,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "validator",
 		Deployment: "validator",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "walls.natwelch.com",
