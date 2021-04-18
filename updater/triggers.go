@@ -80,7 +80,8 @@ metadata:
   name: {{ .Deployment }}-hpa
   namespace: default
 spec:
-  maxReplicas: 5
+  minReplicas: 2
+  maxReplicas: 7
   metrics:
   - resource:
       name: cpu
@@ -88,7 +89,6 @@ spec:
         averageUtilization: 80
         type: Utilization
     type: Resource
-  minReplicas: 1
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
