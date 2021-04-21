@@ -80,7 +80,7 @@ metadata:
   name: {{ .Deployment }}-hpa
   namespace: default
 spec:
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 7
   metrics:
   - resource:
