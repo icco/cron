@@ -71,28 +71,34 @@ spec:
   - port: 8080
     targetPort: 8080
 `))
-	hpaTmpl = template.Must(template.New("hpa.yaml").Parse(`
-apiVersion: autoscaling/v2beta2
-kind: HorizontalPodAutoscaler
+	mdpaTmpl = template.Must(template.New("mdpa.yaml").Parse(`
+apiVersion: autoscaling.gke.io/v1beta1
+kind: MultidimPodAutoscaler
 metadata:
   labels:
     app: {{ .Deployment }}
-  name: {{ .Deployment }}-hpa
   namespace: default
+  name: {{ .Deployment }}-autoscaler
 spec:
-  minReplicas: 1
-  maxReplicas: 7
-  metrics:
-  - resource:
-      name: cpu
-      target:
-        averageUtilization: 80
-        type: Utilization
-    type: Resource
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ .Deployment }}
+  goals:
+    metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+  constraints:
+    containerControlledResources: [ memory ]
+    global:
+      minReplicas: 1
+      maxReplicas: 5
+  policy:
+    updateMode: Auto
 `))
 )
 
@@ -233,10 +239,10 @@ func (cfg *Config) deployYAML(s sites.SiteMap) string {
 	return tpl.String()
 }
 
-func (cfg *Config) hpaYAML(s sites.SiteMap) string {
+func (cfg *Config) mdpaYAML(s sites.SiteMap) string {
 	var tpl bytes.Buffer
-	if err := hpaTmpl.Execute(&tpl, s); err != nil {
-		cfg.Log.Errorw("couldn't render hpa.yaml", zap.Error(err))
+	if err := mdpaTmpl.Execute(&tpl, s); err != nil {
+		cfg.Log.Errorw("couldn't render mdpa.yaml", zap.Error(err))
 		return ""
 	}
 
@@ -285,15 +291,15 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
                   set -ex;
                   mkdir -p $_K8S_YAML_PATH;
                   echo %q > $_K8S_YAML_PATH/deployment.yaml;
-                  echo %q > $_K8S_YAML_PATH/hpa.yaml;
+                  echo %q > $_K8S_YAML_PATH/mdpa.yaml;
                   echo %q > $_K8S_YAML_PATH/service.yaml;
                   ls -al $_K8S_YAML_PATH
                   cat $_K8S_YAML_PATH/deployment.yaml
-                  cat $_K8S_YAML_PATH/hpa.yaml
+                  cat $_K8S_YAML_PATH/mdpa.yaml
                   cat $_K8S_YAML_PATH/service.yaml
                   `,
 									cfg.deployYAML(s),
-									cfg.hpaYAML(s),
+									cfg.mdpaYAML(s),
 									cfg.serviceYAML(s)),
 							},
 							Entrypoint: "sh",
