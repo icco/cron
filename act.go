@@ -158,15 +158,6 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		if err := c.UpdateOften(ctx); err != nil {
 			return err
 		}
-	case "stats-hourly":
-		c := &stats.Config{
-			Log:          cfg.Log,
-			GraphQLToken: gqlToken,
-		}
-
-		if err := c.UpdateRarely(ctx); err != nil {
-			return err
-		}
 	case "code":
 		c := &code.Config{
 			Log:         cfg.Log,
