@@ -29,6 +29,7 @@ type KeyFunc func(context.Context, *Config) (float64, error)
 var funcMap = map[string]KeyFunc{
 	"ETH":                    GetETHPrice,
 	"BTC":                    GetBTCPrice,
+	"XCH":                    GetChiaPrice,
 	"Aircraft Overhead":      GetAirplanes,
 	"Beacon Temperature":     GetCurrentWeather("Beacon, NY, US"),
 	"Chester Temperature":    GetCurrentWeather("Chester, CA, US"),

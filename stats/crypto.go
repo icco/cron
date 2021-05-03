@@ -17,6 +17,11 @@ type coinbaseResponse struct {
 	} `json:"data"`
 }
 
+// GetChiaPrice gets the price of XCH in USD.
+func GetETHPrice(ctx context.Context, cfg *Config) (float64, error) {
+	return GetCryptoPrice(ctx, "XCH")
+}
+
 // GetETHPrice gets the price of eth in USD.
 func GetETHPrice(ctx context.Context, cfg *Config) (float64, error) {
 	return GetCryptoPrice(ctx, "ETH")
