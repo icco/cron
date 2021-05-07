@@ -76,9 +76,7 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 				Build: &cloudbuildpb.Build{
 					Timeout: durationpb.New(time.Minute * 20),
 					Substitutions: map[string]string{
-						"_IMAGE_NAME":      fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
-						"_DOCKERFILE_DIR":  "",
-						"_DOCKERFILE_NAME": "Dockerfile",
+						"_IMAGE_NAME": fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
 					},
 					Tags: []string{s.Deployment, "build"},
 					Steps: []*cloudbuildpb.BuildStep{
@@ -90,10 +88,9 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 								"$_IMAGE_NAME:$COMMIT_SHA",
 								".",
 								"-f",
-								"$_DOCKERFILE_NAME",
+								"Dockerfile",
 							},
-							Dir: "$_DOCKERFILE_DIR",
-							Id:  "Build",
+							Id: "Build",
 						},
 						{
 							Name: "gcr.io/cloud-builders/docker",
@@ -166,6 +163,8 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 								"build",
 								"-t",
 								"$_IMAGE_NAME:$COMMIT_SHA",
+								"-t",
+								"$_IMAGE_NAME:latest",
 								".",
 								"-f",
 								"Dockerfile",
@@ -181,6 +180,14 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 							Id: "Push",
 						},
 						{
+							Name: "gcr.io/cloud-builders/docker",
+							Args: []string{
+								"push",
+								"$_IMAGE_NAME:latest",
+							},
+							Id: "Push",
+						},
+						{
 							Name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
 							Args: []string{
 								"run",
@@ -188,7 +195,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 								"update",
 								"$_SERVICE_NAME",
 								"--platform=$_PLATFORM",
-								"--image=$_IMAGE_NAME",
+								"--image=$_IMAGE_NAME:$COMMIT_SHA",
 								"--labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID",
 								"--region=$_DEPLOY_REGION",
 							},
