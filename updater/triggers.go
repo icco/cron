@@ -141,6 +141,10 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 }
 
 func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client, s sites.SiteMap, existingTriggerID string) error {
+	idStr := "$TRIGGER_NAME"
+	if existingTriggerID != "" {
+		idStr = existingTriggerID
+	}
 	createReq := &cloudbuildpb.CreateBuildTriggerRequest{
 		ProjectId: cfg.GoogleProject,
 		Trigger: &cloudbuildpb.BuildTrigger{
@@ -152,6 +156,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 						"_IMAGE_NAME":    fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
 						"_DEPLOY_REGION": "us-central1",
 						"_SERVICE_NAME":  s.Deployment,
+						"_TRIGGER_ID":    idStr,
 					},
 					Tags: []string{"$_SERVICE_NAME", "deploy"},
 					Images: []string{
@@ -198,7 +203,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 								"$_SERVICE_NAME",
 								"--platform=$_PLATFORM",
 								"--image=$_IMAGE_NAME:$COMMIT_SHA",
-								"--labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$TRIGGER_NAME",
+								"--labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$_TRIGGER_ID",
 								"--region=$_DEPLOY_REGION",
 								"--quiet",
 							},
