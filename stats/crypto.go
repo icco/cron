@@ -11,9 +11,8 @@ import (
 
 type coinbaseResponse struct {
 	Data struct {
-		Base     string `json:"base"`
-		Currency string `json:"currency"`
-		Amount   string `json:"amount"`
+		Currency string            `json:"currency"`
+		Rates    map[string]string `json:"rates"`
 	} `json:"data"`
 }
 
@@ -34,7 +33,7 @@ func GetBTCPrice(ctx context.Context, cfg *Config) (float64, error) {
 
 // GetCryptoPrice gets a crypto in USD from coinbase.
 func GetCryptoPrice(ctx context.Context, crypto string) (float64, error) {
-	url := fmt.Sprintf("https://api.coinbase.com/v2/prices/%s-USD/buy", crypto)
+	url := fmt.Sprintf("https://api.coinbase.com/v2/exchange-rates?currency=%s", crypto)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return 0.0, fmt.Errorf("build request: %w", err)
@@ -56,5 +55,5 @@ func GetCryptoPrice(ctx context.Context, crypto string) (float64, error) {
 		return 0.0, fmt.Errorf("parse: %w", err)
 	}
 
-	return strconv.ParseFloat(s.Data.Amount, 64)
+	return strconv.ParseFloat(s.Data.Rates["USD"], 64)
 }
