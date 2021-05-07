@@ -54,13 +54,6 @@ var All = []SiteMap{
 		Branch:     "main",
 	},
 	{
-		Host:       "goals.natwelch.com",
-		Owner:      "icco",
-		Repo:       "goals",
-		Deployment: "goals",
-		Branch:     "master",
-	},
-	{
 		Host:       "interview.natwelch.com",
 		Owner:      "icco",
 		Repo:       "interview",
