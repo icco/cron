@@ -113,6 +113,7 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 				},
 				Owner: s.Owner,
 			},
+			Tags: []string{"build"},
 		},
 	}
 
@@ -153,6 +154,10 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 						"_SERVICE_NAME":  s.Deployment,
 					},
 					Tags: []string{"$_SERVICE_NAME", "deploy"},
+					Images: []string{
+						"$_IMAGE_NAME:latest",
+						"$_IMAGE_NAME:$COMMIT_SHA",
+					},
 					Steps: []*cloudbuildpb.BuildStep{
 						{
 							Name: "gcr.io/cloud-builders/docker",
@@ -193,8 +198,9 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 								"$_SERVICE_NAME",
 								"--platform=$_PLATFORM",
 								"--image=$_IMAGE_NAME:$COMMIT_SHA",
-								"--labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID",
+								"--labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID,gcb-trigger-id=$TRIGGER_NAME",
 								"--region=$_DEPLOY_REGION",
+								"--quiet",
 							},
 							Id:         "Deploy",
 							Entrypoint: "gcloud",
@@ -214,6 +220,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 				},
 				Owner: s.Owner,
 			},
+			Tags: []string{"deploy"},
 		},
 	}
 
