@@ -17,89 +17,6 @@ import (
 
 var (
 	deployerFormat = "%s-deploy"
-	deployTmpl     = template.Must(template.New("deployment.yaml").Parse(`
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: {{ .Deployment }}
-  labels:
-    app: {{ .Deployment }}
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: {{ .Deployment }}
-  template:
-    metadata:
-      labels:
-        app: {{ .Deployment }}
-        tier: web
-    spec:
-      containers:
-      - name: {{ .Deployment }}
-        image: gcr.io/icco-cloud/{{ .Repo }}:latest
-        ports:
-        - name: appport
-          containerPort: 8080
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: appport
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: appport
-        envFrom:
-        - configMapRef:
-            name: {{ .Deployment }}-env
-`))
-	serviceTmpl = template.Must(template.New("service.yaml").Parse(`
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Deployment }}-service
-  labels:
-    app: {{ .Deployment }}
-  annotations:
-    cloud.google.com/neg: '{"ingress": true}'
-spec:
-  type: NodePort
-  selector:
-    app: {{ .Deployment }}
-    tier: web
-  ports:
-  - port: 8080
-    targetPort: 8080
-`))
-	mdpaTmpl = template.Must(template.New("mdpa.yaml").Parse(`
-apiVersion: autoscaling.gke.io/v1beta1
-kind: MultidimPodAutoscaler
-metadata:
-  labels:
-    app: {{ .Deployment }}
-  namespace: default
-  name: {{ .Deployment }}-autoscaler
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: {{ .Deployment }}
-  goals:
-    metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 70
-  constraints:
-    containerControlledResources: [ memory ]
-    global:
-      minReplicas: 1
-      maxReplicas: 5
-  policy:
-    updateMode: Auto
-`))
 )
 
 // UpdateTriggers updates our build triggers on gcp.
@@ -159,10 +76,9 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 				Build: &cloudbuildpb.Build{
 					Timeout: durationpb.New(time.Minute * 20),
 					Substitutions: map[string]string{
-						"_IMAGE_NAME":         fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
-						"_DOCKERFILE_DIR":     "",
-						"_DOCKERFILE_NAME":    "Dockerfile",
-						"_OUTPUT_BUCKET_PATH": fmt.Sprintf("%s_cloudbuild/deploy", cfg.GoogleProject),
+						"_IMAGE_NAME":      fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
+						"_DOCKERFILE_DIR":  "",
+						"_DOCKERFILE_NAME": "Dockerfile",
 					},
 					Tags: []string{s.Deployment, "build"},
 					Steps: []*cloudbuildpb.BuildStep{
@@ -229,36 +145,6 @@ func (cfg *Config) upsertBuildTrigger(ctx context.Context, c *cloudbuild.Client,
 	return nil
 }
 
-func (cfg *Config) deployYAML(s sites.SiteMap) string {
-	var tpl bytes.Buffer
-	if err := deployTmpl.Execute(&tpl, s); err != nil {
-		cfg.Log.Errorw("couldn't render deployment.yaml", zap.Error(err))
-		return ""
-	}
-
-	return tpl.String()
-}
-
-func (cfg *Config) mdpaYAML(s sites.SiteMap) string {
-	var tpl bytes.Buffer
-	if err := mdpaTmpl.Execute(&tpl, s); err != nil {
-		cfg.Log.Errorw("couldn't render mdpa.yaml", zap.Error(err))
-		return ""
-	}
-
-	return tpl.String()
-}
-
-func (cfg *Config) serviceYAML(s sites.SiteMap) string {
-	var tpl bytes.Buffer
-	if err := serviceTmpl.Execute(&tpl, s); err != nil {
-		cfg.Log.Errorw("couldn't render service.yaml", zap.Error(err))
-		return ""
-	}
-
-	return tpl.String()
-}
-
 func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client, s sites.SiteMap, existingTriggerID string) error {
 	createReq := &cloudbuildpb.CreateBuildTriggerRequest{
 		ProjectId: cfg.GoogleProject,
@@ -267,43 +153,13 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 				Build: &cloudbuildpb.Build{
 					Timeout: durationpb.New(time.Minute * 20),
 					Substitutions: map[string]string{
-						"_K8S_LABELS":         "",
-						"_K8S_ANNOTATIONS":    fmt.Sprintf("gcb-trigger-id=%s", existingTriggerID),
-						"_K8S_YAML_PATH":      "/workspace/kubernetes",
-						"_IMAGE_NAME":         fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
-						"_GKE_LOCATION":       "us-central1",
-						"_K8S_APP_NAME":       s.Deployment,
-						"_GKE_CLUSTER":        "autopilot-cluster-1",
-						"_DOCKERFILE_DIR":     "",
-						"_K8S_NAMESPACE":      "default",
-						"_DOCKERFILE_NAME":    "Dockerfile",
-						"_OUTPUT_BUCKET_PATH": fmt.Sprintf("%s_cloudbuild/deploy", cfg.GoogleProject),
+						"_PLATFORM":      "managed",
+						"_IMAGE_NAME":    fmt.Sprintf("gcr.io/icco-cloud/%s", s.Repo),
+						"_DEPLOY_REGION": "us-central1",
+						"_SERVICE_NAME":  s.Deployment,
 					},
-					Tags: []string{"$_K8S_APP_NAME", "deploy"},
+					Tags: []string{"$_SERVICE_NAME", "deploy"},
 					Steps: []*cloudbuildpb.BuildStep{
-						{
-							Id:   "Write k8s",
-							Name: "gcr.io/cloud-builders/curl",
-							Args: []string{
-								"-c",
-								fmt.Sprintf(
-									`
-                  set -ex;
-                  mkdir -p $_K8S_YAML_PATH;
-                  echo %q > $_K8S_YAML_PATH/deployment.yaml;
-                  echo %q > $_K8S_YAML_PATH/mdpa.yaml;
-                  echo %q > $_K8S_YAML_PATH/service.yaml;
-                  ls -al $_K8S_YAML_PATH
-                  cat $_K8S_YAML_PATH/deployment.yaml
-                  cat $_K8S_YAML_PATH/mdpa.yaml
-                  cat $_K8S_YAML_PATH/service.yaml
-                  `,
-									cfg.deployYAML(s),
-									cfg.mdpaYAML(s),
-									cfg.serviceYAML(s)),
-							},
-							Entrypoint: "sh",
-						},
 						{
 							Name: "gcr.io/cloud-builders/docker",
 							Args: []string{
@@ -312,10 +168,9 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 								"$_IMAGE_NAME:$COMMIT_SHA",
 								".",
 								"-f",
-								"$_DOCKERFILE_NAME",
+								"Dockerfile",
 							},
-							Dir: "$_DOCKERFILE_DIR",
-							Id:  "Build",
+							Id: "Build",
 						},
 						{
 							Name: "gcr.io/cloud-builders/docker",
@@ -326,44 +181,18 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 							Id: "Push",
 						},
 						{
-							Name: "gcr.io/cloud-builders/gke-deploy",
+							Name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
 							Args: []string{
-								"prepare",
-								"--filename=$_K8S_YAML_PATH",
-								"--image=$_IMAGE_NAME:$COMMIT_SHA",
-								"--app=$_K8S_APP_NAME",
-								"--version=$COMMIT_SHA",
-								"--namespace=$_K8S_NAMESPACE",
-								"--label=$_K8S_LABELS",
-								"--annotation=$_K8S_ANNOTATIONS,gcb-build-id=$BUILD_ID",
-								"--create-application-cr",
-								`--links="Build details=https://console.cloud.google.com/cloud-build/builds/$BUILD_ID?project=$PROJECT_ID"`,
-								"--output=output",
+								"run",
+								"services",
+								"update",
+								"$_SERVICE_NAME",
+								"--platform=$_PLATFORM",
+								"--image=$_IMAGE_NAME",
+								"--labels=managed-by=gcp-cloud-build-deploy-cloud-run,commit-sha=$COMMIT_SHA,gcb-build-id=$BUILD_ID",
+								"--region=$_DEPLOY_REGION",
 							},
-							Id: "Prepare deploy",
-						},
-						{
-							Name: "gcr.io/cloud-builders/gsutil",
-							Args: []string{
-								"-c",
-								`if [ "$_OUTPUT_BUCKET_PATH" != "" ]; then
-                  gsutil cp -r output/suggested gs://$_OUTPUT_BUCKET_PATH/config/$_K8S_APP_NAME/$BUILD_ID/suggested
-                  gsutil cp -r output/expanded gs://$_OUTPUT_BUCKET_PATH/config/$_K8S_APP_NAME/$BUILD_ID/expanded
-                fi`,
-							},
-							Id:         "Save configs",
-							Entrypoint: "sh",
-						},
-						{
-							Name: "gcr.io/cloud-builders/gke-deploy",
-							Args: []string{
-								"apply",
-								"--filename=output/expanded",
-								"--cluster=$_GKE_CLUSTER",
-								"--location=$_GKE_LOCATION",
-								"--namespace=$_K8S_NAMESPACE",
-							},
-							Id: "Apply deploy",
+							Id: "Deploy",
 						},
 					},
 				},
