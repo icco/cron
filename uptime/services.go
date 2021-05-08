@@ -36,7 +36,7 @@ func UpdateServices(ctx context.Context, c *Config) error {
 		}
 
 		c.Log.Debugw("found service", "job", "uptime", "service", svc)
-		if strings.Constains(svc.Telemetry.ResourceName, "container.googleapis.com") {
+		if strings.Contains(svc.Telemetry.ResourceName, "container.googleapis.com") {
 			c.Log.Debugw("delete service", "job", "uptime", "service", svc)
 			if err := client.DeleteService(ctx, &monitoringpb.DeleteServiceRequest{Name: svc.Name}); err != nil {
 				return fmt.Errorf("delete service %q: %w", svc.Name, err)
