@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	monitoring "cloud.google.com/go/monitoring/apiv3"
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"github.com/icco/cron/sites"
 	compute "google.golang.org/api/compute/v1"
 	"google.golang.org/api/iterator"
@@ -21,11 +21,10 @@ func UpdateServices(ctx context.Context, c *Config) error {
 		return fmt.Errorf("service monitoring: %w", err)
 	}
 
+	var svcs []*monitoringpb.Service
 	req := &monitoringpb.ListServicesRequest{
 		Parent: "projects/" + c.ProjectID,
 	}
-
-	svcs := []*monitoringpb.Service{}
 	it := client.ListServices(ctx, req)
 	for {
 		svc, err := it.Next()
@@ -37,20 +36,29 @@ func UpdateServices(ctx context.Context, c *Config) error {
 		}
 
 		c.Log.Debugw("found service", "job", "uptime", "service", svc)
-		svcs = append(svcs, svc)
+		if strings.Constains(svc.Telemetry.ResourceName, "container.googleapis.com") {
+			c.Log.Debugw("delete service", "job", "uptime", "service", svc)
+			if err := client.DeleteService(ctx, &monitoringpb.DeleteServiceRequest{Name: svc.Name}); err != nil {
+				return fmt.Errorf("delete service %q: %w", svc.Name, err)
+			}
+		} else {
+			svcs = append(svcs, svc)
+		}
 	}
 
 	location := "us-central1"
-	cluster := "autopilot-cluster-1"
-
 	for _, s := range sites.All {
 		wanted := &monitoringpb.Service{
 			DisplayName: s.Deployment,
 			Identifier:  &monitoringpb.Service_Custom_{},
 			Telemetry: &monitoringpb.Service_Telemetry{
 				ResourceName: fmt.Sprintf(
-					"//container.googleapis.com/projects/%s/locations/%s/clusters/%s/k8s/namespaces/default/apps/deployments/%s",
-					c.ProjectID, location, cluster, s.Deployment),
+					"//run.googleapis.com/projects/%s/locations/%s/namespaces/%s/services/%s",
+					c.ProjectID,
+					location,
+					c.ProjectID,
+					s.Deployment,
+				),
 			},
 		}
 
