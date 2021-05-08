@@ -11,7 +11,7 @@ require (
 	github.com/dghubble/oauth1 v0.7.0
 	github.com/dgraph-io/ristretto v0.0.3
 	github.com/go-chi/chi/v5 v5.0.3
-	github.com/go-playground/validator/v10 v10.5.0 // indirect
+	github.com/go-playground/validator/v10 v10.6.0 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b
 	github.com/icco/graphql v0.0.0-20210503183435-ece9bc6b5e1d
@@ -26,15 +26,16 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
+	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.16.0
-	golang.org/x/crypto v0.0.0-20210503195802-e9a32991a82e // indirect
-	golang.org/x/net v0.0.0-20210505024714-0287a6fb4125 // indirect
+	golang.org/x/crypto v0.0.0-20210506145944-38f3c27a63bf // indirect
+	golang.org/x/net v0.0.0-20210508051633-16afe75a6701 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+	golang.org/x/sys v0.0.0-20210507161434-a76c4d0a0096 // indirect
 	google.golang.org/api v0.46.0
-	google.golang.org/genproto v0.0.0-20210505142820-a42aa055cf76
+	google.golang.org/genproto v0.0.0-20210506142907-4a47615972c2
 	google.golang.org/protobuf v1.26.0
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 	gorm.io/gorm v1.21.9 // indirect
 )
