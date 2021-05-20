@@ -89,6 +89,11 @@ func main() {
 		}
 	})
 
+	r.Post("/sub", func(w http.ResponseWriter, r *http.Request) {
+
+		dealWithMessage(cfg)(r.Context(), msg)
+	})
+
 	log.Fatal(http.ListenAndServe(":"+port, r))
 }
 
@@ -117,7 +122,15 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 	}
 	log.Debugw("got subscription config", "config", scfg, "subscription", subName)
 
-	if err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+	if err := sub.Receive(ctx, dealWithMessage(cfg)); err != nil && err != context.Canceled {
+		return fmt.Errorf("recieving messages: %w", err)
+	}
+
+	return nil
+}
+
+func dealWithMessage(cfg *Config) func(ctx context.Context, msg *pubsub.Message) {
+	return func(ctx context.Context, msg *pubsub.Message) {
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
 			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
@@ -129,9 +142,5 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 			log.Errorw("problem running job", "job", data, zap.Error(err))
 		}
 		msg.Ack()
-	}); err != nil && err != context.Canceled {
-		return fmt.Errorf("recieving messages: %w", err)
 	}
-
-	return nil
 }
