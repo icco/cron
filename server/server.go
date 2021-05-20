@@ -55,14 +55,16 @@ func main() {
 	}
 	cfg := &cron.Config{Log: log, Cache: cache}
 
-	go func() {
-		ctx := context.Background()
-		for {
-			if err := recieveMessages(ctx, "cron-client", cfg); err != nil {
-				log.Errorw("could not process message", zap.Error(err))
+	if os.Getenv("USE_HTTP") == "" {
+		go func() {
+			ctx := context.Background()
+			for {
+				if err := recieveMessages(ctx, "cron-client", cfg); err != nil {
+					log.Errorw("could not process message", zap.Error(err))
+				}
 			}
-		}
-	}()
+		}()
+	}
 
 	r := chi.NewRouter()
 	r.Use(middleware.RealIP)
