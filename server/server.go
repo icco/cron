@@ -100,7 +100,7 @@ func main() {
 		}
 
 		dealWithMessage(cfg)(r.Context(), &msg)
-		fmt.Wprintf(w, "success")
+		fmt.Fprintf(w, "success")
 	})
 
 	log.Fatal(http.ListenAndServe(":"+port, r))
@@ -138,7 +138,7 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 	return nil
 }
 
-func dealWithMessage(cfg *Config) func(ctx context.Context, msg *pubsub.Message) {
+func dealWithMessage(cfg *cron.Config) func(ctx context.Context, msg *pubsub.Message) {
 	return func(ctx context.Context, msg *pubsub.Message) {
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
