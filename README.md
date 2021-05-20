@@ -2,6 +2,7 @@
 
 [![GoDoc](https://godoc.org/github.com/icco/cron?status.svg)](https://godoc.org/github.com/icco/cron)
 [![Go Report Card](https://goreportcard.com/badge/github.com/icco/cron)](https://goreportcard.com/report/github.com/icco/cron)
+[![Build Status](https://travis-ci.com/icco/cron.svg?branch=main)](https://travis-ci.com/icco/cron)
 
 A bunch of cron jobs that run on my infra
 
