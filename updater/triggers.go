@@ -210,6 +210,18 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 							Id:         "Deploy",
 							Entrypoint: "gcloud",
 						},
+						{
+							Name: "curlimages/curl",
+							Args: []string{
+								"-svL",
+								"-d",
+								`"{\"id\":\"$BUILD_ID\", \"deployed\": \"$_SERVICE_NAME\", \"image\": \"$_IMAGE_NAME:$COMMIT_SHA"}"`,
+								"-X",
+								"POST",
+								"https://relay.natwelch.com/hook",
+							},
+							Id: "Notfiy",
+						},
 					},
 				},
 			},
