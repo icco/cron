@@ -90,8 +90,15 @@ func main() {
 	})
 
 	r.Post("/sub", func(w http.ResponseWriter, r *http.Request) {
+		var msg pubsub.Message
+		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+			log.Errorw("could not decode request", zap.Error(err))
+			http.Error(w, "body decode error", http.StatusInternalServerError)
+			return
+		}
 
-		dealWithMessage(cfg)(r.Context(), msg)
+		dealWithMessage(cfg)(r.Context(), &msg)
+		fmt.Wprintf(w, "success")
 	})
 
 	log.Fatal(http.ListenAndServe(":"+port, r))
