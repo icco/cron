@@ -218,6 +218,8 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 								`"{\"id\":\"$BUILD_ID\", \"deployed\": \"$_SERVICE_NAME\", \"image\": \"$_IMAGE_NAME:$COMMIT_SHA"}"`,
 								"-X",
 								"POST",
+								"-H",
+								"Content-Type: application/json",
 								"https://relay.natwelch.com/hook",
 							},
 							Id: "Notfiy",
