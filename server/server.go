@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"cloud.google.com/go/pubsub"
-	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/dgraph-io/ristretto"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -38,6 +37,14 @@ var (
 </html>
 `
 )
+
+type PubSubMessage struct {
+	Message struct {
+		Data []byte `json:"data,omitempty"`
+		ID   string `json:"id"`
+	} `json:"message"`
+	Subscription string `json:"subscription"`
+}
 
 func main() {
 	port := "8080"
@@ -93,25 +100,16 @@ func main() {
 	})
 
 	r.Post("/sub", func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
-		var event cloudevents.Event
+		var event PubSubMessage
 		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 			log.Errorw("could not decode request", zap.Error(err))
 			http.Error(w, "body decode error", http.StatusInternalServerError)
 			return
 		}
 
-		data := map[string]string{}
-		if err := json.Unmarshal(event.DataEncoded, &data); err != nil {
-			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(event.DataEncoded))
+		if err := parseMsg(r.Context(), cfg, event.Message.Data); err != nil {
+			log.Errorw("error running job", zap.Error(err), "unparsed", string(event.Message.Data))
 			http.Error(w, "body decode error", http.StatusInternalServerError)
-			return
-		}
-
-		log.Debugw("got message", "parsed", data, "unparsed", string(event.DataEncoded))
-		if err := cfg.Act(ctx, data["job"]); err != nil {
-			log.Errorw("problem running job", "job", data, zap.Error(err))
-			http.Error(w, "problem running job", http.StatusInternalServerError)
 			return
 		}
 
@@ -156,16 +154,24 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 func dealWithMessage(cfg *cron.Config) func(ctx context.Context, msg *pubsub.Message) {
 	return func(ctx context.Context, msg *pubsub.Message) {
 		cfg.Log.Debugw("got message", "msg", msg)
-		data := map[string]string{}
-		if err := json.Unmarshal(msg.Data, &data); err != nil {
-			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
+		if err := parseMsg(ctx, cfg, msg.Data); err != nil {
+			msg.Nack()
 			return
-		}
-
-		log.Debugw("got message", "parsed", data, "unparsed", string(msg.Data))
-		if err := cfg.Act(ctx, data["job"]); err != nil {
-			log.Errorw("problem running job", "job", data, zap.Error(err))
 		}
 		msg.Ack()
 	}
+}
+
+func parseMsg(ctx context.Context, cfg *cron.Config, msg []byte) error {
+	data := map[string]string{}
+	if err := json.Unmarshal(msg, &data); err != nil {
+		return fmt.Errorf("parsed json: %w", err)
+	}
+
+	log.Debugw("got message", "parsed", data, "unparsed", string(msg))
+	if err := cfg.Act(ctx, data["job"]); err != nil {
+		return fmt.Errorf("could not run %q: %w", data["job"], err)
+	}
+
+	return nil
 }
