@@ -9,7 +9,7 @@ import (
 	"os"
 
 	"cloud.google.com/go/pubsub"
-	"github.com/cloudevents/sdk-go/v2"
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/dgraph-io/ristretto"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
