@@ -93,6 +93,7 @@ func main() {
 	})
 
 	r.Post("/sub", func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
 		var event cloudevents.Event
 		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 			log.Errorw("could not decode request", zap.Error(err))
@@ -102,7 +103,7 @@ func main() {
 
 		data := map[string]string{}
 		if err := json.Unmarshal(event.DataEncoded, &data); err != nil {
-			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
+			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(event.DataEncoded))
 			return
 		}
 
