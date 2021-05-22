@@ -98,13 +98,14 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 			cfg.Log.Debugw("got filtered data", "github", gh)
 			repo := gh.Repo.Name
 			for _, c := range gh.Payload.Commits {
-				user := cfg.User
 				getUser, err := cfg.GetUserByEmail(ctx, c.Author.Email)
+				var user string
 				if err != nil {
 					user = cfg.User
 					continue
+				} else {
+					user = getUser
 				}
-				user = getUser
 
 				data = append(data, &code.Commit{
 					Repo: repo,

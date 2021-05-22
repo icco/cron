@@ -4,7 +4,7 @@ import (
 	"context"
 	"sort"
 
-	monitoring "cloud.google.com/go/monitoring/apiv3"
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/icco/cron/sites"
 	"github.com/pkg/errors"

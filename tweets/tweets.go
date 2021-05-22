@@ -33,7 +33,7 @@ type Twitter struct {
 // Validate gets a twitter client and the current twitter user.
 func (t *TwitterAuth) Validate(ctx context.Context, log *zap.SugaredLogger) (*twitter.Client, *twitter.User, error) {
 	if t.ConsumerKey == "" || t.ConsumerSecret == "" || t.AccessToken == "" || t.AccessSecret == "" {
-		return nil, nil, fmt.Errorf("Consumer key/secret and Access token/secret required")
+		return nil, nil, fmt.Errorf("consumer key/secret and Access token/secret required")
 	}
 
 	config := oauth1.NewConfig(t.ConsumerKey, t.ConsumerSecret)
@@ -76,7 +76,7 @@ func (t *Twitter) SaveUserTweets(ctx context.Context) error {
 			return err
 		}
 		tm := time.Unix(i, 0)
-		return fmt.Errorf("Out of Rate Limit. Returns: %+v", tm)
+		return fmt.Errorf("out of Rate Limit, returns: %+v", tm)
 	}
 
 	if err != nil {
@@ -170,7 +170,7 @@ func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error
 			return nil, err
 		}
 		tm := time.Unix(i, 0)
-		return nil, fmt.Errorf("Out of Rate Limit. Returns: %+v", tm)
+		return nil, fmt.Errorf("out of Rate Limit, returns: %+v", tm)
 	}
 
 	if err != nil {

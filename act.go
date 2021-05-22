@@ -170,7 +170,7 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 			return err
 		}
 	default:
-		return fmt.Errorf("Unknown job type: %s", job)
+		return fmt.Errorf("unknown job type: %q", job)
 	}
 
 	return nil
