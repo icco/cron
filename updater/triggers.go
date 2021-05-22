@@ -215,7 +215,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 							Args: []string{
 								"-svL",
 								"-d",
-								`"{\"id\":\"$BUILD_ID\", \"deployed\": \"$_SERVICE_NAME\", \"image\": \"$_IMAGE_NAME:$COMMIT_SHA"}"`,
+								`"{\"id\":\"$BUILD_ID\", \"deployed\": \"$_SERVICE_NAME\", \"image\": \"$_IMAGE_NAME:$COMMIT_SHA\"}"`,
 								"-X",
 								"POST",
 								"-H",
