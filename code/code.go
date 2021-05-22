@@ -102,7 +102,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 				var user string
 				if err != nil {
 					user = cfg.User
-					continue
+					cfg.Log.Debugw("could not get user", "commit", c, "author", c.Author.Email, zap.Error(err))
 				} else {
 					user = getUser
 				}
