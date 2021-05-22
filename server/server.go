@@ -104,12 +104,15 @@ func main() {
 		data := map[string]string{}
 		if err := json.Unmarshal(event.DataEncoded, &data); err != nil {
 			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(event.DataEncoded))
+			http.Error(w, "body decode error", http.StatusInternalServerError)
 			return
 		}
 
 		log.Debugw("got message", "parsed", data, "unparsed", string(event.DataEncoded))
 		if err := cfg.Act(ctx, data["job"]); err != nil {
 			log.Errorw("problem running job", "job", data, zap.Error(err))
+			http.Error(w, "problem running job", http.StatusInternalServerError)
+			return
 		}
 
 		fmt.Fprintf(w, "success")
