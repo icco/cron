@@ -108,7 +108,8 @@ func main() {
 		}
 
 		go func() {
-			if err := parseMsg(r.Context(), cfg, event.Message.Data); err != nil {
+			ctx := context.Background()
+			if err := parseMsg(ctx, cfg, event.Message.Data); err != nil {
 				log.Errorw("error running job", zap.Error(err), "unparsed", string(event.Message.Data))
 			}
 		}()
