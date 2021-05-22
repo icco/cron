@@ -140,6 +140,7 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 
 func dealWithMessage(cfg *cron.Config) func(ctx context.Context, msg *pubsub.Message) {
 	return func(ctx context.Context, msg *pubsub.Message) {
+		cfg.Log.Debugw("got message", "message", msg)
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
 			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
