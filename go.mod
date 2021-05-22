@@ -8,7 +8,6 @@ require (
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/briandowns/openweathermap v0.16.0
-	github.com/cloudevents/sdk-go/v2 v2.4.1
 	github.com/dghubble/go-twitter v0.0.0-20201011215211-4b180d0cc78d
 	github.com/dghubble/oauth1 v0.7.0
 	github.com/dgraph-io/ristretto v0.0.3
@@ -21,9 +20,10 @@ require (
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.8 // indirect
-	github.com/json-iterator/go v1.1.11 // indirect
+	github.com/kr/text v0.2.0 // indirect
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
+	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
@@ -33,6 +33,7 @@ require (
 	google.golang.org/api v0.47.0
 	google.golang.org/genproto v0.0.0-20210521181308-5ccab8a35a9a
 	google.golang.org/protobuf v1.26.0
+	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/gorm v1.21.10 // indirect
 )
