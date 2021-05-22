@@ -107,11 +107,11 @@ func main() {
 			return
 		}
 
-		if err := parseMsg(r.Context(), cfg, event.Message.Data); err != nil {
-			log.Errorw("error running job", zap.Error(err), "unparsed", string(event.Message.Data))
-			http.Error(w, "body decode error", http.StatusInternalServerError)
-			return
-		}
+		go func() {
+			if err := parseMsg(r.Context(), cfg, event.Message.Data); err != nil {
+				log.Errorw("error running job", zap.Error(err), "unparsed", string(event.Message.Data))
+			}
+		}()
 
 		fmt.Fprintf(w, "success")
 	})
