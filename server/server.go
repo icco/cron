@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"cloud.google.com/go/pubsub"
+	"github.com/cloudevents/sdk-go/v2"
 	"github.com/dgraph-io/ristretto"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -92,14 +93,24 @@ func main() {
 	})
 
 	r.Post("/sub", func(w http.ResponseWriter, r *http.Request) {
-		var msg pubsub.Message
-		if err := json.NewDecoder(r.Body).Decode(&msg); err != nil {
+		var event cloudevents.Event
+		if err := json.NewDecoder(r.Body).Decode(&event); err != nil {
 			log.Errorw("could not decode request", zap.Error(err))
 			http.Error(w, "body decode error", http.StatusInternalServerError)
 			return
 		}
 
-		dealWithMessage(cfg)(r.Context(), &msg)
+		data := map[string]string{}
+		if err := json.Unmarshal(event.DataEncoded, &data); err != nil {
+			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
+			return
+		}
+
+		log.Debugw("got message", "parsed", data, "unparsed", string(event.DataEncoded))
+		if err := cfg.Act(ctx, data["job"]); err != nil {
+			log.Errorw("problem running job", "job", data, zap.Error(err))
+		}
+
 		fmt.Fprintf(w, "success")
 	})
 
@@ -140,7 +151,7 @@ func recieveMessages(ctx context.Context, subName string, cfg *cron.Config) erro
 
 func dealWithMessage(cfg *cron.Config) func(ctx context.Context, msg *pubsub.Message) {
 	return func(ctx context.Context, msg *pubsub.Message) {
-		cfg.Log.Debugw("got message", "message", msg)
+		cfg.Log.Debugw("got message", "msg", msg)
 		data := map[string]string{}
 		if err := json.Unmarshal(msg.Data, &data); err != nil {
 			log.Warnw("could not decode json", zap.Error(err), "parsed", data, "unparsed", string(msg.Data))
