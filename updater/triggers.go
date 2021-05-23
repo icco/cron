@@ -219,7 +219,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 								"-X",
 								"POST",
 								"-H",
-								"Content-Type: application/json",
+								`"Content-Type: application/json"`,
 								"-f",
 								"https://relay.natwelch.com/hook",
 							},
