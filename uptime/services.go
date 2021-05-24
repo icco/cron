@@ -53,10 +53,9 @@ func UpdateServices(ctx context.Context, c *Config) error {
 			Identifier:  &monitoringpb.Service_Custom_{},
 			Telemetry: &monitoringpb.Service_Telemetry{
 				ResourceName: fmt.Sprintf(
-					"//run.googleapis.com/projects/%s/locations/%s/namespaces/%s/services/%s",
+					"//run.googleapis.com/projects/%s/locations/%s/services/%s",
 					c.ProjectID,
 					location,
-					c.ProjectID,
 					s.Deployment,
 				),
 			},
