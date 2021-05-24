@@ -70,5 +70,5 @@ func (c *Client) Do(ctx context.Context, path string, reqBody interface{}) (int,
 		return 0, nil, fmt.Errorf("reading response: %w", err)
 	}
 
-	return resp.Status, resp_body, nil
+	return resp.StatusCode, respBody, nil
 }
