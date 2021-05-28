@@ -212,6 +212,6 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "writing",
 		Deployment: "writing",
-		Branch:     "master",
+		Branch:     "main",
 	},
 }
