@@ -195,6 +195,19 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 							Id: "Push latest",
 						},
 						{
+							Name:       "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+							Id:         "VulnScan",
+							Entrypoint: "gcloud",
+							Args: []string{
+								"artifacts",
+								"docker",
+								"images",
+								"scan",
+								"$_IMAGE_NAME:$COMMIT_SHA",
+								"--remote",
+							},
+						},
+						{
 							Name: "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
 							Args: []string{
 								"run",
