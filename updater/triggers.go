@@ -195,7 +195,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 							Id: "Push latest",
 						},
 						{
-							Name:       "gcr.io/google.com/cloudsdktool/cloud-sdk:slim",
+							Name:       "gcr.io/google.com/cloudsdktool/cloud-sdk:emulators",
 							Id:         "VulnScan",
 							Entrypoint: "gcloud",
 							Args: []string{
