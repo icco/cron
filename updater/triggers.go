@@ -205,6 +205,7 @@ func (cfg *Config) upsertDeployTrigger(ctx context.Context, c *cloudbuild.Client
 								"scan",
 								"$_IMAGE_NAME:$COMMIT_SHA",
 								"--remote",
+								"--quiet",
 							},
 						},
 						{
