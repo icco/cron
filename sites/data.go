@@ -142,7 +142,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "postmortems",
 		Deployment: "postmortems",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "quotes.natwelch.com",
