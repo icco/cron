@@ -2,11 +2,11 @@ package sites
 
 // SiteMap defines a site we deploy.
 type SiteMap struct {
-	Host       string
-	Owner      string
-	Repo       string
-	Deployment string
-	Branch     string
+	Host       string `json:"host"`
+	Owner      string `json:"owner"`
+	Repo       string `json:"repo"`
+	Deployment string `json:"deployment"`
+	Branch     string `json:"branch"`
 }
 
 // All contains a list of all domains I update from my code.
