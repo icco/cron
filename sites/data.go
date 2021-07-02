@@ -68,6 +68,13 @@ var All = []SiteMap{
 		Branch:     "main",
 	},
 	{
+		Host:       "food.natwelch.com",
+		Owner:      "icco",
+		Repo:       "recipes",
+		Deployment: "recipes",
+		Branch:     "main",
+	},
+	{
 		Host:       "gotak.app",
 		Owner:      "icco",
 		Repo:       "gotak",
