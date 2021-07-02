@@ -17,7 +17,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b
 	github.com/icco/graphql v0.0.0-20210607005129-8857ee859027
-	github.com/icco/gutil v0.0.0-20210702140233-1358c0e07405
+	github.com/icco/gutil v0.0.0-20210702143127-12e3439e77ee
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.8 // indirect

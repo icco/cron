@@ -363,8 +363,8 @@ github.com/icco/graphql v0.0.0-20210607005129-8857ee859027 h1:8Oe71ZI+YkINxg0HTi
 github.com/icco/graphql v0.0.0-20210607005129-8857ee859027/go.mod h1:EEw8yVeKhdGGFgdNVApEap5wotOlWUV58eGE4yC+ejo=
 github.com/icco/gutil v0.0.0-20210411012557-3b3e286fd470/go.mod h1:fy5nXvFzJakaQRoxMY92xJmp/LQjbOj5ssZQRStCm0U=
 github.com/icco/gutil v0.0.0-20210607003632-0fb9226bd58b/go.mod h1:+im7r5cXXGNBptBC/3oNcyKGINMkTs28Y+ROuw/KNWk=
-github.com/icco/gutil v0.0.0-20210702140233-1358c0e07405 h1:pvsZcaj1GNyyGk5mlcyvZpdOD6vc1KtTjwAXZokyWDY=
-github.com/icco/gutil v0.0.0-20210702140233-1358c0e07405/go.mod h1:RbZ9hZI4YSvefD+qKbi6dTMnbHnbjsfk6SjjhhnPPS8=
+github.com/icco/gutil v0.0.0-20210702143127-12e3439e77ee h1:Y2Jko7VA6EZh5nNlwN/f3Pd0MpwA6zgB9KAkCu6WVsg=
+github.com/icco/gutil v0.0.0-20210702143127-12e3439e77ee/go.mod h1:RbZ9hZI4YSvefD+qKbi6dTMnbHnbjsfk6SjjhhnPPS8=
 github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535 h1:2H0OPKDIDDep8BYUOnYwCmgANG63RC9hoHvR2GMhxdQ=
 github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535/go.mod h1:TdpPQk49qE3l67DQCTv1cptfnjksGcL6FLypJcPjebY=
 github.com/icco/zapdriver v1.4.0 h1:ACpofOtnSJT9eywNOoTuEhzo7YtFUGCc4xBXYFWYMkI=
