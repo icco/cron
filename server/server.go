@@ -15,6 +15,7 @@ import (
 	"github.com/icco/cron"
 	"github.com/icco/cron/sites"
 	"github.com/icco/gutil/logging"
+	"github.com/icco/gutil/render"
 	"go.uber.org/zap"
 )
 
@@ -79,10 +80,11 @@ func main() {
 	r.Use(logging.Middleware(log.Desugar(), cron.GCPProject))
 
 	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) {
-		_, err := w.Write([]byte("ok."))
-		if err != nil {
-			log.Errorw("could not write response", zap.Error(err))
-		}
+		render.JSON(log, w, http.StatusOK, map[string]string{"status": "ok"})
+	})
+
+	r.Get("/sites", func(w http.ResponseWriter, r *http.Request) {
+		render.JSON(log, w, http.StatusOK, sites.All)
 	})
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {

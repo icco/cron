@@ -3,8 +3,8 @@ module github.com/icco/cron
 go 1.15
 
 require (
-	cloud.google.com/go v0.85.0
-	cloud.google.com/go/pubsub v1.12.0
+	cloud.google.com/go v0.86.0
+	cloud.google.com/go/pubsub v1.12.1
 	cloud.google.com/go/storage v1.16.0 // indirect
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
 	github.com/briandowns/openweathermap v0.16.0
@@ -17,7 +17,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b
 	github.com/icco/graphql v0.0.0-20210607005129-8857ee859027
-	github.com/icco/gutil v0.0.0-20210607003632-0fb9226bd58b
+	github.com/icco/gutil v0.0.0-20210702122404-ce37ee24f388
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.8 // indirect
@@ -28,14 +28,12 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
-	go.uber.org/atomic v1.8.0 // indirect
 	go.uber.org/zap v1.18.1
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e // indirect
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
 	google.golang.org/api v0.50.0
-	google.golang.org/genproto v0.0.0-20210701133433-6b8dcf568a95
+	google.golang.org/genproto v0.0.0-20210701191553-46259e63a0a9
 	google.golang.org/grpc v1.39.0 // indirect
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
