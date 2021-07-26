@@ -18,7 +18,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-github/v37 v37.0.0
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/icco/code.natwelch.com v0.0.0-20210411174529-95b7c1c2e51b
+	github.com/icco/code.natwelch.com v0.0.0-20210726000525-26842ef5e694
 	github.com/icco/graphql v0.0.0-20210607005129-8857ee859027
 	github.com/icco/gutil v0.0.0-20210706020035-d1bef041b1ac
 	github.com/icco/lunchmoney v0.0.0-20210127022727-ce2dc351d535
@@ -30,15 +30,12 @@ require (
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
-	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/zap v1.18.1
-	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97 // indirect
-	golang.org/x/net v0.0.0-20210716203947-853a461950ff // indirect
+	golang.org/x/oauth2 v0.0.0-20210628180205-a41e5a781914
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/api v0.51.0
 	google.golang.org/genproto v0.0.0-20210722135532-667f2b7c528f
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gorm.io/gorm v1.21.12 // indirect
 )
