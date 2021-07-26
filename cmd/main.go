@@ -8,6 +8,7 @@ import (
 
 	"github.com/dgraph-io/ristretto"
 	"github.com/icco/cron"
+	"github.com/icco/cron/shared"
 	"github.com/icco/gutil/logging"
 	"go.uber.org/zap"
 )
@@ -31,7 +32,10 @@ func main() {
 	if err != nil {
 		log.Fatalw("could not create cache", zap.Error(err))
 	}
-	cfg := &cron.Config{Log: log, Cache: cache}
+	cfg := &cron.Config{
+		Config: shared.Config{Log: log},
+		Cache:  cache,
+	}
 
 	if err := cfg.Act(context.Background(), strings.Join(cmd[1:], " ")); err != nil {
 		log.Errorw("could not act", zap.Error(err))

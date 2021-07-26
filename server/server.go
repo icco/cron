@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/icco/cron"
+	"github.com/icco/cron/shared"
 	"github.com/icco/cron/sites"
 	"github.com/icco/gutil/logging"
 	"github.com/icco/gutil/render"
@@ -62,7 +63,10 @@ func main() {
 	if err != nil {
 		log.Fatalw("could not create cache", zap.Error(err))
 	}
-	cfg := &cron.Config{Log: log, Cache: cache}
+	cfg := &cron.Config{
+		Config: shared.Config{Log: log},
+		Cache:  cache,
+	}
 
 	if os.Getenv("USE_HTTP") == "" {
 		go func() {
