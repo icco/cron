@@ -26,7 +26,7 @@ func (c *Config) CheckRepos(ctx context.Context) error {
 	}
 
 	for _, r := range repos {
-		c.Log.Infow(fmt.Sprintf("%s/%s", user, r.GetName()), "repo", r)
+		c.Log.Infow(fmt.Sprintf("%s/%s", r.GetOwner(), r.GetName()), "repo", r)
 	}
 
 	return nil

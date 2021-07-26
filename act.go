@@ -7,6 +7,7 @@ import (
 
 	"github.com/dgraph-io/ristretto"
 	"github.com/icco/cron/code"
+	"github.com/icco/cron/gaudit"
 	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
 	"github.com/icco/cron/shared"
