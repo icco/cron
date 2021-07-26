@@ -10,6 +10,7 @@ import (
 
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
+	"github.com/icco/cron/shared"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
 	"go.uber.org/zap"
@@ -25,8 +26,9 @@ type TwitterAuth struct {
 
 // Twitter contains the context needed for working with twitter.
 type Twitter struct {
+	shared.Config
+
 	TwitterAuth  *TwitterAuth
-	Log          *zap.SugaredLogger
 	GraphQLToken string
 }
 

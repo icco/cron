@@ -2,13 +2,13 @@ package uptime
 
 import (
 	"context"
+	"fmt"
 	"sort"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"github.com/golang/protobuf/ptypes/duration"
+	"github.com/icco/cron/shared"
 	"github.com/icco/cron/sites"
-	"github.com/pkg/errors"
-	"go.uber.org/zap"
 	"google.golang.org/api/iterator"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
@@ -17,7 +17,8 @@ import (
 
 // Config is a config.
 type Config struct {
-	Log       *zap.SugaredLogger
+	shared.Config
+
 	ProjectID string
 }
 
@@ -48,7 +49,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 
 	existingChecks, err := c.listChecks(ctx)
 	if err != nil {
-		return errors.Wrap(err, "list checks")
+		return fmt.Errorf("list checks: %w")
 	}
 	checkHostMap := map[string]string{}
 
@@ -64,7 +65,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 		if val, ok := checkHostMap[host]; ok {
 			cfg, err := c.updateCheck(ctx, host, val)
 			if err != nil {
-				return errors.Wrapf(err, "update check %s", host)
+				return fmt.Errorf("update check %s: %w", host, err)
 			}
 
 			c.Log.Debugw("updated uptime check", "job", "uptime", "host", host)
@@ -72,7 +73,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 		} else {
 			cfg, err := c.createCheck(ctx, host)
 			if err != nil {
-				return errors.Wrapf(err, "create check %s", host)
+				return fmt.Errorf("create check %s: %w", host, err)
 			}
 
 			c.Log.Debugw("created uptime check", "job", "uptime", "host", host)

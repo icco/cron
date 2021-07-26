@@ -9,6 +9,7 @@ import (
 	"github.com/icco/cron/code"
 	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
+	"github.com/icco/cron/shared"
 	"github.com/icco/cron/spider"
 	"github.com/icco/cron/stats"
 	"github.com/icco/cron/tweets"
@@ -28,7 +29,8 @@ const (
 
 // Config is our base act config struct.
 type Config struct {
-	Log   *zap.SugaredLogger
+	shared.Config
+
 	Cache *ristretto.Cache
 }
 
