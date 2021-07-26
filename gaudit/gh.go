@@ -6,18 +6,21 @@ import (
 
 	"github.com/google/go-github/v37/github"
 	"github.com/icco/cron/shared"
+	"golang.org/x/oauth2"
 )
 
 type Config struct {
 	shared.Config
+
+	User        string
+	GithubToken string
 }
 
-func (c *Config) checkRepos(ctx context.Context) error {
-	client := github.NewClient(nil)
+func (c *Config) CheckRepos(ctx context.Context) error {
+	client := GithubClient(ctx, c.GithubToken)
 	opt := &github.RepositoryListOptions{Type: "owner", Sort: "updated", Direction: "desc"}
-	user := "icco"
 
-	repos, _, err := client.Repositories.List(ctx, user, opt)
+	repos, _, err := client.Repositories.List(ctx, c.User, opt)
 	if err != nil {
 		return err
 	}
@@ -27,4 +30,12 @@ func (c *Config) checkRepos(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func GithubClient(ctx context.Context, token string) *github.Client {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	)
+	tc := oauth2.NewClient(ctx, ts)
+	return github.NewClient(tc)
 }

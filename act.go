@@ -88,10 +88,16 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		if err := cfg.UpdateTriggers(ctx); err != nil {
 			return fmt.Errorf("update triggers: %w", err)
 		}
+	case "github-audit":
+		c := &gaudit.Config{
+			Log:         cfg.Log,
+			User:        "icco",
+			GithubToken: githubToken,
+		}
 
-		//if err := cfg.UpdateRandomSite(ctx); err != nil {
-		//	return fmt.Errorf("update random site: %w", err)
-		//}
+		if err := c.CheckRepos(ctx); err != nil {
+			return err
+		}
 	case "spider":
 		spider.Crawl(ctx, &spider.Config{
 			Log: cfg.Log,
