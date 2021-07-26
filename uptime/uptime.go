@@ -49,7 +49,7 @@ func UpdateUptimeChecks(ctx context.Context, c *Config) error {
 
 	existingChecks, err := c.listChecks(ctx)
 	if err != nil {
-		return fmt.Errorf("list checks: %w")
+		return fmt.Errorf("list checks: %w", err)
 	}
 	checkHostMap := map[string]string{}
 
