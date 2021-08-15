@@ -12,9 +12,11 @@ import (
 
 // Config stores config.
 type Config struct {
-	Log          *zap.SugaredLogger
-	GraphQLToken string
-	OWMKey       string
+	Log *zap.SugaredLogger
+
+	GraphQLToken    string
+	LunchMoneyToken string
+	OWMKey          string
 }
 
 // KeyFunc is a function for key exporters.

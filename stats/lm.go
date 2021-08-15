@@ -11,9 +11,8 @@ import (
 
 // GetAssetMix gets our asset mix from LunchMoney.
 // TODO: Add to config thing.
-func GetAssetMix(ctx context.Context) (float64, error) {
-	token := os.Getenv("LUNCHMONEY_TOKEN")
-	client, err := lunchmoney.NewClient(token)
+func (c *Config) GetAssetMix(ctx context.Context) (float64, error) {
+	client, err := lunchmoney.NewClient(c.LunchMoneyToken)
 	if err != nil {
 		return 0.0, fmt.Errorf("lm client: %w", err)
 	}
