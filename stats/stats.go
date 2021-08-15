@@ -4,15 +4,16 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/icco/cron/shared"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
-	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
 
 // Config stores config.
 type Config struct {
-	Log          *zap.SugaredLogger
+	shared.Config
+
 	GraphQLToken string
 	OWMKey       string
 }

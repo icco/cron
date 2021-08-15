@@ -7,8 +7,10 @@ import (
 
 	"github.com/dgraph-io/ristretto"
 	"github.com/icco/cron/code"
+	"github.com/icco/cron/gaudit"
 	"github.com/icco/cron/goodreads"
 	"github.com/icco/cron/pinboard"
+	"github.com/icco/cron/shared"
 	"github.com/icco/cron/spider"
 	"github.com/icco/cron/stats"
 	"github.com/icco/cron/tweets"
@@ -28,7 +30,8 @@ const (
 
 // Config is our base act config struct.
 type Config struct {
-	Log   *zap.SugaredLogger
+	shared.Config
+
 	Cache *ristretto.Cache
 }
 
@@ -75,30 +78,39 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 	switch job {
 	case "test":
 		v, err := stats.GetAssetMix(ctx)
+		if err != nil {
+			return err
+		}
 		cfg.Log.Warnf("%d, %+v", v, err)
 	case "minute":
 		cfg.Log.Info("heartbeat")
 	case "update-deployments":
 		cfg := &updater.Config{
-			Log:           cfg.Log,
+			Config:        shared.Config{Log: cfg.Log},
 			GoogleProject: GCPProject,
 		}
 		if err := cfg.UpdateTriggers(ctx); err != nil {
 			return fmt.Errorf("update triggers: %w", err)
 		}
+	case "github-audit":
+		c := &gaudit.Config{
+			Config:      shared.Config{Log: cfg.Log},
+			User:        "icco",
+			GithubToken: githubToken,
+		}
 
-		//if err := cfg.UpdateRandomSite(ctx); err != nil {
-		//	return fmt.Errorf("update random site: %w", err)
-		//}
+		if err := c.CheckRepos(ctx); err != nil {
+			return err
+		}
 	case "spider":
 		spider.Crawl(ctx, &spider.Config{
-			Log: cfg.Log,
-			URL: "https://writing.natwelch.com/",
+			Config: shared.Config{Log: cfg.Log},
+			URL:    "https://writing.natwelch.com/",
 		})
 	case "user-tweets":
 		t := tweets.Twitter{
+			Config:       shared.Config{Log: cfg.Log},
 			TwitterAuth:  twitterAuth,
-			Log:          cfg.Log,
 			GraphQLToken: gqlToken,
 		}
 		err := t.SaveUserTweets(ctx)
@@ -107,8 +119,8 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		}
 	case "pinboard":
 		p := &pinboard.Pinboard{
+			Config:       shared.Config{Log: cfg.Log},
 			Token:        pinboardToken,
-			Log:          cfg.Log,
 			GraphQLToken: gqlToken,
 		}
 		err := p.UpdatePins(ctx)
@@ -117,8 +129,8 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		}
 	case "random-tweets":
 		t := &tweets.Twitter{
+			Config:       shared.Config{Log: cfg.Log},
 			TwitterAuth:  twitterAuth,
-			Log:          cfg.Log,
 			GraphQLToken: gqlToken,
 		}
 		err := t.CacheRandomTweets(ctx)
@@ -127,7 +139,7 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		}
 	case "goodreads":
 		g := &goodreads.Goodreads{
-			Log:          cfg.Log,
+			Config:       shared.Config{Log: cfg.Log},
 			Token:        goodreadsToken,
 			GraphQLToken: gqlToken,
 		}
@@ -137,7 +149,7 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		}
 	case "uptime":
 		c := &uptime.Config{
-			Log:       cfg.Log,
+			Config:    shared.Config{Log: cfg.Log},
 			ProjectID: GCPProject,
 		}
 
@@ -150,7 +162,7 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		}
 	case "stats":
 		c := &stats.Config{
-			Log:          cfg.Log,
+			Config:       shared.Config{Log: cfg.Log},
 			GraphQLToken: gqlToken,
 			OWMKey:       os.Getenv("OPEN_WEATHER_MAP_KEY"),
 		}
@@ -160,7 +172,7 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		}
 	case "code":
 		c := &code.Config{
-			Log:         cfg.Log,
+			Config:      shared.Config{Log: cfg.Log},
 			User:        "icco",
 			GithubToken: githubToken,
 			Cache:       cfg.Cache,

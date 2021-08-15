@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/icco/cron/shared"
 	"github.com/jackdanger/collectlinks"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/stats/view"
@@ -15,7 +16,8 @@ import (
 
 // Config is our config.
 type Config struct {
-	Log *zap.SugaredLogger
+	shared.Config
+
 	URL string
 }
 

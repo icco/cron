@@ -6,6 +6,7 @@ import (
 
 	"github.com/KyleBanks/goodreads"
 	"github.com/KyleBanks/goodreads/responses"
+	"github.com/icco/cron/shared"
 	gql "github.com/icco/graphql"
 	"github.com/machinebox/graphql"
 	"go.uber.org/zap"
@@ -13,8 +14,9 @@ import (
 
 // Goodreads contains the scope for doing work against the goodreads API.
 type Goodreads struct {
+	shared.Config
+
 	Token        string
-	Log          *zap.SugaredLogger
 	GraphQLToken string
 }
 

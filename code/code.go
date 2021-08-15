@@ -11,13 +11,15 @@ import (
 
 	"github.com/dgraph-io/ristretto"
 	"github.com/icco/code.natwelch.com/code"
+	"github.com/icco/cron/shared"
 	"go.uber.org/zap"
 )
 
 // Config is a basic configuration struct.
 type Config struct {
+	shared.Config
+
 	User        string
-	Log         *zap.SugaredLogger
 	GithubToken string
 	Cache       *ristretto.Cache
 }
