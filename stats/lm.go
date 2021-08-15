@@ -10,7 +10,6 @@ import (
 )
 
 // GetAssetMix gets our asset mix from LunchMoney.
-// TODO: Add to config thing.
 func (c *Config) GetAssetMix(ctx context.Context) (float64, error) {
 	client, err := lunchmoney.NewClient(c.LunchMoneyToken)
 	if err != nil {
