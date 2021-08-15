@@ -19,7 +19,7 @@ require (
 	github.com/icco/code.natwelch.com v0.0.0-20210726000525-26842ef5e694
 	github.com/icco/graphql v0.0.0-20210607005129-8857ee859027
 	github.com/icco/gutil v0.0.0-20210706020035-d1bef041b1ac
-	github.com/icco/lunchmoney v0.1.0
+	github.com/icco/lunchmoney v0.2.0
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/jarcoal/httpmock v1.0.8 // indirect
 	github.com/machinebox/graphql v0.2.2
