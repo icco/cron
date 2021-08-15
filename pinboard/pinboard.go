@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/icco/cron/shared"
 	"github.com/machinebox/graphql"
 	"github.com/zachlatta/pin"
 	"go.uber.org/zap"
@@ -14,8 +15,9 @@ import (
 
 // Pinboard contains the context needed to call pinboard.
 type Pinboard struct {
+	shared.Config
+
 	Token        string
-	Log          *zap.SugaredLogger
 	GraphQLToken string
 }
 

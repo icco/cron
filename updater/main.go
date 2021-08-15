@@ -1,11 +1,10 @@
 package updater
 
-import (
-	"go.uber.org/zap"
-)
+import "github.com/icco/cron/shared"
 
 // Config is a config.
 type Config struct {
-	Log           *zap.SugaredLogger
+	shared.Config
+
 	GoogleProject string
 }
