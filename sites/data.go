@@ -96,11 +96,11 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
-		Host:       "inspiration.natwelch.com",
+		Host:       "mood.natwelch.com",
 		Owner:      "icco",
 		Repo:       "inspiration",
 		Deployment: "inspiration",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "kyoudai.industries",
