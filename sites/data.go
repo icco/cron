@@ -16,7 +16,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "aniplaxt",
 		Deployment: "aniplaxt",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "cacophony.natwelch.com",
