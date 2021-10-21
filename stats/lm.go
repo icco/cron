@@ -3,7 +3,6 @@ package stats
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/icco/lunchmoney"
 )
@@ -27,7 +26,7 @@ func (c *Config) GetAssetMix(ctx context.Context) (float64, error) {
 		}
 
 		// .AsMajorUnits()
-		log.Printf("asset: %q - %+v", t.Name, v.Display())
+		c.Log.Debugf("asset: %q - %+v", t.Name, v.Display())
 	}
 
 	pas, err := client.GetPlaidAccounts(ctx)
@@ -40,7 +39,7 @@ func (c *Config) GetAssetMix(ctx context.Context) (float64, error) {
 		if err != nil {
 			return 0.0, err
 		}
-		log.Printf("account: %q - %+v", t.Name, v.Display())
+		c.Log.Debugf("account: %q - %+v", t.Name, v.Display())
 	}
 
 	return 0.0, nil
