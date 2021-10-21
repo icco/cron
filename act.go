@@ -77,7 +77,13 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 
 	switch job {
 	case "test":
-		v, err := stats.GetAssetMix(ctx)
+		c := &stats.Config{
+			Config:          shared.Config{Log: cfg.Log},
+			GraphQLToken:    gqlToken,
+			OWMKey:          os.Getenv("OPEN_WEATHER_MAP_KEY"),
+			LunchMoneyToken: os.Getenv("LUNCHMONEY_TOKEN"),
+		}
+		v, err := c.GetAssetMix(ctx)
 		if err != nil {
 			return err
 		}
@@ -162,9 +168,10 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		}
 	case "stats":
 		c := &stats.Config{
-			Config:       shared.Config{Log: cfg.Log},
-			GraphQLToken: gqlToken,
-			OWMKey:       os.Getenv("OPEN_WEATHER_MAP_KEY"),
+			Config:          shared.Config{Log: cfg.Log},
+			GraphQLToken:    gqlToken,
+			OWMKey:          os.Getenv("OPEN_WEATHER_MAP_KEY"),
+			LunchMoneyToken: os.Getenv("LUNCHMONEY_TOKEN"),
 		}
 
 		if err := c.UpdateOften(ctx); err != nil {
