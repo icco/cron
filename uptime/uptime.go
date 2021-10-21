@@ -6,13 +6,13 @@ import (
 	"sort"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
-	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/icco/cron/shared"
 	"github.com/icco/cron/sites"
 	"google.golang.org/api/iterator"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
 	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 	"google.golang.org/genproto/protobuf/field_mask"
+	"google.golang.org/protobuf/types/known/durationpb"
 )
 
 // Config is a config.
@@ -112,8 +112,8 @@ func (c *Config) createCheck(ctx context.Context, host string) (*monitoringpb.Up
 					ValidateSsl: true,
 				},
 			},
-			Timeout: &duration.Duration{Seconds: 5},
-			Period:  &duration.Duration{Seconds: 60},
+			Timeout: &durationpb.Duration{Seconds: 5},
+			Period:  &durationpb.Duration{Seconds: 60},
 		},
 	}
 
@@ -175,8 +175,8 @@ func (c *Config) updateCheck(ctx context.Context, host, id string) (*monitoringp
 			ValidateSsl: true,
 		},
 	}
-	config.Timeout = &duration.Duration{Seconds: 5}
-	config.Period = &duration.Duration{Seconds: 60}
+	config.Timeout = &durationpb.Duration{Seconds: 5}
+	config.Period = &durationpb.Duration{Seconds: 60}
 	req := &monitoringpb.UpdateUptimeCheckConfigRequest{
 		UptimeCheckConfig: config,
 		UpdateMask: &field_mask.FieldMask{

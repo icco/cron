@@ -15,7 +15,6 @@ require (
 	github.com/go-chi/chi/v5 v5.0.4
 	github.com/go-playground/validator/v10 v10.9.0 // indirect
 	github.com/golang/glog v1.0.0 // indirect
-	github.com/golang/protobuf v1.5.2
 	github.com/google/go-github/v37 v37.0.0
 	github.com/icco/code.natwelch.com v0.0.0-20210726000525-26842ef5e694
 	github.com/icco/graphql v0.0.0-20211021014339-1d911e29160e
