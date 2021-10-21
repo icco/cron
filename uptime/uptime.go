@@ -29,7 +29,6 @@ var (
 		"dcwelch.com",
 		"google.com",
 		"lydiadehn.com",
-		"mood.natwelch.com",
 		"newyork.welch.io",
 		"timebyping.com",
 		"www.natwelch.com",

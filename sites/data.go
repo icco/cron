@@ -16,7 +16,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "aniplaxt",
 		Deployment: "aniplaxt",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "cacophony.natwelch.com",
@@ -86,7 +86,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "graphql",
 		Deployment: "graphql",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "hello.natwelch.com",
@@ -96,11 +96,11 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
-		Host:       "inspiration.natwelch.com",
+		Host:       "mood.natwelch.com",
 		Owner:      "icco",
 		Repo:       "inspiration",
 		Deployment: "inspiration",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "kyoudai.industries",
