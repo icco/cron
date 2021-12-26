@@ -117,6 +117,13 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
+		Host:       "locative.garden",
+		Owner:      "icco",
+		Repo:       "locative.garden",
+		Deployment: "locative",
+		Branch:     "main",
+	},
+	{
 		Host:       "melandnat.com",
 		Owner:      "icco",
 		Repo:       "melandnat.com",
