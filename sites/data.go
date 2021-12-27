@@ -170,7 +170,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "relay",
 		Deployment: "relay",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "reportd.natwelch.com",
