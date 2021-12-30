@@ -28,8 +28,8 @@ var All = []SiteMap{
 	{
 		Host:       "candygrams.xyz",
 		Owner:      "cloudwalking",
-		Repo:       "candygram.xyz",
-		Deployment: "candygram",
+		Repo:       "candygrams.xyz",
+		Deployment: "candygrams",
 		Branch:     "main",
 	},
 	{
