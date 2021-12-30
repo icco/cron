@@ -26,7 +26,7 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
-		Host:       "candygram.xyz",
+		Host:       "candygrams.xyz",
 		Owner:      "cloudwalking",
 		Repo:       "candygram.xyz",
 		Deployment: "candygram",
