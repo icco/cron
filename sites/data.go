@@ -30,7 +30,7 @@ var All = []SiteMap{
 		Owner:      "cloudwalking",
 		Repo:       "candygram.xyz",
 		Deployment: "candygram",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "chartopia.app",
