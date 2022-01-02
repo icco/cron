@@ -23,7 +23,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "cacophony",
 		Deployment: "cacophony",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "candygrams.xyz",
