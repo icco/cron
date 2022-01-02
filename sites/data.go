@@ -184,7 +184,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "reportd",
 		Deployment: "reportd",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "realworldsre.com",
