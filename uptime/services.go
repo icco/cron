@@ -277,8 +277,8 @@ func (c *Config) getBackend(ctx context.Context, dep string) (string, error) {
 	}
 
 	for _, b := range list.Items {
-		if strings.Contains(b.Name, name) {
-			log.Debugw("found backend", "backend", b, "service", dep)
+		if strings.Contains(b.Name, dep) {
+			c.Log.Debugw("found backend", "backend", b, "service", dep)
 			return b.Name, nil
 		}
 	}
