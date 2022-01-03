@@ -2,10 +2,10 @@ package tweets
 
 import (
 	"context"
-	//"encoding/json"
 	"fmt"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -137,7 +137,7 @@ func (t *Twitter) CacheRandomTweets(ctx context.Context) error {
 		}
 
 		tw, err := t.GetTweet(ctx, id)
-		if err != nil {
+		if err != nil && !strings.Contains(err.String(), "No status found with that ID.") {
 			return err
 		}
 
