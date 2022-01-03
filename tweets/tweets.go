@@ -176,7 +176,7 @@ func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error
 
 	if err != nil {
 		t.Log.Warnw("getting tweets", "resp", resp, zap.Error(err))
-		return nil, err
+		return nil, fmt.Errorf("could not get tweet %d: %w", id, err)
 	}
 
 	return tweet, nil
@@ -239,7 +239,7 @@ func (t *Twitter) UploadTweet(ctx context.Context, tw twitter.Tweet) error {
 	err = gqlClient.Run(ctx, req, nil)
 	if err != nil {
 		t.Log.Errorw("error talking to graphql", zap.Error(err))
-		return err
+		return fmt.Errorf("upload tweet: %w", err)
 	}
 
 	return nil
