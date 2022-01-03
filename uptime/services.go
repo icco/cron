@@ -277,11 +277,11 @@ func (c *Config) getBackend(ctx context.Context, dep string) (string, error) {
 	}
 
 	for _, b := range list.Items {
-		name := fmt.Sprintf("%s-service-8080", dep)
-		if strings.Contains(b.Name, name) {
+		if strings.Contains(b.Name, dep) {
+			c.Log.Debugw("found backend", "backend", b, "service", dep)
 			return b.Name, nil
 		}
 	}
 
-	return "", fmt.Errorf("no backends found")
+	return "", fmt.Errorf("no backends found for %q", dep)
 }

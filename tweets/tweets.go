@@ -114,13 +114,12 @@ func (t *Twitter) CacheRandomTweets(ctx context.Context) error {
 
 	gqlClient := graphql.NewClient("https://graphql.natwelch.com/graphql")
 
-	var data tweetids
-
 	req := graphql.NewRequest(query)
 	req.Header.Add("X-API-AUTH", t.GraphQLToken)
 	req.Header.Add("User-Agent", "icco-cron/1.0")
-	err := gqlClient.Run(ctx, req, &data)
-	if err != nil {
+
+	var data tweetids
+	if err := gqlClient.Run(ctx, req, &data); err != nil {
 		t.Log.Errorw("error talking to graphql", zap.Error(err))
 		return err
 	}

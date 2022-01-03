@@ -23,7 +23,14 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "cacophony",
 		Deployment: "cacophony",
-		Branch:     "master",
+		Branch:     "main",
+	},
+	{
+		Host:       "candygrams.xyz",
+		Owner:      "cloudwalking",
+		Repo:       "candygrams.xyz",
+		Deployment: "candygrams",
+		Branch:     "main",
 	},
 	{
 		Host:       "chartopia.app",
@@ -117,6 +124,13 @@ var All = []SiteMap{
 		Branch:     "master",
 	},
 	{
+		Host:       "locative.garden",
+		Owner:      "icco",
+		Repo:       "locative.garden",
+		Deployment: "locative",
+		Branch:     "main",
+	},
+	{
 		Host:       "melandnat.com",
 		Owner:      "icco",
 		Repo:       "melandnat.com",
@@ -163,14 +177,14 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "relay",
 		Deployment: "relay",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "reportd.natwelch.com",
 		Owner:      "icco",
 		Repo:       "reportd",
 		Deployment: "reportd",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "realworldsre.com",

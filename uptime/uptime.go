@@ -25,7 +25,6 @@ type Config struct {
 var (
 	// ExtraHosts is a list of hosts we also want to monitor.
 	ExtraHosts = []string{
-		"corybooker.com",
 		"dcwelch.com",
 		"google.com",
 		"lydiadehn.com",
