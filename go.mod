@@ -14,8 +14,8 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/go-github/v37 v37.0.0
 	github.com/icco/code.natwelch.com v0.0.0-20210726000525-26842ef5e694
-	github.com/icco/graphql v0.0.0-20211230231802-e5286a6aaec9
-	github.com/icco/gutil v0.0.0-20211212224553-1d468206bb48
+	github.com/icco/graphql v0.0.0-20220103034045-2a605919838a
+	github.com/icco/gutil v0.0.0-20220103033153-df48b5793850
 	github.com/icco/lunchmoney v0.3.0
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/machinebox/graphql v0.2.2
@@ -41,6 +41,15 @@ require (
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
 	github.com/cncf/xds/go v0.0.0-20211216145620-d92e9ce0af51 // indirect
+	github.com/cznic/b v0.0.0-20181122101859-a26611c4d92d // indirect
+	github.com/cznic/fileutil v0.0.0-20181122101858-4d67cfea8c87 // indirect
+	github.com/cznic/golex v0.0.0-20181122101858-9c343928389c // indirect
+	github.com/cznic/internal v0.0.0-20181122101858-3279554c546e // indirect
+	github.com/cznic/lldb v1.1.0 // indirect
+	github.com/cznic/mathutil v0.0.0-20181122101859-297441e03548 // indirect
+	github.com/cznic/sortutil v0.0.0-20181122101858-f5f958428db8 // indirect
+	github.com/cznic/strutil v0.0.0-20181122101858-275e90344537 // indirect
+	github.com/cznic/zappy v0.0.0-20181122101859-ca47d358d4b1 // indirect
 	github.com/dghubble/sling v1.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.1 // indirect
@@ -66,6 +75,7 @@ require (
 	github.com/opencensus-integrations/ocsql v0.1.7 // indirect
 	github.com/paulmach/orb v0.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/unrolled/render v1.4.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.2.0 // indirect
