@@ -45,7 +45,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 	for i := yesterday; i.Before(now); i.Add(time.Hour) {
 		cmts, err := cfg.FetchCommits(ctx, i.Year(), i.Month(), i.Day(), i.Hour())
 		if err != nil {
-			return fmt.Errorf("get %q: %w", i, err)
+			return fmt.Errorf("get commits for %q: %w", i, err)
 		}
 
 		tosave = append(tosave, cmts...)
@@ -67,7 +67,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("build request: %w", err)
 	}
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 
@@ -78,7 +78,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("get archive %q: got %s", u, resp.Status)
+		return nil, fmt.Errorf("get archive %q != 200: got %s", u, resp.Status)
 	}
 
 	rdr, err := gzip.NewReader(resp.Body)
