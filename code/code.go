@@ -153,7 +153,7 @@ func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, er
 func (cfg *Config) Save(ctx context.Context, commit *code.Commit) error {
 	b, err := json.Marshal(commit)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not marshal commit: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(
@@ -162,13 +162,13 @@ func (cfg *Config) Save(ctx context.Context, commit *code.Commit) error {
 		"https://code.natwelch.com/save",
 		bytes.NewBuffer(b))
 	if err != nil {
-		return err
+		return fmt.Errof("could not build request: %w", err)
 	}
 
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not save commit: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
