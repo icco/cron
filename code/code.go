@@ -42,7 +42,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 	yesterday := now.Add(-24 * time.Hour)
 
 	var tosave []*code.Commit
-	for i := yesterday; i.Before(now); i.Add(time.Hour) {
+	for i := yesterday; i.Before(now); i = i.Add(time.Hour) {
 		cfg.Log.Debugw("fetching one hour of commits", "time", i)
 		cmts, err := cfg.FetchCommits(ctx, i.Year(), i.Month(), i.Day(), i.Hour())
 		if err != nil {
