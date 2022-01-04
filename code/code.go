@@ -162,7 +162,7 @@ func (cfg *Config) Save(ctx context.Context, commit *code.Commit) error {
 		"https://code.natwelch.com/save",
 		bytes.NewBuffer(b))
 	if err != nil {
-		return fmt.Errof("could not build request: %w", err)
+		return fmt.Errorf("could not build request: %w", err)
 	}
 
 	client := http.DefaultClient
