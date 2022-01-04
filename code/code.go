@@ -43,6 +43,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 
 	var tosave []*code.Commit
 	for i := yesterday; i.Before(now); i.Add(time.Hour) {
+		cfg.Log.Debugw("fetching one hour of commits", "time", i)
 		cmts, err := cfg.FetchCommits(ctx, i.Year(), i.Month(), i.Day(), i.Hour())
 		if err != nil {
 			return fmt.Errorf("get commits for %q: %w", i, err)
@@ -65,6 +66,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 	t := time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
 	u := fmt.Sprintf("https://data.githubarchive.org/%s.json.gz", t.Format("2006-01-02-15"))
 
+	cfg.Log.Debugw("grabbing one hour of gh archive", "url", u)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
 		return nil, fmt.Errorf("build request: %w", err)
