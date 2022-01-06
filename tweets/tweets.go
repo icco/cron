@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -55,6 +56,15 @@ func (t *TwitterAuth) Validate(ctx context.Context, log *zap.SugaredLogger) (*tw
 	}
 
 	return client, user, nil
+}
+
+// CacophonyCron triggers the cacophony cron.
+func (t *Twitter) CacophonyCron(ctx context.Context) error {
+	if _, err := http.Get("https://cacophony.natwelch.com/cron"); err != nil {
+		return fmt.Errorf("could not trigger cacophony: %w", err)
+	}
+
+	return nil
 }
 
 // SaveUserTweets gets a users timeline and uploads it to graphql.
