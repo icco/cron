@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	cloud.google.com/go/cloudbuild v1.0.0
-	cloud.google.com/go/monitoring v1.1.0
+	cloud.google.com/go/monitoring v1.2.0
 	cloud.google.com/go/pubsub v1.17.1
 	github.com/KyleBanks/goodreads v0.0.0-20200527082926-28539417959b
 	github.com/briandowns/openweathermap v0.16.0
@@ -21,7 +21,7 @@ require (
 	github.com/machinebox/graphql v0.2.2
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
 	go.opencensus.io v0.23.0
-	go.uber.org/zap v1.19.1
+	go.uber.org/zap v1.20.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/api v0.63.0
@@ -30,7 +30,9 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.99.0 // indirect
+	cloud.google.com/go v0.100.2 // indirect
+	cloud.google.com/go/compute v0.1.0 // indirect
+	cloud.google.com/go/iam v0.1.0 // indirect
 	cloud.google.com/go/storage v1.18.2 // indirect
 	github.com/99designs/gqlgen v0.14.0 // indirect
 	github.com/GuiaBolso/darwin v0.0.0-20191218124601-fd6d2aa3d244 // indirect
@@ -82,7 +84,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
-	golang.org/x/net v0.0.0-20211216030914-fe4d6282115f // indirect
+	golang.org/x/net v0.0.0-20220105145211-5b0dc2dfae98 // indirect
 	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
