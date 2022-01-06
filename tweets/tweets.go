@@ -68,6 +68,7 @@ func (t *Twitter) SaveUserTweets(ctx context.Context) error {
 		ScreenName:      user.ScreenName,
 		Count:           200,
 		TweetMode:       "extended",
+		IncludeEntities: twitter.Bool(true),
 		IncludeRetweets: twitter.Bool(true),
 	}
 	tweets, resp, err := client.Timelines.UserTimeline(userTimelineParams)
