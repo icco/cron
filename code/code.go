@@ -38,7 +38,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 		cfg.Cache = cache
 	}
 
-	now := time.Now()
+	now := time.Now().Add(-1 * time.Hour)
 	yesterday := now.Add(-24 * time.Hour)
 
 	var tosave []*code.Commit
