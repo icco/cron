@@ -65,7 +65,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month, day, hour int) ([]*code.Commit, error) {
 	t := time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
 	if time.Now().Before(t) {
-		return fmt.Errorf("cannot fetch commits for the future. %v is after %v", t, time.Now())
+		return nil, fmt.Errorf("cannot fetch commits for the future. %v is after %v", t, time.Now())
 	}
 	u := fmt.Sprintf("https://data.githubarchive.org/%s.json.gz", t.Format("2006-01-02-15"))
 
