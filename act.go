@@ -119,8 +119,12 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 			TwitterAuth:  twitterAuth,
 			GraphQLToken: gqlToken,
 		}
-		err := t.SaveUserTweets(ctx)
-		if err != nil {
+
+		if err := t.CacophonyCron(ctx); err != nil {
+			return err
+		}
+
+		if err := t.SaveUserTweets(ctx); err != nil {
 			return err
 		}
 	case "pinboard":

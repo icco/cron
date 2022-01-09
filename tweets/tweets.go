@@ -2,10 +2,11 @@ package tweets
 
 import (
 	"context"
-	//"encoding/json"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dghubble/go-twitter/twitter"
@@ -57,6 +58,15 @@ func (t *TwitterAuth) Validate(ctx context.Context, log *zap.SugaredLogger) (*tw
 	return client, user, nil
 }
 
+// CacophonyCron triggers the cacophony cron.
+func (t *Twitter) CacophonyCron(ctx context.Context) error {
+	if _, err := http.Get("https://cacophony.natwelch.com/cron"); err != nil {
+		return fmt.Errorf("could not trigger cacophony: %w", err)
+	}
+
+	return nil
+}
+
 // SaveUserTweets gets a users timeline and uploads it to graphql.
 func (t *Twitter) SaveUserTweets(ctx context.Context) error {
 	client, user, err := t.TwitterAuth.Validate(ctx, t.Log)
@@ -67,7 +77,6 @@ func (t *Twitter) SaveUserTweets(ctx context.Context) error {
 	userTimelineParams := &twitter.UserTimelineParams{
 		ScreenName:      user.ScreenName,
 		Count:           200,
-		TweetMode:       "extended",
 		IncludeRetweets: twitter.Bool(true),
 	}
 	tweets, resp, err := client.Timelines.UserTimeline(userTimelineParams)
@@ -137,7 +146,7 @@ func (t *Twitter) CacheRandomTweets(ctx context.Context) error {
 		}
 
 		tw, err := t.GetTweet(ctx, id)
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), "No status found with that ID.") {
 			return err
 		}
 
@@ -176,7 +185,7 @@ func (t *Twitter) GetTweet(ctx context.Context, id int64) (*twitter.Tweet, error
 
 	if err != nil {
 		t.Log.Warnw("getting tweets", "resp", resp, zap.Error(err))
-		return nil, err
+		return nil, fmt.Errorf("could not get tweet %d: %w", id, err)
 	}
 
 	return tweet, nil
@@ -239,7 +248,7 @@ func (t *Twitter) UploadTweet(ctx context.Context, tw twitter.Tweet) error {
 	err = gqlClient.Run(ctx, req, nil)
 	if err != nil {
 		t.Log.Errorw("error talking to graphql", zap.Error(err))
-		return err
+		return fmt.Errorf("upload tweet: %w", err)
 	}
 
 	return nil

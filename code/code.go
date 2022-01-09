@@ -38,14 +38,15 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 		cfg.Cache = cache
 	}
 
-	now := time.Now()
+	now := time.Now().UTC().Add(-1 * time.Hour)
 	yesterday := now.Add(-24 * time.Hour)
 
 	var tosave []*code.Commit
-	for i := yesterday; i.Before(now); i.Add(time.Hour) {
+	for i := yesterday; i.Before(now); i = i.Add(time.Hour) {
+		cfg.Log.Debugw("fetching one hour of commits", "time", i)
 		cmts, err := cfg.FetchCommits(ctx, i.Year(), i.Month(), i.Day(), i.Hour())
 		if err != nil {
-			return fmt.Errorf("get %q: %w", i, err)
+			return fmt.Errorf("get commits for %q: %w", i, err)
 		}
 
 		tosave = append(tosave, cmts...)
@@ -63,11 +64,15 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 // FetchCommits gets all commits from githubarchive.org for a user at an hour.
 func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month, day, hour int) ([]*code.Commit, error) {
 	t := time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
+	if time.Now().Before(t) {
+		return nil, fmt.Errorf("cannot fetch commits for the future. %v is after %v", t, time.Now())
+	}
 	u := fmt.Sprintf("https://data.githubarchive.org/%s.json.gz", t.Format("2006-01-02-15"))
 
+	cfg.Log.Debugw("grabbing one hour of gh archive", "url", u)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("build request: %w", err)
 	}
 	req.Header.Add("User-Agent", "icco-cron/1.0")
 
@@ -78,7 +83,7 @@ func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month,
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("get archive %q: got %s", u, resp.Status)
+		return nil, fmt.Errorf("get archive %q != 200: got %s", u, resp.Status)
 	}
 
 	rdr, err := gzip.NewReader(resp.Body)
@@ -151,7 +156,7 @@ func (cfg *Config) GetUserByEmail(ctx context.Context, email string) (string, er
 func (cfg *Config) Save(ctx context.Context, commit *code.Commit) error {
 	b, err := json.Marshal(commit)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not marshal commit: %w", err)
 	}
 
 	req, err := http.NewRequestWithContext(
@@ -160,13 +165,13 @@ func (cfg *Config) Save(ctx context.Context, commit *code.Commit) error {
 		"https://code.natwelch.com/save",
 		bytes.NewBuffer(b))
 	if err != nil {
-		return err
+		return fmt.Errorf("could not build request: %w", err)
 	}
 
 	client := http.DefaultClient
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return fmt.Errorf("could not save commit: %w", err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
