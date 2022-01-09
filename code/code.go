@@ -38,7 +38,7 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 		cfg.Cache = cache
 	}
 
-	now := time.Now().Add(-1 * time.Hour)
+	now := time.Now().UTC().Add(-1 * time.Hour)
 	yesterday := now.Add(-24 * time.Hour)
 
 	var tosave []*code.Commit
@@ -64,6 +64,9 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 // FetchCommits gets all commits from githubarchive.org for a user at an hour.
 func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month, day, hour int) ([]*code.Commit, error) {
 	t := time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
+	if time.Now().Before(t) {
+		return fmt.Errorf("cannot fetch commits for the future. %v is after %v", t, time.Now())
+	}
 	u := fmt.Sprintf("https://data.githubarchive.org/%s.json.gz", t.Format("2006-01-02-15"))
 
 	cfg.Log.Debugw("grabbing one hour of gh archive", "url", u)
