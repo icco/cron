@@ -70,7 +70,7 @@ func main() {
 	}
 
 	ctx := context.Background()
-	if err := otel.Init(ctx, log, gcpID, project); err != nil {
+	if err := otel.Init(ctx, log, cron.GCPProject, cron.Service); err != nil {
 		log.Errorw("could not init opentelemetry", zap.Error(err))
 	}
 
