@@ -16,6 +16,7 @@ import (
 	"github.com/icco/cron/shared"
 	"github.com/icco/cron/sites"
 	"github.com/icco/gutil/logging"
+	"github.com/icco/gutil/otel"
 	"github.com/icco/gutil/render"
 	"go.uber.org/zap"
 )
@@ -68,6 +69,11 @@ func main() {
 		Cache:  cache,
 	}
 
+	ctx := context.Background()
+	if err := otel.Init(ctx, log, gcpID, project); err != nil {
+		log.Errorw("could not init opentelemetry", zap.Error(err))
+	}
+
 	if os.Getenv("USE_HTTP") == "" {
 		go func() {
 			ctx := context.Background()
@@ -80,6 +86,7 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+	r.Use(otel.Middleware)
 	r.Use(middleware.RealIP)
 	r.Use(logging.Middleware(log.Desugar(), cron.GCPProject))
 
