@@ -13,7 +13,7 @@ require (
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/go-github/v37 v37.0.0
-	github.com/icco/code.natwelch.com v0.0.0-20210726000525-26842ef5e694
+	github.com/icco/code.natwelch.com v0.0.0-20220115170022-8c9698ce27df
 	github.com/icco/graphql v0.0.0-20220115161852-1b88449db525
 	github.com/icco/gutil v0.0.0-20220115170613-a57da700978e
 	github.com/icco/lunchmoney v0.3.0
@@ -55,6 +55,7 @@ require (
 	github.com/cznic/zappy v0.0.0-20181122101859-ca47d358d4b1 // indirect
 	github.com/dghubble/sling v1.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/edsrzf/mmap-go v1.1.0 // indirect
 	github.com/felixge/httpsnoop v1.0.2 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-logr/logr v1.2.2 // indirect
