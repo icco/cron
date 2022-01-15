@@ -14,8 +14,8 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/go-github/v37 v37.0.0
 	github.com/icco/code.natwelch.com v0.0.0-20210726000525-26842ef5e694
-	github.com/icco/graphql v0.0.0-20220111135130-446f18898dfe
-	github.com/icco/gutil v0.0.0-20220114023342-a7824029aba7
+	github.com/icco/graphql v0.0.0-20220114104352-280620036810
+	github.com/icco/gutil v0.0.0-20220115012634-f4c905407630
 	github.com/icco/lunchmoney v0.3.0
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/machinebox/graphql v0.2.2
@@ -25,7 +25,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 	google.golang.org/api v0.65.0
-	google.golang.org/genproto v0.0.0-20220112215332-a9c7c0acf9f2
+	google.golang.org/genproto v0.0.0-20220114231437-d2e6a121cae0
 	google.golang.org/protobuf v1.27.1
 )
 
@@ -35,11 +35,12 @@ require (
 	cloud.google.com/go/iam v0.1.0 // indirect
 	cloud.google.com/go/storage v1.18.2 // indirect
 	cloud.google.com/go/trace v1.0.0 // indirect
-	github.com/99designs/gqlgen v0.14.0 // indirect
+	github.com/99designs/gqlgen v0.15.0 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v1.0.0-RC1.0.20220111155622-771af0772772 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.1-0.20220111155622-771af0772772 // indirect
 	github.com/GuiaBolso/darwin v0.0.0-20191218124601-fd6d2aa3d244 // indirect
 	github.com/Rhymond/go-money v1.0.3 // indirect
+	github.com/XSAM/otelsql v0.10.0 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
@@ -76,7 +77,6 @@ require (
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lib/pq v1.10.4 // indirect
 	github.com/matryer/is v1.4.0 // indirect
-	github.com/opencensus-integrations/ocsql v0.1.7 // indirect
 	github.com/paulmach/orb v0.4.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 // indirect
@@ -95,7 +95,7 @@ require (
 	go.uber.org/multierr v1.7.0 // indirect
 	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce // indirect
 	golang.org/x/net v0.0.0-20220114011407-0dd24b26b47d // indirect
-	golang.org/x/sys v0.0.0-20220111092808-5a964db01320 // indirect
+	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
