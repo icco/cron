@@ -403,6 +403,8 @@ github.com/icco/graphql v0.0.0-20220115161852-1b88449db525/go.mod h1:aozTjZh3wWN
 github.com/icco/gutil v0.0.0-20210706020035-d1bef041b1ac/go.mod h1:RbZ9hZI4YSvefD+qKbi6dTMnbHnbjsfk6SjjhhnPPS8=
 github.com/icco/gutil v0.0.0-20220115163816-b7b82159b0b6 h1:90PoKzDTjCyV8Xpqq+nkWvnw9qrra61BcMCS/hbfXx4=
 github.com/icco/gutil v0.0.0-20220115163816-b7b82159b0b6/go.mod h1:UiXotcDkvn8rsWcm0RuvAGdpJrKBNhM11dQoMBoJmmk=
+github.com/icco/gutil v0.0.0-20220115170613-a57da700978e h1:pJquGP067UIPoyWKRX+V/3nCOWwT4L2A7eNjCHRa2wU=
+github.com/icco/gutil v0.0.0-20220115170613-a57da700978e/go.mod h1:UiXotcDkvn8rsWcm0RuvAGdpJrKBNhM11dQoMBoJmmk=
 github.com/icco/lunchmoney v0.3.0 h1:OnWeikKmt5m7LB0LVjkUSXzbAMS36nUp1XFNsDTHm0Y=
 github.com/icco/lunchmoney v0.3.0/go.mod h1:tFNWfrL+ZVVkik8E2jRtKiZOdm7yrWuhLbUGc5aAOdY=
 github.com/icco/zapdriver v1.4.0 h1:ACpofOtnSJT9eywNOoTuEhzo7YtFUGCc4xBXYFWYMkI=
