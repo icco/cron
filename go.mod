@@ -15,7 +15,7 @@ require (
 	github.com/google/go-github/v37 v37.0.0
 	github.com/icco/code.natwelch.com v0.0.0-20220115170022-8c9698ce27df
 	github.com/icco/graphql v0.0.0-20220115171111-ed4369d8ed92
-	github.com/icco/gutil v0.0.0-20220115171937-06fb917087d7
+	github.com/icco/gutil v0.0.0-20220117013958-c851cb44991d
 	github.com/icco/lunchmoney v0.3.0
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/machinebox/graphql v0.2.2
