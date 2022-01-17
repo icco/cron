@@ -13,8 +13,8 @@ require (
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/go-github/v37 v37.0.0
-	github.com/icco/code.natwelch.com v0.0.0-20220115170022-8c9698ce27df
-	github.com/icco/graphql v0.0.0-20220115171111-ed4369d8ed92
+	github.com/icco/code.natwelch.com v0.0.0-20220115172711-1e68878f42df
+	github.com/icco/graphql v0.0.0-20220115172806-f561f722370d
 	github.com/icco/gutil v0.0.0-20220117013958-c851cb44991d
 	github.com/icco/lunchmoney v0.3.0
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
@@ -35,7 +35,7 @@ require (
 	cloud.google.com/go/iam v0.1.0 // indirect
 	cloud.google.com/go/storage v1.18.2 // indirect
 	cloud.google.com/go/trace v1.0.0 // indirect
-	github.com/99designs/gqlgen v0.15.0 // indirect
+	github.com/99designs/gqlgen v0.15.1 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/metric v1.0.0-RC1.0.20220111155622-771af0772772 // indirect
 	github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.0.1-0.20220111155622-771af0772772 // indirect
 	github.com/GuiaBolso/darwin v0.0.0-20191218124601-fd6d2aa3d244 // indirect
