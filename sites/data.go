@@ -194,6 +194,13 @@ var All = []SiteMap{
 		Branch:     "main",
 	},
 	{
+		Host:       "reliableweb.dev",
+		Owner:      "icco",
+		Repo:       "reliableweb.dev",
+		Deployment: "reliableweb",
+		Branch:     "main",
+	},
+	{
 		Host:       "resume.natwelch.com",
 		Owner:      "icco",
 		Repo:       "resume",
