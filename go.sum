@@ -315,8 +315,6 @@ github.com/icco/code.natwelch.com v0.0.0-20220117014302-07fab50fb089/go.mod h1:J
 github.com/icco/graphql v0.0.0-20220117022652-920714757af4 h1:+RBsSJqdyMm3Mqx6yZLFcEIZG6cZMaq9ZY/1VjrRMxM=
 github.com/icco/graphql v0.0.0-20220117022652-920714757af4/go.mod h1:AHSZLUBIdxBlvWW9UhaQBTlv5j5UQaSCnCR7JtKdLhk=
 github.com/icco/gutil v0.0.0-20220117013958-c851cb44991d/go.mod h1:UiXotcDkvn8rsWcm0RuvAGdpJrKBNhM11dQoMBoJmmk=
-github.com/icco/gutil v0.0.0-20220220010526-7c82f1ebf02d h1:0rfG17MhZkdsy5CzuOUU6NdB0CZH56Wh6axFD3K55e0=
-github.com/icco/gutil v0.0.0-20220220010526-7c82f1ebf02d/go.mod h1:Xc7MNR9CYQQS0qIRgqtTzbj81E8Sr7/46mnSO+jvoTM=
 github.com/icco/gutil v0.0.0-20220221170217-9aa326c389ec h1:RkTO2KddsDjcaJ8vGsp+L6wFsKXvlQrf7QEco45jIdE=
 github.com/icco/gutil v0.0.0-20220221170217-9aa326c389ec/go.mod h1:Xc7MNR9CYQQS0qIRgqtTzbj81E8Sr7/46mnSO+jvoTM=
 github.com/icco/lunchmoney v0.3.0 h1:OnWeikKmt5m7LB0LVjkUSXzbAMS36nUp1XFNsDTHm0Y=
