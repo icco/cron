@@ -121,7 +121,7 @@ var All = []SiteMap{
 		Owner:      "icco",
 		Repo:       "lifeline",
 		Deployment: "life",
-		Branch:     "master",
+		Branch:     "main",
 	},
 	{
 		Host:       "locative.garden",
