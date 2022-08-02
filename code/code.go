@@ -81,6 +81,8 @@ func (cfg *Config) FetchSkyline(ctx context.Context, year int) ([]*code.Commit, 
 		return nil, fmt.Errorf("get skyline %q != 200: got %s", u, resp.Status)
 	}
 
+	// Do something iwth data
+
 }
 
 // FetchCommits gets all commits from githubarchive.org for a user at an hour.
