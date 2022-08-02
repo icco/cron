@@ -61,6 +61,28 @@ func (cfg *Config) FetchAndSaveCommits(ctx context.Context) error {
 	return nil
 }
 
+func (cfg *Config) FetchSkyline(ctx context.Context, year int) ([]*code.Commit, error) {
+	u := fmt.Sprintf("https://skyline.github.com/icco/%d.json", year)
+
+	cfg.Log.Debugw("grabbing one year of skyline", "url", u)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if err != nil {
+		return nil, fmt.Errorf("build request: %w", err)
+	}
+	req.Header.Add("User-Agent", "icco-cron/1.0")
+
+	client := http.DefaultClient
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("get skyline %q: %w", u, err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("get skyline %q != 200: got %s", u, resp.Status)
+	}
+
+}
+
 // FetchCommits gets all commits from githubarchive.org for a user at an hour.
 func (cfg *Config) FetchCommits(ctx context.Context, year int, month time.Month, day, hour int) ([]*code.Commit, error) {
 	t := time.Date(year, month, day, hour, 0, 0, 0, time.UTC)
