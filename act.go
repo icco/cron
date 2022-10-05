@@ -15,7 +15,6 @@ import (
 	"github.com/icco/cron/stats"
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
-	"github.com/icco/cron/uptime"
 	"go.opencensus.io/tag"
 	"go.uber.org/zap"
 )
@@ -149,19 +148,6 @@ func (cfg *Config) Act(octx context.Context, job string) error {
 		}
 		err := g.UpsertBooks(ctx)
 		if err != nil {
-			return err
-		}
-	case "uptime":
-		c := &uptime.Config{
-			Config:    shared.Config{Log: cfg.Log},
-			ProjectID: GCPProject,
-		}
-
-		if err := uptime.UpdateUptimeChecks(ctx, c); err != nil {
-			return err
-		}
-
-		if err := uptime.UpdateServices(ctx, c); err != nil {
 			return err
 		}
 	case "stats":
