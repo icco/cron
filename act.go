@@ -34,7 +34,7 @@ type Config struct {
 }
 
 // Act takes a job and calls a sub project to do work.
-func (cfg *Config) Act(octx context.Context, job string) error {
+func (cfg *Config) Act(ctx context.Context, job string) error {
 	gqlToken := os.Getenv("GQL_TOKEN")
 	if gqlToken == "" {
 		return fmt.Errorf("GQL_TOKEN is unset")
