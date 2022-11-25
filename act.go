@@ -15,7 +15,6 @@ import (
 	"github.com/icco/cron/stats"
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
-	"go.uber.org/zap"
 )
 
 const (
