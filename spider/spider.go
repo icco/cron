@@ -9,8 +9,7 @@ import (
 
 	"github.com/icco/cron/shared"
 	"github.com/jackdanger/collectlinks"
-	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/stats/view"
+	http "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 )
 
@@ -54,16 +53,8 @@ func enqueue(ctx context.Context, uri string, queue chan string) {
 	atomic.AddUint64(&ops, 1)
 	c.Log.Infow("enqued", "ops", atomic.LoadUint64(&ops), "uri", uri)
 
-	if err := view.Register(
-		ochttp.ClientSentBytesDistribution,
-		ochttp.ClientReceivedBytesDistribution,
-		ochttp.ClientRoundtripLatencyDistribution,
-	); err != nil {
-		c.Log.Errorw("registering views", zap.Error(err))
-	}
-
 	client := &http.Client{
-		Transport: &ochttp.Transport{},
+		Transport: NewTransport(http.DefaultTransport),
 	}
 
 	resp, err := client.Get(uri)
