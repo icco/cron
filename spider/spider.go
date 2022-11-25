@@ -9,7 +9,7 @@ import (
 
 	"github.com/icco/cron/shared"
 	"github.com/jackdanger/collectlinks"
-	http "go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 )
 
@@ -54,7 +54,7 @@ func enqueue(ctx context.Context, uri string, queue chan string) {
 	c.Log.Infow("enqued", "ops", atomic.LoadUint64(&ops), "uri", uri)
 
 	client := &http.Client{
-		Transport: NewTransport(http.DefaultTransport),
+		Transport: otelhttp.NewTransport(http.DefaultTransport),
 	}
 
 	resp, err := client.Get(uri)

@@ -19,7 +19,7 @@ require (
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/machinebox/graphql v0.2.2
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
-	go.opencensus.io v0.24.0
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.4
 	go.uber.org/zap v1.23.0
 	golang.org/x/oauth2 v0.2.0
 	golang.org/x/sync v0.1.0
@@ -91,7 +91,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/unrolled/render v1.5.0 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.1 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.36.4 // indirect
+	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/otel v1.11.1 // indirect
 	go.opentelemetry.io/otel/metric v0.33.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.11.1 // indirect
