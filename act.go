@@ -15,8 +15,6 @@ import (
 	"github.com/icco/cron/stats"
 	"github.com/icco/cron/tweets"
 	"github.com/icco/cron/updater"
-	"go.opencensus.io/tag"
-	"go.uber.org/zap"
 )
 
 const (
@@ -35,18 +33,7 @@ type Config struct {
 }
 
 // Act takes a job and calls a sub project to do work.
-func (cfg *Config) Act(octx context.Context, job string) error {
-	jobKey, err := tag.NewKey("natwelch.com/keys/job")
-	if err != nil {
-		cfg.Log.Warnw("could not create oc tag", zap.Error(err))
-	}
-	ctx, err := tag.New(octx,
-		tag.Upsert(jobKey, job),
-	)
-	if err != nil {
-		cfg.Log.Warnw("could not add oc tag", zap.Error(err))
-	}
-
+func (cfg *Config) Act(ctx context.Context, job string) error {
 	gqlToken := os.Getenv("GQL_TOKEN")
 	if gqlToken == "" {
 		return fmt.Errorf("GQL_TOKEN is unset")

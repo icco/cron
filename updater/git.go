@@ -7,8 +7,8 @@ import (
 	"time"
 
 	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
+	cloudbuildpb "cloud.google.com/go/cloudbuild/apiv1/v2/cloudbuildpb"
 	"github.com/icco/cron/sites"
-	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
 )
 
 // Update runs a trigger to update a site.

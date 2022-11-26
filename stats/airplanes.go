@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -69,7 +69,7 @@ func GetAirplanes(ctx context.Context, cfg *Config) (float64, error) {
 		return 0.0, fmt.Errorf("do request: %w", err)
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return 0.0, fmt.Errorf("body: %w", err)
 	}
