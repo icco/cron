@@ -12,7 +12,7 @@ require (
 	github.com/dgraph-io/ristretto v0.1.1
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/go-github/v37 v37.0.0
-	github.com/icco/code.natwelch.com v0.0.0-20220802162728-155e8c2d794f
+	github.com/icco/code.natwelch.com v0.0.0-20221126011551-44de67cce881
 	github.com/icco/graphql v0.0.0-20221126004311-982f180992b6
 	github.com/icco/gutil v0.0.0-20221125220839-f4ca1629c04f
 	github.com/icco/lunchmoney v0.3.0
