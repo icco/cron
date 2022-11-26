@@ -6,9 +6,9 @@ import (
 	"time"
 
 	cloudbuild "cloud.google.com/go/cloudbuild/apiv1/v2"
+	cloudbuildpb "cloud.google.com/go/cloudbuild/apiv1/v2/cloudbuildpb"
 	"github.com/icco/cron/sites"
 	"google.golang.org/api/iterator"
-	cloudbuildpb "google.golang.org/genproto/googleapis/devtools/cloudbuild/v1"
 	"google.golang.org/protobuf/types/known/durationpb"
 )
 
