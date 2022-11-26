@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	//lint:ignore SA1019 deprecated and I don't care
 	"github.com/dghubble/go-twitter/twitter"
 	"github.com/dghubble/oauth1"
 	"github.com/icco/cron/shared"
