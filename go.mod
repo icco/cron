@@ -11,7 +11,7 @@ require (
 	github.com/dghubble/oauth1 v0.7.1
 	github.com/dgraph-io/ristretto v0.1.1
 	github.com/go-chi/chi/v5 v5.0.7
-	github.com/google/go-github/v37 v37.0.0
+	github.com/google/go-github/v48 v48.1.0
 	github.com/icco/code.natwelch.com v0.0.0-20221126011551-44de67cce881
 	github.com/icco/graphql v0.0.0-20221126004311-982f180992b6
 	github.com/icco/gutil v0.0.0-20221125220839-f4ca1629c04f
@@ -71,6 +71,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/go-github/v37 v37.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.2.0 // indirect
