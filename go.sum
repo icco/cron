@@ -177,8 +177,8 @@ github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/ad
 github.com/hashicorp/golang-lru v0.5.4/go.mod h1:iADmTwqILo4mZ8BN3D2Q6+9jd8WM5uGBxy+E8yxSoD4=
 github.com/icco/code.natwelch.com v0.0.0-20220802162728-155e8c2d794f h1:Ve48vAK4/GcWuwqmkrNV/4+llcQheaLwyCJjZclPjII=
 github.com/icco/code.natwelch.com v0.0.0-20220802162728-155e8c2d794f/go.mod h1:HRv9J87x30q6aTS21ACIfLZC5lvq/me/yo8bBjtxLxY=
-github.com/icco/graphql v0.0.0-20220306032656-76180de7dc57 h1:qII9q95S1rDmuv9flqttwvlXsV3ce/8FG4m8FxVNOk0=
-github.com/icco/graphql v0.0.0-20220306032656-76180de7dc57/go.mod h1:1FbiASFhQ+j6cUky6/RSf1WH+SJ20GKr07jP/a/Pt5A=
+github.com/icco/graphql v0.0.0-20221126004311-982f180992b6 h1:scrXEdLkMLsvnBX9owx2P6bg4mgvsGIhYVgKgp6mf+E=
+github.com/icco/graphql v0.0.0-20221126004311-982f180992b6/go.mod h1:m8+fYV96pN/I/g4+miFL4nkyCF32FjohB8tdAoTFFwk=
 github.com/icco/gutil v0.0.0-20221125220839-f4ca1629c04f h1:F6A4AaWm0MTOBSP5WojINNJN/y7R4VzFqHOPXXeQ4ww=
 github.com/icco/gutil v0.0.0-20221125220839-f4ca1629c04f/go.mod h1:0Z2+Ly2NDMTYAg4is1wi3WnGj6hRfdRGqR4vYGxagh0=
 github.com/icco/lunchmoney v0.3.0 h1:OnWeikKmt5m7LB0LVjkUSXzbAMS36nUp1XFNsDTHm0Y=

@@ -13,7 +13,7 @@ require (
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/google/go-github/v37 v37.0.0
 	github.com/icco/code.natwelch.com v0.0.0-20220802162728-155e8c2d794f
-	github.com/icco/graphql v0.0.0-20220306032656-76180de7dc57
+	github.com/icco/graphql v0.0.0-20221126004311-982f180992b6
 	github.com/icco/gutil v0.0.0-20221125220839-f4ca1629c04f
 	github.com/icco/lunchmoney v0.3.0
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
