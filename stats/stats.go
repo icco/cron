@@ -14,8 +14,9 @@ import (
 type Config struct {
 	shared.Config
 
-	GraphQLToken string
-	OWMKey       string
+	GraphQLToken    string
+	LunchMoneyToken string
+	OWMKey          string
 }
 
 // KeyFunc is a function for key exporters.
