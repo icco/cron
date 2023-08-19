@@ -14,7 +14,6 @@ import (
 	"github.com/icco/cron/spider"
 	"github.com/icco/cron/stats"
 	"github.com/icco/cron/tweets"
-	"github.com/icco/cron/updater"
 )
 
 const (
@@ -70,14 +69,6 @@ func (cfg *Config) Act(ctx context.Context, job string) error {
 		cfg.Log.Warnf("%d, %+v", v, err)
 	case "minute":
 		cfg.Log.Info("heartbeat")
-	case "update-deployments":
-		cfg := &updater.Config{
-			Config:        shared.Config{Log: cfg.Log},
-			GoogleProject: GCPProject,
-		}
-		if err := cfg.UpdateTriggers(ctx); err != nil {
-			return fmt.Errorf("update triggers: %w", err)
-		}
 	case "github-audit":
 		c := &gaudit.Config{
 			Config:      shared.Config{Log: cfg.Log},
