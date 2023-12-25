@@ -21,7 +21,6 @@ require (
 	github.com/jackdanger/collectlinks v0.0.0-20160421202702-24c4ee2870ba
 	github.com/machinebox/graphql v0.2.2
 	github.com/zachlatta/pin v0.0.0-20161031192518-51cb10fdcd53
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1
 	go.uber.org/zap v1.26.0
 	golang.org/x/oauth2 v0.15.0
 	golang.org/x/sync v0.5.0
@@ -81,22 +80,23 @@ require (
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/icco/zapdriver v1.4.0 // indirect
 	github.com/imgix/imgix-go/v2 v2.0.3 // indirect
-	github.com/jarcoal/httpmock v1.2.0 // indirect
+	github.com/jarcoal/httpmock v1.3.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lib/pq v1.10.9 // indirect
-	github.com/matryer/is v1.4.0 // indirect
+	github.com/matryer/is v1.4.1 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.26 // indirect
 	github.com/paulmach/orb v0.10.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/remyoudompheng/bigfft v0.0.0-20220927061507-ef77025ab5aa // indirect
+	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sosodev/duration v1.2.0 // indirect
 	github.com/unrolled/render v1.6.1 // indirect
 	github.com/vektah/gqlparser/v2 v2.5.10 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.1 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect
 	go.opentelemetry.io/otel v1.21.0 // indirect
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.21.0 // indirect
