@@ -9,7 +9,6 @@ import (
 
 	"github.com/icco/cron/shared"
 	"github.com/jackdanger/collectlinks"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.uber.org/zap"
 )
 
@@ -53,9 +52,7 @@ func enqueue(ctx context.Context, uri string, queue chan string) {
 	atomic.AddUint64(&ops, 1)
 	c.Log.Infow("enqued", "ops", atomic.LoadUint64(&ops), "uri", uri)
 
-	client := &http.Client{
-		Transport: otelhttp.NewTransport(http.DefaultTransport),
-	}
+	client := http.DefaultClient
 
 	resp, err := client.Get(uri)
 	visited[uri] = true
