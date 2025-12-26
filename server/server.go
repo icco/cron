@@ -40,6 +40,7 @@ var (
 `
 )
 
+// PubSubMessage is a message recieved on pubsub.
 type PubSubMessage struct {
 	Message struct {
 		Data []byte `json:"data,omitempty"`
