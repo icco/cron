@@ -10,7 +10,7 @@ require (
 	github.com/dghubble/go-twitter v0.0.0-20221104224141-912508c3888b
 	github.com/dghubble/oauth1 v0.7.2
 	github.com/dgraph-io/ristretto v0.1.1
-	github.com/go-chi/chi/v5 v5.0.11
+	github.com/go-chi/chi/v5 v5.2.2
 	github.com/google/go-github/v48 v48.2.0
 	github.com/icco/code.natwelch.com v0.0.0-20231225210121-e6c2f572c647
 	github.com/icco/graphql v0.0.0-20231225210641-d87ace733e3b
