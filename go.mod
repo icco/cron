@@ -86,7 +86,7 @@ require (
 	github.com/sosodev/duration v1.2.0 // indirect
 	github.com/unrolled/render v1.6.1 // indirect
 	github.com/urfave/cli/v2 v2.26.0 // indirect
-	github.com/vektah/gqlparser/v2 v2.5.10 // indirect
+	github.com/vektah/gqlparser/v2 v2.5.15 // indirect
 	github.com/xrash/smetrics v0.0.0-20231213231151-1d8dd44e695e // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.46.1 // indirect
